@@ -1,0 +1,188 @@
+Steam
+[placeholder]
+url: rtmp://***-***.broadcast.steamcontent.com/app
+e.g
+rtmp://br4-lhr1.broadcast.steamcontent.com/app
+
+key: steam_852695447_c3886cec1233395a
+
+ustream
+[placeholder]
+url: rtmp://*.******.fme.ustream.tv/ustreamVideo/******
+e.g
+url: rtmp://1.19595351.fme.ustream.tv/ustreamVideo/00000000
+
+key: ...
+
+periscope
+[placeholder]
+url: rtmp://ie.pscp.tv:80/x/**
+e.g
+rtmp://ie.pscp.tv:80/x/5
+
+key: ...
+
+mobcrush
+url: rtmp://live.mobcrush.net/stream
+url: rtmp://live.mobcrush.net/mob
+key: ...
+
+goodgame
+url: rtmp://msk.goodgame.ru:1940/live
+key: 30549?pwd=000a0000b00000b0
+
+cybergame tv
+urls:
+"RU Origin"  : rtmp://st.cybergame.tv:1953/live
+"RU Premium" : rtmp://premium.cybergame.tv:1953/premium
+"EU Premium" : rtmp://vod5.cybergame.tv:1953/live/
+key: example?key=tJz0m0XRsZZktYOuv
+
+
+major league gaming
+url: unknown
+key: stream_7a334334ff2a112343b4ac051dbc5544
+
+Stream.me
+urls:
+default: rtmp://uc-origin.stream.me/origin
+us east: rtmp://ue-origin.stream.me/origin
+us west: rtmp://uw-origin.stream.me/origin
+europe west: rtmp://ew-origin.stream.me/origin
+asia east: rtmp://ae-origin.stream.me/origin
+4k: rtmp://sea-origin.stream.me/origin
+
+key: stream_7a334334ff2a112343b4ac051dbc5544
+
+
+bilibili
+url: rtmp://txy.live-send.acg.tv/live-txy/?
+key: streamname=live_25046456_6293557&key=e0b292e96743f47e7292153eb8c773e4
+
+Picarto Tv
+url: 
+default: rtmp://live.us.picarto.tv/golive
+US East (Chicago, USA): rtmp://live.us-east1.picarto.tv/golive"
+US West (Los Angeles, USA) : rtmp://live.us-west1.picarto.tv/golive
+EU West (Düsseldorf, Germany):rtmp://live.eu-west1.picarto.tv/golive
+
+key: ptv_125095_01115ae8b3cd
+
+
+Web.TV
+rtmp://live3.origins.web.tv/liveext
+key: ..
+
+GamePlank
+rtmp://www.gameplank.tv/live
+key: ..
+
+Breakers.TV
+urls:
+US: Primary: rtmp://live.vaughnsoft.net/live
+US: Chicago, IL: rtmp://live-ord.vaughnsoft.net/live
+US: Denver, CO: rtmp://live-den.vaughnsoft.net/live
+US: New York, NY: rtmp://live-nyc.vaughnsoft.net/live
+EU: Amsterdam, NL: rtmp://live-ams.vaughnsoft.net/live
+
+key: ..
+
+Vaughn Live / iNSTAGIB
+urls:
+US: Primary: rtmp://live.vaughnsoft.net/live
+US: Chicago, IL: rtmp://live-ord.vaughnsoft.net/live
+US: Denver, CO: rtmp://live-den.vaughnsoft.net/live
+US: New York, NY: rtmp://live-nyc.vaughnsoft.net/live
+EU: Amsterdam, NL: rtmp://live-ams.vaughnsoft.net/live
+
+key: ..
+
+Vapers TV
+urls:
+US: Primary: rtmp://live.vaughnsoft.net/live
+US: Chicago, IL: rtmp://live-ord.vaughnsoft.net/live
+US: Denver, CO: rtmp://live-den.vaughnsoft.net/live
+US: New York, NY: rtmp://live-nyc.vaughnsoft.net/live
+EU: Amsterdam, NL: rtmp://live-ams.vaughnsoft.net/live
+
+key: ..
+
+Facebook Live
+url: rtmp://rtmp-api.facebook.com:80/rtmp
+key: ...
+
+DJlive.pl
+url: rtmp://live.djlive.pl/live
+key: ..
+
+
+Boomstream
+url: rtmp://live.boomstream.com/live
+key: ...
+
+
+stream.live
+url: rtmp://media.stream.live:1935/live
+key: ...
+
+Meridix Live Sports
+url:rtmp://publish.meridix.com/live
+key:..
+
+Livestream
+rtmp://rtmpin.livestreamingest.com/rtmpin
+key: ...
+
+LiveEdu.tv
+urls:
+US: rtmp://usmedia11.liveedu.tv/liveedutv
+EU: rtmp://eumedia8.liveedu.tv/liveedutv
+Asia: rtmp://apmedia1.liveedu.tv/liveedutv
+
+key: ...
+
+
+Switchboard Live
+
+Default - Performance Global:rtmp://ingest-global-a.switchboard.zone/live
+US West: rtmp://ingest-us-west.a.switchboard.zone/live
+US East: rtmp://ingest-us-east.a.switchboard.zone/live
+Europe West: rtmp://ingest-eu-west.a.switchboard.zone/live
+Europe Central: rtmp://ingest-us-east.a.switchboard.zone/live
+Australia East: rtmp://ingest-au-east.a.switchboard.zone/live
+Asia Central:rtmp://ingest-as-central.a.switchboard.zone/live
+
+key: ...
+
+Lahzenegar لحظه نگار
+rtmp://live.lahzenegar.com:80/pro
+key: ..
+
+
+vimeo
+rtmp://rtmp.cloud.vimeo.com/live
+key: ..
+
+
+Aparat
+rtmp://rtmp.cdn.asset.aparat.com:443/event
+key: ..
+
+
+cavetube
+rtmp://cavestream.net/live
+key: ..
+
+younnow
+rtmp://stream.younow.com:80/liveapp
+key: ..
+
+
+livehouse.in
+rtmp://live-ea.livehouse.in/app/
+key: ..
+
+fc2 live
+rtmp://media.live.fc2.com/live
+key: ..
+

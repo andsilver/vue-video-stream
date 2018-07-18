@@ -1,0 +1,385 @@
+<template>
+  <div class="view-wrapper container text-center" :style="{ 'min-height': minWindowHeight || 'auto' }">
+    <div class="form">
+      <div class="text-center">
+        
+        <h3 class="title">
+          Package Subscription
+        </h3>
+        <p style="font-size:13px;">* All charges are inclusive of any mentioned or hidden tax</p>
+      </div>
+      <br>
+
+     <div v-if="processing"
+          style="display:flex;justify-content:center;align-items:center;">
+          <b-progress :value="100"
+                    :max="100" 
+                    animated
+                    class="w-50 mt-2"
+                    style="height: 10px;"></b-progress>
+     </div>
+     <div v-else >
+       <div class="receipt-wrapper">
+         <div class="reciept-row">
+           <b-row class="reciept-row">
+             <b-col class="key">subscription</b-col>
+             <b-col class="value">
+
+               <b-dropdown class="package-dropdown w-100">
+                <template slot="button-content">
+                  <div v-if="!subscriptionPackage" style="display:inline-block;">Select</div>
+                  <div v-else 
+                       class="package-dropdown-item package-dropdown-item-placeholder text-uppercase" 
+                       style="display: inline-block;margin-right: 10px;">
+                    <span class="package-name">{{subscriptionPackage.name}}</span>
+                  </div>
+                </template>
+                <b-dropdown-item v-for="(pack, index) in packages || []"
+                                 :key="index"
+                                 @click="selectSubscriptionPackage(pack)"
+                                 :disabled="isCurrentSubscription(pack)">
+                  <div class="a package-dropdown-item" 
+                       :class="{ selected: subscriptionPackage === pack }">
+                    <span class="package-name">{{pack.name}}</span>
+                    <span v-if="pack.baseCharge > 0" class="package-price">${{pack.baseCharge}} <small style="text-transform:none;">/mon</small> </span>
+                    <code v-else class="package-price">free</code>
+                    &nbsp;
+                    <code v-if="isCurrentSubscription(pack)" 
+                          class="text-muted text-lowercase">(current)</code>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+
+             </b-col>
+           </b-row>
+         </div>
+         <!-- <div class="reciept-row">
+           <b-row class="reciept-row">
+             <b-col class="key">subscription</b-col>
+             <b-col class="value">
+               <span>{{subscriptionPackage.name}}</span>
+               &nbsp; 
+               <a href="/#pricing" 
+                  target="_blank" 
+                  style="font-size:12px;text-transform:none;">Details</a>
+             </b-col>
+           </b-row>
+         </div> -->
+         <!-- <div v-if="hasFee()" class="reciept-row">
+           <b-row class="reciept-row">
+             <b-col class="key">subscription packs</b-col>
+             <b-col class="value">
+               <b-select v-model="quantity" 
+                         size="sm" 
+                         :disabled="checkoutStep!=0"
+                         style="width:35%;">
+                 <option v-for="count in [1,2,4,5,6,7,8,9,10,11,12]" :key="count">{{count}}</option>
+               </b-select>
+             </b-col>
+           </b-row>
+         </div> -->
+         <div v-if="hasFee()" class="reciept-row">
+           <b-row class="reciept-row">
+             <b-col class="key">Valid till</b-col>
+             <b-col class="value">{{getEndingDate() | date('DD-MM-YYYY')}}</b-col>
+           </b-row>
+         </div>
+         <div class="reciept-row">
+           <b-row class="reciept-row">
+             <b-col class="key">basic charge</b-col>
+             <b-col class="value currency sm">
+               <div v-if="subscriptionPackage">
+                 <span>${{getSubscriptionFee()}}</span>
+                 <!-- <code v-if="hasFee()" style="font-size:13px;">x{{quantity}}</code> -->
+               </div>
+               <div v-else>--</div>
+             </b-col>
+           </b-row>
+         </div>
+         <!-- <div class="reciept-row">
+           <b-row class="reciept-row">
+             <b-col class="key">discount</b-col>
+             <b-col class="value currency sm">$0.00</b-col>
+           </b-row>
+         </div> -->
+         <div class="reciept-row">
+           <b-row class="reciept-row">
+             <b-col class="key">payable amount</b-col>
+             <b-col class="value currency">
+               <div v-if="subscriptionPackage">${{getTotalFee()}}</div>
+               <div v-else>--</div>
+             </b-col>
+           </b-row>
+         </div>
+       </div>
+       <div class="text-center">
+         <b-button v-if="checkoutStep==0 && subscriptionPackage"
+                   size="lg"
+                   variant="success"
+                   @click="requestCheckout"
+                   :disabled="isCurrentSubscription()">
+           &nbsp; 
+           <i v-if="hasFee()" class="far fa-check-circle"></i>
+           <span>{{ hasFee() ? 'Pay Now' : 'Change Package' }}</span>
+           &nbsp;
+        </b-button>
+         <div v-else-if="checkoutStep==1" class="text-info message">Request is being validated</div>
+         <div v-else-if="checkoutStep==2" class="text-info message">{{ hasFee() ? 'Validating payment' : 'Changing subscription' }}</div>
+         <div v-else-if="checkoutStep==3">
+         <div class="alert alert-success ">
+           <div class="message"><strong>Successfully Subscribed</strong></div>
+             <p>Great, we have enabled your selected package to your account.</p>
+           </div>
+           <br>
+           <p>Back to <router-link to="/dashboard">Dashboard</router-link></p>
+         </div>
+        
+        <div v-if="checkoutStep==1 || checkoutStep==2"
+             style="display:flex;justify-content:center;align-items:center;margin-top:5px;">
+                <b-progress :value="100"
+                            :max="100" 
+                            animated
+                            class="w-50 mt-2"
+                            style="height: 10px;"></b-progress>
+       </div>
+       
+       <div v-if="checkoutStep!==3" style="margin-top:15px;">
+         Not willing to change? Go to <router-link to="/manage/billing">accounts</router-link>
+       </div>
+
+      </div>
+     </div>
+
+      <!-- error placeholder -->
+      <b-alert v-if="error"
+               show
+               variant="danger"
+               class="left inline"
+               style="margin:15px 0;">{{error.message}}</b-alert>
+
+    </div>
+  </div>
+</template>
+
+<script>
+import UserService from "../services/UserService";
+import SubscriptionService from "../services/SubscriptionService";
+
+export default {
+  name: "Payments",
+  async mounted() {
+    this.minWindowHeight = window.innerHeight + "px";
+    
+    try {
+      // fetch available subscriptions packages
+      const packages = await SubscriptionService.getSubscriptionPackages()
+      // this.packages = _.filter(packages, p => p.baseCharge > 0)
+      this.packages = packages
+
+      // set selected subscription
+      const packageId = this.$route.query && this.$route.query.package
+      if (packageId) {
+        this.subscriptionPackage = _.find(packages, { _id: packageId })
+      }
+
+      // fetch user subscriptions
+      const userSubscription = await SubscriptionService.getUserSubscriptions(true)
+      this.userSubscription = userSubscription
+      this.processing = false
+
+      const action = this.$route.query && this.$route.query.action
+      if (action === 'upgrade') {
+        const userPackage = userSubscription.subscription.package
+        const superiorPackage = _.find(packages, p => p.baseCharge > userPackage.baseCharge)
+
+        if (superiorPackage) {
+          this.subscriptionPackage = superiorPackage
+        }
+      }
+
+    } catch (e) {
+      this.error = e
+    }  
+    
+    window.trackEvent(`Payments Page`)
+  },
+  data() {
+    return {
+      error: null,
+      minWindowHeight: null,
+      checkoutStep: 0,
+      processing: true,
+      cardValidated: false,
+      packages: [],
+      userSubscription: null,
+      subscriptionPackage: null,
+      quantity: 1,
+      getEndingDate() {
+        const today = new Date();
+        today.setMonth(today.getMonth() + this.quantity);
+        return today;
+      },
+      getSubscriptionFee() {
+        return this.subscriptionPackage.baseCharge;
+      },
+      getTotalFee() {
+        let fee = this.quantity * this.subscriptionPackage.baseCharge;
+        fee = fee.toFixed(2);
+        return fee;
+      },
+      hasFee() {
+        return this.subscriptionPackage && this.getTotalFee() > 0
+      },
+      onInputChange(prop) {
+        this.formErrors[prop] = false;
+      }
+    };
+  },
+  methods: {
+    isCurrentSubscription (pack) {
+      pack = pack || this.subscriptionPackage
+      return pack && _.get(this, 'userSubscription.subscription.package') === pack._id
+    },
+    selectSubscriptionPackage (pack) {
+      this.subscriptionPackage = pack
+    },
+    requestCheckout() {
+      this.checkoutStep = 1;
+
+      if (!this.hasFee()) {
+        this.validatePayment();
+        return
+      }
+
+      // this.$checkout.close()
+      // is also available.
+      const checkoutLabel = `${_.toUpper(this.subscriptionPackage.name)} x${
+        this.quantity
+      }`;
+      const amount = this.getTotalFee() * 100;
+
+      this.$checkout.open(
+        {
+          amount,
+          name: checkoutLabel,
+          currency: "USD",
+          token: token => {
+            this.cardValidated = true;
+            const tok = token.id;
+            this.validatePayment(tok);
+          }
+        },
+        () => {
+          if (this.cardValidated) return;
+          this.checkoutStep = 0;
+        }
+      );
+    },
+    async validatePayment(token='__token__') {
+      this.checkoutStep = 2;
+      try {
+        const packageId = this.subscriptionPackage._id
+        const quantity = this.quantity
+        // return console.log(packageId, quantity, token)
+
+        await SubscriptionService.orderSubscription(packageId, quantity, token)
+        this.checkoutStep = 3
+
+        // event tracking
+        const charge = this.getTotalFee()
+        window.trackEvent(`User piad $${charge} for package ${this.subscriptionPackage._id}`)
+        window.trackEvent(`Subscription Package changed to ${this.subscriptionPackage._id}`)
+        // track user charge
+        mixpanel.people.track_charge(charge);
+
+      } catch (e) {
+        this.error = e
+        this.checkoutStep = 0
+      }
+    }
+  },
+  components: {}
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+.view-wrapper {
+  color: #ffffff;
+  /* padding-top: 25px; */
+}
+.title {
+  font-size: 32px;
+  color: #f7f7f7;
+  font-weight: 600;
+  letter-spacing: -1px;
+  text-align: center;
+}
+.receipt-wrapper {
+  width: 500px;
+  background-color: #0b0d3a;
+  text-align: left;
+  border-radius: 5px;
+  margin-bottom: 30px;
+}
+.receipt-wrapper .reciept-row {
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(40, 44, 131, 0.45);
+}
+.receipt-wrapper .reciept-row:last-of-type {
+  border-bottom-color: transparent;
+}
+.receipt-wrapper .key {
+  text-transform: capitalize;
+  opacity: 0.65;
+}
+.receipt-wrapper .value {
+  text-transform: uppercase;
+}
+.receipt-wrapper .value.currency {
+  font-size: 24px;
+  font-family: monaco;
+}
+.receipt-wrapper .value.currency.sm {
+  font-size: 16px;
+}
+.logo-icon {
+  width: 165px;
+  margin-left: -5px;
+}
+.form {
+  display: inline-block;
+  align-self: center;
+  padding: 60px 0;
+}
+.field-container {
+  width: 300px;
+  padding: 10px 0;
+  /* border-bottom: 1px solid #22244d; */
+}
+.field-container:last-of-type {
+  border-bottom: none;
+}
+.label {
+  font-size: 12px;
+  opacity: 0.65;
+  text-transform: capitalize;
+}
+.input {
+  display: block;
+  width: 100%;
+  margin: 7px 0;
+  font-size: 14.5px;
+  padding: 12px 14px;
+  color: #ffffff;
+  background-color: #010329;
+  border: none;
+  border-radius: 2px;
+}
+.input:focus {
+  background-color: rgba(1, 3, 41, 0.47);
+}
+.message {
+  font-size: 15px;
+}
+</style>
