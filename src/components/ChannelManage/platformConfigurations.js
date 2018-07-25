@@ -78,10 +78,19 @@ const platforms = [{
       { text: 'rtmp://', hidden: true },
       { input: true, placeholder: 'x', width: 50 },
       '.rtmp.youtube.com',
-      { text: '/live2', hidden: false },
+      { text: '/live2', hidden: false }
     ],
     serverKeySegmentValues: [],
-    // canLinkService: true
+    canLinkService: false,
+    serviceAuthorization: {
+      enabled: true,
+      metadata: {
+        fields: [
+          { key: 'title', required: true },
+          { key: 'description', disabled: true, value: 'Multistreaming with Castr.io' }
+        ]
+      }
+    }
   },
   {
     name: 'twitch',

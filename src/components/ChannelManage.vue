@@ -215,6 +215,20 @@
             </div>
             <br>
             <div>
+              <div class="source-switch-container">
+                <b-form-group label="">
+                  <b-form-radio-group id="stream-source-type" 
+                                      buttons
+                                      button-variant="outline-danger"
+                                      v-model="streamSourceType"
+                                      @input="onSourceTypeChange">
+                    <b-form-radio :value="SourceTypes.Publish"
+                                  :disabled="streamSourceTypeProcessing">Publish</b-form-radio>
+                    <b-form-radio :value="SourceTypes.Pull"
+                                  :disabled="streamSourceTypeProcessing">Pull</b-form-radio>
+                  </b-form-radio-group>
+                </b-form-group>
+              </div>
               <div class="field-container">
                 <div class="label">Deployment Region</div>
                 <div class="input">
@@ -224,10 +238,20 @@
                          style="width:20px;" />
                     &nbsp;<span>{{stream.region.name}}</span>
                   </div>
+                  <!-- <div v-show="!hasPullSource()"  -->
                   <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div>
                 </div>
               </div>
-              <div class="field-container">
+              <div v-if="hasPullSource()" class="field-container">
+                <div class="label">Pull Source</div>
+                <div>
+                  <input v-model="streamPullUrl"
+                         @keypress="onPullUrlChange()"
+                         class="input" 
+                         placeholder="specify source url"/>
+                </div>
+              </div>
+              <div v-else class="field-container">
                 <div class="label">Streaming Key</div>
                 <div class="input">
                   <button class="modal-button modal-button-sm highlight float-right"
@@ -239,20 +263,41 @@
                   <div v-else class="flaot-left">xxxxxxxxxxxxxxxxx</div>
                 </div>
               </div>
-              <div class="field-container">
+              <div class="field-container"
+                   style="padding-top:0;">
                 <!-- <div class="label">RTMP pull url</div> -->
-                <div class="" style="margin-right:5px;">
+                <div style="margin-right:5px;">
                   <!-- <button class="modal-button modal-button-sm highlight float-rights"
                             style="margin-top: -4px; margin-right: -6px;"
                             v-clipboard:copy="getStreamPullUrl()"
                             v-clipboard:success="onStreamKeyCopied">Get RTMP Pull</button> -->
-                  <button class="modal-button modal-button-sm highlight float-rights"
-                            style="margin-top: -4px; margin-right: -6px;"
-                            @click="requestRTMPPullUrl()">
+                  <!-- <div v-if="hasPullSource()" style="margin: 15px 0;"> -->
+                            <!-- class="modal-button modal-button-variant2 highlight disabled" -->
+                    <b-button v-if="hasPullSource()"
+                              style="margin-right:10px;"
+                              variant="primary"
+                              @click="setStreamPullUrl"
+                              :disabled="!canSavePullUrl() || streamSourceTypeProcessing">
+                      <span v-if="streamSourceTypeProcessing">
+                        <i class="fas fa-spinner fa-spin"></i>
+                      </span>
+                      <span v-else>Save</span>
+                    </b-button>
+                  <!-- </div> -->
+
+                          <!-- style="margin-top: -4px; margin-right: -6px;" -->
+                  <button class="modal-button modal-button-sm highlight"
+                          :class="{'float-right': hasPullSource() }"
+                          :style="{'margin-top': hasPullSource() ? '4px' : 0}"
+                          @click="requestRTMPPullUrl()">
                     <span v-if="rmptPullUrlProcessing">
                       <i class="fas fa-spinner fa-spin"></i></span>
                     <span v-else>Get RTMP Pull</span>
                   </button>
+
+                  <div v-if="streamPullError && streamSourceType === SourceTypes.Pull"
+                       class="text-danger"
+                       style="margin-top:10px;">Source pull url is invalid</div>
                 </div>
                 <!-- <input class="input"
                        :value="getStreamPullUrl(true)"
@@ -316,6 +361,11 @@ import UserService from "../services/UserService";
 import SubscriptionService from "../services/SubscriptionService";
 import platformConfigurations from "./ChannelManage/platformConfigurations";
 
+const SourceTypes = {
+  Pull: "pull",
+  Publish: "publish"
+};
+
 export default {
   name: "ChannelManage",
   async mounted() {
@@ -340,10 +390,15 @@ export default {
   },
   data() {
     return {
+      SourceTypes,
       userSubscription: null,
       processing: true,
       processingMessage: null,
       rmptPullUrlProcessing: false,
+      streamSourceType: null,
+      streamPullUrl: null,
+      streamPullError: false,
+      streamSourceTypeProcessing: null,
       stream: null,
       streamId: null,
       streamName: null,
@@ -357,7 +412,9 @@ export default {
       windowHeight: 0,
       nameEdit: false,
       configurablePlatform: {},
-
+      hasPullSource() {
+        return this.streamSourceType === SourceTypes.Pull;
+      },
       isCustomPlatform(platform) {
         return platform.template === "custom";
       },
@@ -419,55 +476,152 @@ export default {
     };
   },
   methods: {
-    navigatePaymentsPage () {
+    navigatePaymentsPage() {
       this.$router.push({ path: "/subscribe?action=upgrade" });
     },
-    async requestRTMPPullUrl () {
-      let sub = this.userSubscription
+    onPullUrlChange () {
+      this.streamPullError = false
+    },
+    canSavePullUrl () {
+      let canSave = false
+      // check for valid input
+      const {streamPullUrl} = this
+
+      if (streamPullUrl) {
+        // check if pull remained same
+        if (streamPullUrl !== this.stream.pullUrl)
+          canSave = true
+      }
+
+      return canSave
+    },
+    async onSourceTypeChange() {
+      // check if new mode is `publish`
+      if (this.streamSourceType === SourceTypes.Publish) {
+        // check if operational mode is `pull`
+        const hadPullUrl = this.stream.pullUrl;
+        if (hadPullUrl) this.unsetStreamPullUrl();
+      }
+    },
+    async setStreamPullUrl() {
+      this.streamPullError = false
+      const pullSource = this.streamPullUrl;
+
+      // check if url is valid
+      if (!isValidUrl(pullSource)) {
+        this.streamPullError = true
+        return
+      }
+
+      // swtich source mode to specified pull url
+      this.streamSourceTypeProcessing = true;
+
+      try {
+        await StreamService.setStreamPullUrl(this.streamId, pullSource)
+        this.stream.pullUrl = pullSource;
+        this.$notify({ group: "success", text: "stream pull url saved" });
+
+      } catch (e) {
+        this.$notify({ group: "error", text: "could not save stream pull url" });
+      }
+
+      this.streamSourceTypeProcessing = false;
+      // #SUCCESS
+      // setTimeout(() => {
+      //   this.stream.pullUrl = pullSource;
+      //   this.$notify({ group: "success", text: "stream pull url saved" });
+      //   this.streamSourceTypeProcessing = false;
+      // }, 2000);
+
+      // #FAILED
+      // setTimeout(() => {
+      //   this.$notify({ group: "error", text: "could not save stream pull url" });
+      //   this.streamSourceTypeProcessing = false;
+      // }, 2000);
+    },
+    async unsetStreamPullUrl() {
+      this.streamSourceTypeProcessing = true;
+
+      try {
+        await StreamService.unsetStreamPullUrl(this.streamId)
+        this.stream.pullUrl = null;
+        this.$notify({ group: "success", text: "Publish mode activated" });
+      } catch(e) {
+        this.streamSourceType = SourceTypes.Pull
+        this.$notify({ group: "error", text: "could not switch to Publish mode" });
+      }
+
+      this.streamSourceTypeProcessing = false;
+      // #SUCCESS
+      // setTimeout(() => {
+      //   this.stream.pullUrl = null;
+      //   this.$notify({ group: "success", text: "Publish mode activated" });
+      //   this.streamSourceTypeProcessing = false;
+      // }, 2000);
+      
+      // #FAILED
+      // setTimeout(() => {
+      //   this.streamSourceType = SourceTypes.Pull
+      //   this.$notify({ group: "error", text: "could not switch to Publish mode" });
+      //   this.streamSourceTypeProcessing = false;
+      // }, 2000);
+    },
+    async requestRTMPPullUrl() {
+      let sub = this.userSubscription;
       if (!sub) {
-        this.rmptPullUrlProcessing = true
+        this.rmptPullUrlProcessing = true;
         // get user subscription
         try {
-          sub = await SubscriptionService.getUserSubscriptions(true)
+          sub = await SubscriptionService.getUserSubscriptions(true);
         } catch (e) {
           this.$notify({ group: "error", text: e.message });
         }
 
-        this.userSubscription = sub
-        this.rmptPullUrlProcessing = false
+        this.userSubscription = sub;
+        this.rmptPullUrlProcessing = false;
       }
 
-      if (!sub) return
+      if (!sub) return;
 
       // check if user has paid subscription
-      const pack = sub.subscription.package
+      const pack = sub.subscription.package;
       if (pack.baseCharge === 0) {
         // show upgrade prompt if free subscription
         this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
-        return
+        return;
       }
 
       // try copy to clipboard
-      const rtmpPullUrl = this.getStreamPullUrl()
+      const rtmpPullUrl = this.getStreamPullUrl();
       try {
-        this.$copyText(rtmpPullUrl)  
-        this.onStreamKeyCopied()
+        this.$copyText(rtmpPullUrl);
+        this.onStreamKeyCopied();
       } catch (e) {}
-
     },
-    openChatWindow () {
-      const {protocol, hostname} = window.location
-      const chatAppUrl = `${protocol}//${hostname}/chat/web?token=${this.stream._id}__${UserService.getUserToken()}`
-      const chatAppTitle = `${this.stream.name} Chat`
-      const chatAppPopupOptions = 'toolbar,scrollbars,resizable,top=100,left=100,width=450,height=700'
+    openChatWindow() {
+      const { protocol, hostname } = window.location;
+      const chatAppUrl = `${protocol}//${hostname}/chat/web?token=${
+        this.stream._id
+      }__${UserService.getUserToken()}`;
+      const chatAppTitle = `${this.stream.name} Chat`;
+      const chatAppPopupOptions =
+        "toolbar,scrollbars,resizable,top=100,left=100,width=450,height=700";
 
-      window.open(chatAppUrl, chatAppTitle, chatAppPopupOptions)
+      window.open(chatAppUrl, chatAppTitle, chatAppPopupOptions);
     },
     async setupStream() {
       // get stream details
       try {
-        this.stream = await StreamService.getStream(this.streamId);
+        const stream = await StreamService.getStream(this.streamId);
+        this.stream = stream;
         this.streamName = this.stream.name;
+
+        const hasPullUrl = stream.pullUrl;
+        this.streamSourceType = hasPullUrl
+          ? SourceTypes.Pull
+          : SourceTypes.Publish;
+        if (hasPullUrl) this.streamPullUrl = stream.pullUrl;
+
         this.setupMediaPulse();
 
         // normalize data
@@ -649,8 +803,12 @@ export default {
     },
     togglePlatformConfiguration(platform) {
       if (platform.linkedServiceCreds) {
-        window.alert(`Platform is connected to ${platform.template} account and can not be edited but can be toggled or deleted`)
-        return
+        window.alert(
+          `Platform is connected to ${
+            platform.template
+          } account and can not be edited but can be toggled or deleted`
+        );
+        return;
       }
 
       this.configurablePlatform = platform;
@@ -801,7 +959,7 @@ export default {
     ConfigurePlatformModal,
     ConfirmModal,
     StreamThumb,
-    StreamPlayer,
+    StreamPlayer
   }
 };
 
@@ -809,6 +967,10 @@ function flushBlobUrl(blob) {
   if (blob) {
     window.URL.revokeObjectURL(blob);
   }
+}
+
+function isValidUrl (url) {
+  return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
 }
 </script>
 
@@ -961,7 +1123,7 @@ function flushBlobUrl(blob) {
   display: block;
   width: 100%;
   height: auto !important;
-  margin: 7px 0 7px 0;
+  margin: 10px 0 10px 0;
   padding: 10px 14px;
   color: #ffffff;
   /* background-color: #010329; */

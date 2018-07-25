@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import _ from 'lodash'
+import io from 'socket.io-client'
 import UserService from './services/UserService'
 import StreamService from './services/StreamService'
 import SubscriptionService from './services/SubscriptionService'
@@ -7,7 +8,9 @@ import SubscriptionService from './services/SubscriptionService'
 export default function appRun() {
   // setup api base in http service
   const route = window.location
-  Vue.axios.defaults.baseURL = `${route.protocol}//${route.hostname}:22777`
+  const baseURL = 'https://castr.io:22777'
+  // const baseURL = `${route.protocol}//${route.hostname}:22777`
+  Vue.axios.defaults.baseURL = baseURL
   // Vue.axios.defaults.baseURL = 'https://castr.io:22777'
 
   Vue.axios.defaults.timeout = 30 * 1000
@@ -47,6 +50,20 @@ export default function appRun() {
 
     // setup event tracking
     setTimeout(activateEventTracking, 3000)
+
+    // init socket io con
+
+    const connUrl = baseURL + `?authkey=${UserService.getUserToken()}`
+    console.log('connUrl', connUrl)
+    const socket = io(connUrl)
+    socket.on('connect', () => {
+      console.log('app event system connected')
+      Vue.appEvents = socket
+    })
+
+    socket.on('error', (err) => {
+      console.log('could not connect to app event system', err)
+    })
   }
 }
 

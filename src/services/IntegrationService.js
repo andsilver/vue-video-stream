@@ -11,9 +11,29 @@ import RequestError from './RequestError'
  */
 
 export default {
+  checkIntegrationConnect,
+  checkIntegrationConflict,
   checkServiceIntegrationStatus,
   checkSiblingPlatformLinkStatus,
   getServiceIngest
+}
+
+/**
+ * @param {string} serviceName
+ * @param {string} streamId
+ */
+function checkIntegrationConnect(connectId) {
+  return makeRequest(`/integrations/connectStatus?connectId=${connectId}`)
+  // return makeRequest('/integrations/' + serviceName)
+}
+
+/**
+ * @param {string} serviceName
+ * @param {string} streamId
+ */
+function checkIntegrationConflict(streamId, oauthMetaId) {
+  return makeRequest(`/integrations/conflictCheck?streamId=${streamId}&oauthMetaId=${oauthMetaId}`)
+  // return makeRequest('/integrations/' + serviceName)
 }
 
 /**
@@ -35,12 +55,13 @@ function checkSiblingPlatformLinkStatus(serviceName, streamId) {
 }
 
 /**
- * @param {string} serviceName
+ * @param {string} integrationId
  * @param {string} streamId
  * @param {string} integrationId
  */
-function getServiceIngest(serviceName, streamId, integrationId) {
-  let url = `/integrations/${serviceName}/ingest?stream=${streamId}`
+function getServiceIngest(linkedMetaId) {
+  // let url = `/integrations/${serviceName}/ingest?stream=${streamId}`
+  let url = `/integrations/${linkedMetaId}/ingest`
   // if (integrationId) url += `&integration=${integrationId}`
 
   return makeRequest(url)

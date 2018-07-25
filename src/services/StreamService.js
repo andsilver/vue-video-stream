@@ -16,6 +16,8 @@ export default {
   addStream,
   setStreamName,
   toggleStream,
+  setStreamPullUrl,
+  unsetStreamPullUrl,
   deleteStream,
   addStreamPlatform,
   toggleStreamPlatform,
@@ -68,6 +70,28 @@ function setStreamName(streamId, name) {
 function toggleStream(streamId) {
   return makeRequest({
     path: `/streams/${streamId}/toggle`,
+    method: 'put'
+  })
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} pulUrl
+ */
+function setStreamPullUrl(streamId, pullUrl) {
+  return makeRequest({
+    path: `/streams/${streamId}/pullurl/set`,
+    method: 'put',
+    data: { url: pullUrl }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function unsetStreamPullUrl(streamId) {
+  return makeRequest({
+    path: `/streams/${streamId}/pullurl/unset`,
     method: 'put'
   })
 }

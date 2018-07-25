@@ -68,7 +68,7 @@
             <br>
             <div v-if="serviceLinkProcessing">
               <p v-if="serviceLinkError">
-                sorry, we could not link your {{platform.name}} account. Please try again
+                sorry, couldn't link with specified {{platform.name}} account
               </p>
               <p v-else>
                 <span v-if="linkedServiceCreds">{{ platform.name|capitalize }} connected, saving platform</span>
@@ -79,7 +79,7 @@
               <button v-if="!linkedServiceCreds" 
                       type="button" 
                       class="modal-button highlight" 
-                      @click="serviceLinkProcessing=false">Cancel</button>
+                      @click="cancelServiceLinking">Cancel</button>
               <!-- <a :href="getServiceOAuthUrl()" target="_blank">
                 <b-button @click="onServiceAuthURLTap"
                           variant="primary" 
@@ -184,7 +184,7 @@
             <button type="button" 
                     class="modal-button" 
                     @click="dismiss">Cancel</button>
-            <button v-if="canSave()" 
+            <button v-if="canSave()"
                     @click="onSavePlatform"
                     type="submit"
                     class="modal-button highlight">Save</button>
@@ -195,6 +195,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import _ from "lodash";
 import platformConfigurations from "./platformConfigurations";
 import UserService from "../../services/UserService";
@@ -221,12 +222,14 @@ export default {
       processing: false,
       error: null,
       serviceLinkError: false,
+      serviceLinkConflict: false,
       linkedServiceCreds: null,
       serviceLinkProcessing: false,
       platform: { enabled: false },
       customPlatform: false,
       platformTemplates: Platforms,
       formErrors: { server: false, streamKey: false },
+      oauthConnectId: null,
       modalSize() {
         return this.stage > 0 ? "sm" : "lg";
       },
@@ -246,7 +249,8 @@ export default {
         this.formErrors[prop] = false;
       },
       canSave() {
-        return this.stage > 0;
+        const validStage = this.stage > 0
+        return validStage;
       }
     };
   },
@@ -321,67 +325,93 @@ export default {
       return config.servers || [];
     },
     getServiceOAuthUrl() {
-      const {protocol, hostname} = window.location
-      return `${protocol}//${hostname}:22777/integrations/${this.platform.name}/oauth?redirect=1&user=${UserService.getUserId()}&stream=${this.stream._id}`
-      ;
+      const { protocol, hostname } = window.location;
+      const pathname = `integrations/${this.platform.name}/oauth`;
+
+      const connectId = Date.now();
+      this.oauthConnectId = connectId;
+
+      const searchParams = `redirect=1&user=${UserService.getUserId()}&stream=${this.stream._id}&connectId=${connectId}`;
+      return `${protocol}//${hostname}:22777/${pathname}?${searchParams}`;
+    },
+    cancelServiceLinking () {
+      this.serviceLinkError = false
+      this.serviceLinkConflict = false
+      this.serviceLinkProcessing = false
     },
     onServiceAuthURLTap() {
+      this.serviceLinkConflict = false
       this.serviceLinkProcessing = true;
-      const serviceName = this.platform.name
-      const streamId = this.stream._id
 
-      ;(async function check() {
-        // check if linking was disabled by user
-        if (!this.serviceLinkProcessing) return
+      // const serviceName = this.platform.name;
+      const connectId = this.oauthConnectId;
 
-        const services = await IntegrationService.checkServiceIntegrationStatus(serviceName, streamId)
-        if (!services || !services.length) {
-          setTimeout(check.bind(this), 1000)
+      const ackTag = "oauth-link";
+      Vue.appEvents.emit("ack.listen", ackTag, connectId);
+
+      const subkey = [ackTag, connectId].join('.')
+      Vue.appEvents.on(subkey, async (response) => {
+
+        if (!response || response.error) {
+          this.serviceLinkError = true;
           return
         }
-        
-        const integration = _.head(services)
-        // check for already linked sources
-        // const data = await IntegrationService.checkSiblingPlatformLinkStatus(serviceName, streamId)
-        // if (data.linked) {
-        //   this.serviceLinkConflict = true
-        //   return
-        // }
 
-        // get ingest config
-        let ingest
+        const oauthMetaId = response.linkedMeta;
+        // acknowledge UI, authorization was successful 
+        this.linkedServiceCreds = oauthMetaId
+
+        // check for linking conflicts
+        let linkResult
         try {
-          ingest = await IntegrationService.getServiceIngest(serviceName, streamId, integration._id)
-        } catch(e) {
-          this.serviceLinkError = true
+          linkResult = await IntegrationService.checkIntegrationConflict(this.stream._id, oauthMetaId)
+
+        } catch(E) {
+          debugger
+        }
+        if (!linkResult || linkResult.linked) {
+          // conflicts are there
+          this.serviceLinkError = true;
+          this.serviceLinkConflict = true
+          this.linkedServiceCreds = null
           return
         }
-        
-        this.platform.enabled = true
-        this.platform.streamKey = ingest.key
-        this.platform.server = ingest.server
-        this.linkedServiceCreds = ingest._id
+
+        // const linkedMetaId = response.linkedMeta;
+        // get ingest config
+        let ingest;
+        try {
+          ingest = await IntegrationService.getServiceIngest(oauthMetaId);
+        } catch (e) {
+          this.serviceLinkError = true;
+          return;
+        }
+
+        // console.log('ingest', ingest)
+        // return
+        // setup service ingest
+        this.platform.enabled = true;
+        this.platform.streamKey = ingest.key;
+        this.platform.server = ingest.server;
+        this.linkedServiceCreds = ingest._id;
 
         if (!ingest.server) {
-          this.ignoreServiceLinking()
-          return
+          this.ignoreServiceLinking();
+          return 
         }
 
-        this.onSavePlatform()
-
-        // apply ingest config and try saving
-
-      }.bind(this))()
-      // console.log("here");
-      // debugger;
-      // const uri = await IntegrationService.getServiceOAuthURI(this.platform.name)
-      // window.open(uri)
-      // console.log('oauth uri', uri)
+        this.onSavePlatform();
+      });
     },
     isServiceAlreadyLinked() {
-      const currentTemplate = this.platform.name
-      const linked = _.find(this.stream.platforms, (platform) => platform.template === currentTemplate && platform.linkedServiceCreds)
-      return !!linked
+      const currentTemplate = this.platform.name;
+      const linked = _.find(
+        this.stream.platforms,
+        platform =>
+          platform.template === currentTemplate && platform.linkedServiceCreds
+      );
+      // return !!linked;
+      return false;
     },
     async onSavePlatform() {
       this.error = null;
@@ -397,8 +427,8 @@ export default {
       };
 
       if (this.linkedServiceCreds) {
-        payload.enabled =true
-        payload.linkedServiceCreds = this.linkedServiceCreds
+        payload.enabled = true;
+        payload.linkedServiceCreds = this.linkedServiceCreds;
       }
 
       try {
@@ -453,9 +483,9 @@ export default {
     },
     resetPlatform() {
       this.platform = { enabled: false };
-      this.serviceLinkError = false
-      this.linkedServiceCreds = null
-      this.serviceLinkProcessing = false
+      this.serviceLinkError = false;
+      this.linkedServiceCreds = null;
+      this.serviceLinkProcessing = false;
     }
   },
   components: {}
@@ -486,8 +516,6 @@ export default {
   margin-bottom: 10px;
 }
 .platform-item:hover {
-  /* background-color: rgb(20, 21, 59); */
-  /* background-color: rgb(13, 15, 61); */
   background-color: rgb(40, 44, 131);
   border-color: rgb(20, 21, 59);
 }
@@ -508,33 +536,7 @@ export default {
   text-transform: capitalize;
   opacity: 0.9;
 }
-/* .modal-button {
-  border: none;
-  padding: 7px 30px;
-  font-size: 15.5px;
-  color: #f7f7f7;
-  background-color: transparent;
-  text-transform: capitalize;
-  font-size: 13.5px;
-  transition: all 0.2s ease-in-out;
-  cursor: pointer;
-  border-radius: 50px;
-  outline: none;
-}
-.modal-button:hover {
-  background-color: rgb(13, 15, 61);
-}
-.modal-button:active {
-  background-color: rgb(13, 15, 50);
-}
-.modal-button.highlight {
-  background-color: #ab3147;
-}
-.modal-button.highlight:hover {
-  background-color: #8d1d32;
-} */
 .field-container {
-  /* width: 235px; */
   width: 100%;
   padding: 10px 0;
 }
