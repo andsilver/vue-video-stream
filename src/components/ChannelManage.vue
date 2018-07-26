@@ -229,6 +229,7 @@
                   </b-form-radio-group>
                 </b-form-group>
               </div>
+              <div style="clear: both;"></div>
               <div class="field-container">
                 <div class="label">Deployment Region</div>
                 <div class="input">
@@ -347,6 +348,13 @@
                    okText="Upgrade now"
                    cancelText="No thanks"
                    @modal-confirm="navigatePaymentsPage"></confirm-modal>
+
+     <confirm-modal modal-id="modal-set-publish-mode"
+                    message="Switching to Publish mode will disable your pulled stream"
+                    okText="Enable Publish"
+                    cancelText="Cancel"
+                    @modal-confirm="unsetStreamPullUrl"></confirm-modal>
+
   </div>
 </template>
 
@@ -500,11 +508,21 @@ export default {
       if (this.streamSourceType === SourceTypes.Publish) {
         // check if operational mode is `pull`
         const hadPullUrl = this.stream.pullUrl;
-        if (hadPullUrl) this.unsetStreamPullUrl();
+        // if (hadPullUrl) this.unsetStreamPullUrl();
+        if (hadPullUrl) this.requestPublishPrompt()
       }
+    },
+    requestPublishPrompt () {
+      this.$root.$emit("bv::show::modal", "modal-set-publish-mode");
+      setTimeout(() => { this.streamSourceType = SourceTypes.Pull })
     },
     async setStreamPullUrl() {
       this.streamPullError = false
+      
+      // setTimeout(() => {
+      //   this.streamSourceType = SourceTypes.Publish
+      // })
+
       const pullSource = this.streamPullUrl;
 
       // check if url is valid
@@ -546,6 +564,10 @@ export default {
         await StreamService.unsetStreamPullUrl(this.streamId)
         this.stream.pullUrl = null;
         this.$notify({ group: "success", text: "Publish mode activated" });
+        
+        // change tab to publish
+        this.streamSourceType = SourceTypes.Publish
+
       } catch(e) {
         this.streamSourceType = SourceTypes.Pull
         this.$notify({ group: "error", text: "could not switch to Publish mode" });
@@ -1106,6 +1128,14 @@ function isValidUrl (url) {
   opacity: 0.75;
   margin: 15px 0;
 }
+.source-switch-container {
+  /* margin-top: 20px; */
+  /* display: inline-block; */
+  /* margin-bottom: 20px; */
+  float: right;
+  clear: both
+}
+
 .field-container {
   /* width: 235px; */
   width: 100%;

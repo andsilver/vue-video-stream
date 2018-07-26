@@ -375,3 +375,6 @@ body {
 .to-right {
   float: right;
 }
+.form-group {
+  margin-bottom: 0 !important;  
+}
