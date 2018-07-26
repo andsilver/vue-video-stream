@@ -351,7 +351,7 @@
 
      <confirm-modal modal-id="modal-set-publish-mode"
                     message="Switching to Publish mode will disable your pulled stream"
-                    okText="Enable Publish"
+                    okText="Enable Publish Mode"
                     cancelText="Cancel"
                     @modal-confirm="unsetStreamPullUrl"></confirm-modal>
 
