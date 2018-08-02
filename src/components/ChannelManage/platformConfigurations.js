@@ -98,7 +98,18 @@ const platforms = [{
     icon: '/static/images/platforms/twitch.svg',
     // canLinkService: true
   },
-  { name: 'facebook live', servers: facebookServers, icon: '/static/images/platforms/facebook-live.svg' },
+  // { name: 'facebook live', servers: facebookServers, icon: '/static/images/platforms/facebook-live.svg' },
+  { 
+    name: 'facebook live',
+    // servers: [],
+    customServer: true,
+    // serverKeySegments: [
+    //   { input: true, placeholder: 'rtmp://facebook-rtmp-server-addr:80/rtmp/' },
+    // ],
+    // serverKeySegmentValues: [],
+    serverInputPlaceholder: 'rtmp://facebook-rtmp-server-addr:80/rtmp/',
+    icon: '/static/images/platforms/facebook-live.svg'
+  },
   { name: 'Vimeo', servers: vimeoServers, icon: '/static/images/platforms/vimeo-white-12dfb0dc.svg' },
   {
     name: 'periscope',

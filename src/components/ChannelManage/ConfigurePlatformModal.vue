@@ -20,13 +20,19 @@
                    show
                    variant="danger">{{error.message}}</b-alert>
         <!-- form -->
-        <div v-if="platform.custom || hasMultipleServers()" class="field-container">
+        <div v-if="platform.custom || hasMultipleServers() || platform.customServer" class="field-container">
           <div class="label">streaming {{ platform.custom && 'platform address' || 'server' }} </div>
 
           <input v-if="platform.custom"
                  v-model="platformConfig.server"
                  class="input"
                  placeholder="rtmp://braodcaster_addr/"
+                 @keypress="onInputChange('server')" />
+
+          <input v-else-if="platform.customServer"
+                 v-model="platformConfig.server"
+                 class="input"
+                 :placeholder="platform.serverInputPlaceholder || 'rtmp://braodcaster_addr/'"
                  @keypress="onInputChange('server')" />
 
           <div v-else-if="serverKeySegments" 
@@ -143,13 +149,18 @@ export default {
 
         const platformTemplate = _.find(Platforms, { name: this.platform.template })
         if (platformTemplate) {
+
+          if (platformTemplate.customServer) {
+            this.platform.customServer = true
+            this.platform.serverInputPlaceholder = platformTemplate.serverInputPlaceholder
+          }
+
           let {serverKeySegments, serverKeySegmentValues} = platformTemplate
           if (serverKeySegments) {
             this.serverKeySegments = serverKeySegments
             this.serverKeySegmentValues = getServerUrlSegmentValues(serverAddr, serverKeySegments)
           } else {
             this.platformServers = platformTemplate.servers
-            console.log(this.platformServers)
           }
         }
     },

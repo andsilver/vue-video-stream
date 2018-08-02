@@ -111,7 +111,7 @@
 
           </div>
           <div v-else>
-            <div v-if="customPlatform || hasMultiplePlatformServers(platform)"
+            <div v-if="customPlatform || hasMultiplePlatformServers(platform) || platform.customServer"
                  class="field-container">
               <div class="label">streaming {{ customPlatform && 'platform address' || 'server' }} </div>
 
@@ -119,6 +119,12 @@
                      v-model="platform.server"
                      class="input"
                      placeholder="rtmp://braodcaster_addr/"
+                     @keypress="onInputChange('server')" />
+              
+              <input v-else-if="platform.customServer"
+                     v-model="platform.server"
+                     class="input"
+                     :placeholder="platform.serverInputPlaceholder || 'rtmp://braodcaster_addr/'"
                      @keypress="onInputChange('server')" />
               
               <div v-else-if="platform.serverKeySegments" 
@@ -315,7 +321,7 @@ export default {
     ignoreServiceLinking() {
       // this.platform.ignoreServiceLinking=true
       this.platform.canLinkService = false;
-      console.log(this.platform);
+      // console.log(this.platform);
     },
     hasMultiplePlatformServers(platform) {
       return _.size(platform.servers) > 1 || _.size(platform.serverKeySegments);
