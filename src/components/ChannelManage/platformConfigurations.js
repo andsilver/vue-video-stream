@@ -64,7 +64,7 @@ const switchboardServers = [
 ]
 const vimeoServers = ['rtmp://rtmp.cloud.vimeo.com/live']
 const cavetubeServers = ['rtmp://cavestream.net/live']
-const younowServers = ['rtmp://stream.younow.com:80/liveapp']
+const younowServers = ['rtmp://stream.younow.com/liveapp']
 const livehouseServers = ['rtmp://live-ea.livehouse.in/app/']
 const fc2Servers = ['rtmp://media.live.fc2.com/live']
 const lahzenegarServers = ['rtmp://live.lahzenegar.com:80/pro']
