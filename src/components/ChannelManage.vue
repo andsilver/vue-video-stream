@@ -161,28 +161,34 @@
                         <img v-else :src="getPlatformIcon(platform)" />
                       </div>
                       <div class="platform-name">
-                        <input v-if="platform.template == 'custom'"
+                        <!-- <input v-if="platform.template == 'custom'" -->
+                        <input v-if="true"
                                v-model="platform.editorName"
                                @change="onPlatformNameChange(platform)"
-                               class="name" />
+                               class="name" 
+                               spellcheck="false"/>
                         <span v-else>
                           {{platform.name}}
                         </span>
                         &nbsp;
-                        <div v-if="isAlive() && platform.enabled" class="inline-block">
-                          <code v-if="isPlatformConnected(platform)"
-                                class="platform-connect-status online">connected</code>
-                          <code v-else class="platform-connect-status">connecting..</code>
-                        </div>
 
                         <div class="platform-server">{{getPlatformPushDestination(platform)}}</div>
                         <div v-if="platform.linkedServiceCreds" 
                              class="platform-verified-badge">
                              <i class="fa fa-check-circle"></i> verified
-                             </div>
+                        </div>
+
                       </div>
                     </b-col>
                     <b-col class="text-right">
+                      <div v-if="isAlive() && platform.enabled" 
+                           class="inline-block"
+                           style="margin:10px 15px 0 0;">
+                          <code v-if="isPlatformConnected(platform)"
+                                class="platform-connect-status online">connected</code>
+                          <code v-else class="platform-connect-status">connecting..</code>
+                      </div>
+
                       <span class="platform-button toggle-control fas"
                             v-bind:class="{ 'fa-toggle-on enabled': platform.enabled, 
                                             'fa-toggle-off': !platform.enabled,
@@ -1220,6 +1226,7 @@ function isValidUrl (url) {
   font-size: 12px;
   font-weight: 400;
   color: gray;
+  text-transform: lowercase;
 }
 .platform-connect-status.online {
   color: #1dd240;
@@ -1236,7 +1243,7 @@ function isValidUrl (url) {
 }
 .platform-name .name:focus {
   background-color: #17193e;
-  outline-color: #ffffff;
+  outline-color: #0075ff;
 }
 .platform-server {
   font-size: 13px;
