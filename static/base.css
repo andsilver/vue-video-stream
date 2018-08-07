@@ -320,6 +320,7 @@ body {
   max-width: 100%;
   height: 100%;
   margin: 0;
+  align-items:flex-start !important;
 }
 
 .modal-fullscreen1 .modal-header {
