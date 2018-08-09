@@ -427,6 +427,7 @@ export default {
 
       let serverAddr = this.platform.server
       serverAddr = _.replace(serverAddr, /^rtmps/gi, 'rtmp')
+      serverAddr = _.replace(serverAddr, /^\:443/gi, ':80')
 
       const payload = {
         enabled: this.platform.enabled,

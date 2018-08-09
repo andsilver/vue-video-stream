@@ -215,6 +215,7 @@ export default {
 
       let serverAddr = server
       serverAddr = _.replace(serverAddr, /^rtmps/gi, 'rtmp')
+      serverAddr = _.replace(serverAddr, /^\:443/gi, ':80')
 
       this.processing = true;
 
