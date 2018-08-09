@@ -205,7 +205,7 @@ export default {
       this.error = null
       if (!this.validateForm()) return;
 
-      const {server,key} = this.platformConfig
+      let {server,key} = this.platformConfig
 
       if (this.platform.server === server && 
          this.platform.key === key) {
@@ -213,10 +213,14 @@ export default {
         return
       }
 
+      let serverAddr = server
+      serverAddr = _.replace(serverAddr, /^rtmps/gi, 'rtmp')
+
       this.processing = true;
 
       try {
-        await StreamService.setStreamPlatformAddress(this.stream._id, this.platform._id, { server, key })
+        const updates = { server: serverAddr, key }
+        await StreamService.setStreamPlatformAddress(this.stream._id, this.platform._id, updates)
         this.$emit("platform-updated", this.platform, this.platformConfig);
         this.dismiss();
       } catch (err) {

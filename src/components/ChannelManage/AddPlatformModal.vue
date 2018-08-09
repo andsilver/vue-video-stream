@@ -425,9 +425,12 @@ export default {
 
       this.processing = true;
 
+      let serverAddr = this.platform.server
+      serverAddr = _.replace(serverAddr, /^rtmps/gi, 'rtmp')
+
       const payload = {
         enabled: this.platform.enabled,
-        server: this.platform.server,
+        server: serverAddr,
         key: this.platform.streamKey,
         template: this.customPlatform ? "custom" : this.platform.name
       };
