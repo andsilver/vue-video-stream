@@ -302,9 +302,9 @@
                     <span v-else>Get RTMP Pull</span>
                   </button>
 
-                  <div v-if="streamPullError && streamSourceType === SourceTypes.Pull"
+                  <div v-if="streamPullUrlError && streamSourceType === SourceTypes.Pull"
                        class="text-danger"
-                       style="margin-top:10px;">Source pull url is invalid</div>
+                       style="margin-top:10px;">Doesn't look like a valid source</div>
                 </div>
                 <!-- <input class="input"
                        :value="getStreamPullUrl(true)"
@@ -374,6 +374,7 @@ import StreamService from "../services/StreamService";
 import UserService from "../services/UserService";
 import SubscriptionService from "../services/SubscriptionService";
 import platformConfigurations from "./ChannelManage/platformConfigurations";
+import utils from "@/utils"
 
 const SourceTypes = {
   Pull: "pull",
@@ -411,7 +412,7 @@ export default {
       rmptPullUrlProcessing: false,
       streamSourceType: null,
       streamPullUrl: null,
-      streamPullError: false,
+      streamPullUrlError: false,
       streamSourceTypeProcessing: null,
       stream: null,
       streamId: null,
@@ -494,7 +495,7 @@ export default {
       this.$router.push({ path: "/subscribe?action=upgrade" });
     },
     onPullUrlChange () {
-      this.streamPullError = false
+      this.streamPullUrlError = false
     },
     canSavePullUrl () {
       let canSave = false
@@ -523,7 +524,7 @@ export default {
       setTimeout(() => { this.streamSourceType = SourceTypes.Pull })
     },
     async setStreamPullUrl() {
-      this.streamPullError = false
+      this.streamPullUrlError = false
       
       // setTimeout(() => {
       //   this.streamSourceType = SourceTypes.Publish
@@ -532,8 +533,10 @@ export default {
       const pullSource = this.streamPullUrl;
 
       // check if url is valid
-      if (!isValidUrl(pullSource)) {
-        this.streamPullError = true
+      // if (!utils.validatisValidUrl(pullSource)) {
+      const {valid} = utils.validateURL(pullSource, {allowedProtos: ['https', 'http', 'hls', 'rtmp', 'rtsp'] })
+      if (!valid) {
+        this.streamPullUrlError = true
         return
       }
 
