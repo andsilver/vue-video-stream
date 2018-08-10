@@ -147,11 +147,12 @@
                              v-model="platform.server"
                              :options="platform.servers"
                              class="input"
-                             @change="onInputChange('server')"></b-form-select>
+                             @keypress="onInputChange('server')"></b-form-select>
 
               <p v-show="formErrors.server"
                  class="text-danger">
-                specify {{ customPlatform && 'destination' || platform.name }} server
+                <!-- specify {{ customPlatform && 'destination' || platform.name }} server -->
+                invalid {{ customPlatform && 'destination' || platform.name }} ingest address
               </p>
             </div>
             <p v-if="linkedServiceCreds">
@@ -207,6 +208,7 @@ import platformConfigurations from "./platformConfigurations";
 import UserService from "../../services/UserService";
 import StreamService from "../../services/StreamService";
 import IntegrationService from "../../services/IntegrationService";
+import utils from '@/utils'
 
 const Platforms = platformConfigurations.platforms;
 const ModalTitles = ["Select Streaming Platform", ""];
@@ -253,6 +255,13 @@ export default {
       },
       onInputChange(prop) {
         this.formErrors[prop] = false;
+        
+        // remove unnecessary key chars
+        if (prop === 'streamKey') {
+          setTimeout(() => {
+            this.platform[prop] = utils.resolveStreamKey(this.platform[prop])
+          })
+        }
       },
       canSave() {
         const validStage = this.stage > 0
@@ -425,14 +434,19 @@ export default {
 
       this.processing = true;
 
+      // let serverAddr = this.platform.server
+      // serverAddr = _.replace(serverAddr, /^rtmps/gi, 'rtmp')
+      // serverAddr = _.replace(serverAddr, /\:443/gi, ':80')
       let serverAddr = this.platform.server
-      serverAddr = _.replace(serverAddr, /^rtmps/gi, 'rtmp')
-      serverAddr = _.replace(serverAddr, /\:443/gi, ':80')
+      serverAddr = utils.resolveURL(serverAddr, true)
+
+      let streamKey = this.platform.streamKey
+      streamKey = utils.resolveStreamKey(streamKey)
 
       const payload = {
         enabled: this.platform.enabled,
         server: serverAddr,
-        key: this.platform.streamKey,
+        key: streamKey,
         template: this.customPlatform ? "custom" : this.platform.name
       };
 
@@ -442,10 +456,7 @@ export default {
       }
 
       try {
-        const platform = await StreamService.addStreamPlatform(
-          this.stream._id,
-          payload
-        );
+        const platform = await StreamService.addStreamPlatform(this.stream._id, payload);
         this.$emit("platform-saved", platform);
         this.dismiss();
       } catch (err) {
@@ -466,7 +477,12 @@ export default {
 
       let valids = 0;
       _.each(props, prop => {
-        const val = this.platform[prop];
+        let val = this.platform[prop];
+        if (prop === 'server') {
+          let {valid} = utils.validateURL(val)
+          if (!valid) val = null
+        }
+
         if (val) valids++;
         // else this.formErrors[prop] = true;
 

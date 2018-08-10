@@ -59,7 +59,7 @@
 
           <p v-show="formErrors.server"
              class="text-danger">
-            specify {{ platform.custom && 'destination' || platform.name }} server
+            invalid {{ platform.custom && 'destination' || platform.name }} ingest address
           </p>
         </div>
         <div class="field-container">
@@ -99,17 +99,18 @@
 import _ from "lodash";
 import StreamService from "../../services/StreamService";
 import platformConfigurations from "./platformConfigurations";
+import utils from "@/utils";
 
-const Platforms = platformConfigurations.platforms
+const Platforms = platformConfigurations.platforms;
 export default {
   name: "AddPlatformModal",
   props: ["stream", "platform"],
-  mounted () {
-    this.$refs.modalConfigurePlatform.$on('shown', this.onInit)
-    this.$refs.modalConfigurePlatform.$on('hide', () => { 
-      this.resetForm()
+  mounted() {
+    this.$refs.modalConfigurePlatform.$on("shown", this.onInit);
+    this.$refs.modalConfigurePlatform.$on("hide", () => {
+      this.resetForm();
       this.clearErrors();
-     })
+    });
   },
   data() {
     return {
@@ -121,7 +122,7 @@ export default {
       platformServers: [],
       formErrors: { server: false, key: false },
       modalTitle() {
-        return this.platform.name
+        return this.platform.name;
         let title;
         if (this.platform.custom) title = this.platform.name;
         else
@@ -133,117 +134,145 @@ export default {
       },
       onInputChange(prop) {
         this.formErrors[prop] = false;
+
+        // remove unnecessary key chars
+        if (prop === "key") {
+          setTimeout(() => {
+            this.platformConfig[prop] = utils.resolveStreamKey(
+              this.platformConfig[prop]
+            );
+          });
+        }
       }
     };
   },
   methods: {
-    onInit () {
-      this.platform.custom = this.platform.template == 'custom'
-      
+    onInit() {
+      this.platform.custom = this.platform.template == "custom";
+
       // if (!this.platformConfig.server)
-      const serverAddr = this.platform.server
-      this.platformConfig.server = serverAddr
-    
+      const serverAddr = this.platform.server;
+      this.platformConfig.server = serverAddr;
+
       // if (!this.platformConfig.key)
-        this.platformConfig.key = this.platform.key
+      this.platformConfig.key = this.platform.key;
 
-        const platformTemplate = _.find(Platforms, { name: this.platform.template })
-        if (platformTemplate) {
-
-          if (platformTemplate.customServer) {
-            this.platform.customServer = true
-            this.platform.serverInputPlaceholder = platformTemplate.serverInputPlaceholder
-          }
-
-          let {serverKeySegments, serverKeySegmentValues} = platformTemplate
-          if (serverKeySegments) {
-            this.serverKeySegments = serverKeySegments
-            this.serverKeySegmentValues = getServerUrlSegmentValues(serverAddr, serverKeySegments)
-          } else {
-            this.platformServers = platformTemplate.servers
-          }
+      const platformTemplate = _.find(Platforms, {
+        name: this.platform.template
+      });
+      if (platformTemplate) {
+        if (platformTemplate.customServer) {
+          this.platform.customServer = true;
+          this.platform.serverInputPlaceholder =
+            platformTemplate.serverInputPlaceholder;
         }
-    },
-    hasMultipleServers () {
-      return _.size(this.platformServers) > 1 || _.size(this.serverKeySegments)
-    },
-        focusServerKeySegment (event) {
-      let soruceElement = event.target || event.srcElement
-      if (soruceElement instanceof HTMLInputElement) return
 
-      this.$refs.segment[0].focus()
+        let { serverKeySegments, serverKeySegmentValues } = platformTemplate;
+        if (serverKeySegments) {
+          this.serverKeySegments = serverKeySegments;
+          this.serverKeySegmentValues = getServerUrlSegmentValues(
+            serverAddr,
+            serverKeySegments
+          );
+        } else {
+          this.platformServers = platformTemplate.servers;
+        }
+      }
     },
-    computePlatformServerFromSegments(){
-      let {serverKeySegments, serverKeySegmentValues} = this
-      let inputSegments = _.filter(serverKeySegments, {input: true})
-      let validSegmentValues =  _.compact(serverKeySegmentValues)
+    hasMultipleServers() {
+      return _.size(this.platformServers) > 1 || _.size(this.serverKeySegments);
+    },
+    focusServerKeySegment(event) {
+      let soruceElement = event.target || event.srcElement;
+      if (soruceElement instanceof HTMLInputElement) return;
+
+      this.$refs.segment[0].focus();
+    },
+    computePlatformServerFromSegments() {
+      let { serverKeySegments, serverKeySegmentValues } = this;
+      let inputSegments = _.filter(serverKeySegments, { input: true });
+      let validSegmentValues = _.compact(serverKeySegmentValues);
 
       if (_.size(inputSegments) !== _.size(validSegmentValues)) {
-        this.platformConfig.server = null
-        return
+        this.platformConfig.server = null;
+        return;
       }
 
-      let serverAddr = ''
+      let serverAddr = "";
       _.each(this.serverKeySegments, (segment, index) => {
-        if (segment.exclude) return
+        if (segment.exclude) return;
 
         if (segment.input) {
-          serverAddr += serverKeySegmentValues[index]
+          serverAddr += serverKeySegmentValues[index];
         } else {
-          serverAddr += segment.text || segment
+          serverAddr += segment.text || segment;
         }
-      })
+      });
 
-      this.platformConfig.server = serverAddr
+      this.platformConfig.server = serverAddr;
     },
     getPlatformServers(templateName) {
       const platform = _.find(Platforms, { name: templateName });
-      console.log(platform)
-      return platform && platform.servers || [];
+      console.log(platform);
+      return (platform && platform.servers) || [];
     },
     async onSavePlatform() {
-      this.error = null
+      this.error = null;
       if (!this.validateForm()) return;
 
-      let {server,key} = this.platformConfig
+      let { server, key } = this.platformConfig;
 
-      if (this.platform.server === server && 
-         this.platform.key === key) {
-        this.dismiss()
-        return
+      if (this.platform.server === server && this.platform.key === key) {
+        this.dismiss();
+        return;
       }
 
-      let serverAddr = server
-      serverAddr = _.replace(serverAddr, /^rtmps/gi, 'rtmp')
-      serverAddr = _.replace(serverAddr, /\:443/gi, ':80')
+      let serverAddr = server;
+      serverAddr = utils.resolveURL(serverAddr, true);
+
+      let streamKey = key;
+      streamKey = utils.resolveStreamKey(streamKey);
 
       this.processing = true;
 
       try {
-        const updates = { server: serverAddr, key }
-        await StreamService.setStreamPlatformAddress(this.stream._id, this.platform._id, updates)
-        this.$emit("platform-updated", this.platform, this.platformConfig);
+        const updates = { server: serverAddr, key: streamKey }
+        await StreamService.setStreamPlatformAddress(
+          this.stream._id,
+          this.platform._id,
+          updates
+        )
+
+        // this.$emit("platform-updated", this.platform, this.platformConfig);
+        this.$emit("platform-updated", this.platform, updates);
         this.dismiss();
       } catch (err) {
-        this.error = err
-        this.processing = false
+        this.error = err;
+        this.processing = false;
       }
     },
     dismiss() {
       this.$refs.modalConfigurePlatform.hide();
       // clear up cache
-      this.resetForm()
+      this.resetForm();
       this.clearErrors();
 
       // lazy clear
-      setTimeout(() => { this.processing = false; }, 1000);
+      setTimeout(() => {
+        this.processing = false;
+      }, 1000);
     },
     validateForm() {
       const props = ["server", "key"];
 
       let valids = 0;
       _.each(props, prop => {
-        const val = this.platformConfig[prop];
+        let val = this.platformConfig[prop];
+        if (prop === "server") {
+          let { valid } = utils.validateURL(val);
+          if (!valid) val = null;
+        }
+
         if (val) valids++;
 
         this.formErrors[prop] = !val;
@@ -255,53 +284,53 @@ export default {
       this.formErrors.server = false;
       this.formErrors.key = false;
     },
-    resetForm () {
-      this.platformServers = []
-      this.platformConfig.key = null
-      this.platformConfig.server = null
-      this.serverKeySegments = null
-      this.serverKeySegmentValues = null
+    resetForm() {
+      this.platformServers = [];
+      this.platformConfig.key = null;
+      this.platformConfig.server = null;
+      this.serverKeySegments = null;
+      this.serverKeySegmentValues = null;
     }
   },
   components: {}
 };
 
 function getServerUrlSegmentValues(serverAddr, serverKeySegments) {
-  const pos = []
-  const url = serverAddr
+  const pos = [];
+  const url = serverAddr;
 
   _.each(serverKeySegments, (param, index) => {
-    if (!param || param.exclude) return
+    if (!param || param.exclude) return;
 
-    let val = undefined
+    let val = undefined;
     if (!param.input) {
-      let text = param.text || param
-      let si = url.indexOf(text)
-      let n = _.size(text)
-      val = [si, si + n, n]
+      let text = param.text || param;
+      let si = url.indexOf(text);
+      let n = _.size(text);
+      val = [si, si + n, n];
     }
 
-    pos.push(val)
-  })
+    pos.push(val);
+  });
 
-  const values = []
+  const values = [];
   _.each(pos, (each, index) => {
-    let val = undefined
+    let val = undefined;
 
     if (!each) {
-      let pnode = pos[index - 1]
-      let nnode = pos[index + 1]
+      let pnode = pos[index - 1];
+      let nnode = pos[index + 1];
 
-      let si = pnode ? pnode[1] : 0
-      let ei = nnode ? nnode[0] : url.length
+      let si = pnode ? pnode[1] : 0;
+      let ei = nnode ? nnode[0] : url.length;
 
-      val = url.substr(si, ei - si)
+      val = url.substr(si, ei - si);
     }
 
-    values[index] = val
-  })
+    values[index] = val;
+  });
 
-  return values
+  return values;
 }
 </script>
 
@@ -396,8 +425,8 @@ function getServerUrlSegmentValues(serverAddr, serverKeySegments) {
   background-color: #141642;
   border-radius: 0;
   border-bottom: 1px solid transparent;
-  margin-left:2px;
-  margin-right:2px;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 .input-container .input:focus {
   background-color: #0a0d49;
