@@ -15,7 +15,8 @@ export default {
   checkIntegrationConflict,
   checkServiceIntegrationStatus,
   checkSiblingPlatformLinkStatus,
-  getServiceIngest
+  getServiceIngest,
+  getMixerFTLUrl
 }
 
 /**
@@ -64,6 +65,15 @@ function getServiceIngest(linkedMetaId) {
   let url = `/integrations/${linkedMetaId}/ingest`
   // if (integrationId) url += `&integration=${integrationId}`
 
+  return makeRequest(url)
+  // return makeRequest('/integrations/' + serviceName)
+}
+
+/**
+ * @param {string} username
+ */
+function getMixerFTLUrl(username) {
+  let url = `/integrations/mixerFTL/username/${username}`
   return makeRequest(url)
   // return makeRequest('/integrations/' + serviceName)
 }

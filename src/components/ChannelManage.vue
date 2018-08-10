@@ -296,11 +296,22 @@
                   <button class="modal-button modal-button-sm highlight"
                           :class="{'float-right': hasPullSource() }"
                           :style="{'margin-top': hasPullSource() ? '4px' : 0}"
-                          @click="requestRTMPPullUrl()">
+                          @click="requestRTMPPullUrl">
                     <span v-if="rmptPullUrlProcessing">
                       <i class="fas fa-spinner fa-spin"></i></span>
                     <span v-else>Get RTMP Pull</span>
                   </button>
+
+                  <div v-if="streamSourceType === SourceTypes.Pull"
+                       class="hint"
+                       style="margin-top:20px;">
+                       <code style="font-szie:14px;">
+                         Restreaming Mixer FTL?
+                         <span class="btn btn-link" 
+                               style="margin-left:-2px;"
+                               @click="requestMixerUsername">Get Mixer Pull URL</span>
+                       </code>
+                  </div>
 
                   <div v-if="streamPullUrlError && streamSourceType === SourceTypes.Pull"
                        class="text-danger"
@@ -360,6 +371,12 @@
                     okText="Enable Publish Mode"
                     cancelText="Cancel"
                     @modal-confirm="unsetStreamPullUrl"></confirm-modal>
+     
+     <prompt-modal modal-id="modal-mixer-username"
+                    message="Enter your Mixer username"
+                    okText="Grab Mixer Pull Url"
+                    cancelText="Cancel"
+                    @modal-prompt="onMixerUsername"></prompt-modal>
 
   </div>
 </template>
@@ -368,11 +385,14 @@
 import AddPlatformModal from "./ChannelManage/AddPlatformModal.vue";
 import ConfigurePlatformModal from "./ChannelManage/ConfigurePlatformModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
+import PromptModal from "./PromptModal.vue";
 import StreamThumb from "./StreamThumb.vue";
 import StreamPlayer from "./StreamPlayer.vue";
 import StreamService from "../services/StreamService";
 import UserService from "../services/UserService";
 import SubscriptionService from "../services/SubscriptionService";
+import IntegrationService from "../services/IntegrationService";
+
 import platformConfigurations from "./ChannelManage/platformConfigurations";
 import utils from "@/utils"
 
@@ -566,6 +586,18 @@ export default {
       //   this.streamSourceTypeProcessing = false;
       // }, 2000);
     },
+    requestMixerUsername () {
+      // const res = await IntegrationService.getMixerFTLUrl('tidy')
+      this.$root.$emit("bv::show::modal", "modal-mixer-username");
+    },
+    async onMixerUsername (mixerUsername, ackCB) {
+      // console.log('mixerUsername', mixerUsername)
+      const res = await IntegrationService.getMixerFTLUrl(mixerUsername)
+      ackCB(!res.mixerPullURL)
+
+      const {mixerPullURL} = res
+      this.streamPullUrl = mixerPullURL
+    },
     async unsetStreamPullUrl() {
       this.streamSourceTypeProcessing = true;
 
@@ -589,7 +621,7 @@ export default {
       //   this.$notify({ group: "success", text: "Publish mode activated" });
       //   this.streamSourceTypeProcessing = false;
       // }, 2000);
-      
+        
       // #FAILED
       // setTimeout(() => {
       //   this.streamSourceType = SourceTypes.Pull
@@ -615,12 +647,12 @@ export default {
       if (!sub) return;
 
       // check if user has paid subscription
-      const pack = sub.subscription.package;
-      if (pack.baseCharge === 0) {
-        // show upgrade prompt if free subscription
-        this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
-        return;
-      }
+      // const pack = sub.subscription.package;
+      // if (pack.baseCharge === 0) {
+      //   // show upgrade prompt if free subscription
+      //   this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
+      //   return;
+      // }
 
       // try copy to clipboard
       const rtmpPullUrl = this.getStreamPullUrl();
@@ -989,6 +1021,7 @@ export default {
     AddPlatformModal,
     ConfigurePlatformModal,
     ConfirmModal,
+    PromptModal,
     StreamThumb,
     StreamPlayer
   }
@@ -1306,5 +1339,12 @@ function isValidUrl (url) {
   justify-content: center;
   font-size: 18px;
   position: absolute;
+}
+.hint {
+  font-size: 14.5px;
+}
+.hint button {
+  font-size: 13.5px;
+  letter-spacing: -1px;
 }
 </style>
