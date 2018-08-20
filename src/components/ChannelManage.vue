@@ -116,11 +116,12 @@
                 <div class="subtitle">Published Platforms</div>
               </b-col>
               <b-col class="text-right">
-                <!-- <b-button variant="primary"
-                          @click="openChatWindow">
+                <b-button variant="primary"
+                          @click="openChatWindow"
+                          style="background-color: rgb(41, 31, 199);border: none;">
                   <i class="far fa-comment"></i> &nbsp;Chat
                 </b-button>
-                &nbsp; -->
+                &nbsp;
                 <b-button variant="danger"
                           v-b-modal.modal-add-platform>Add Platform</b-button>
                 <!-- master toggle control -->
@@ -161,28 +162,37 @@
                         <img v-else :src="getPlatformIcon(platform)" />
                       </div>
                       <div class="platform-name">
-                        <input v-if="platform.template == 'custom'"
-                               v-model="platform.editorName"
+                        <!-- <input v-if="platform.template == 'custom'" -->
+                        <input v-model="platform.editorName"
                                @change="onPlatformNameChange(platform)"
                                class="name" />
-                        <span v-else>
+                        <!-- <span v-else>
                           {{platform.name}}
-                        </span>
-                        &nbsp;
-                        <div v-if="isAlive() && platform.enabled" class="inline-block">
+                        </span> -->
+                        
+                        <!-- &nbsp; -->
+                        <!-- <div v-if="isAlive() && platform.enabled" class="inline-block">
                           <code v-if="isPlatformConnected(platform)"
                                 class="platform-connect-status online">connected</code>
                           <code v-else class="platform-connect-status">connecting..</code>
-                        </div>
+                        </div> -->
 
                         <div class="platform-server">{{getPlatformPushDestination(platform)}}</div>
                         <div v-if="platform.linkedServiceCreds" 
                              class="platform-verified-badge">
-                             <i class="fa fa-check-circle"></i> verified
-                             </div>
+                             <i class="fa fa-check-circle"></i> linked
+                        </div>
+                        
                       </div>
                     </b-col>
                     <b-col class="text-right">
+
+                      <div v-if="isAlive() && platform.enabled" class="inline-block" style="margin:8px 16px 0 0">
+                        <code v-if="isPlatformConnected(platform)"
+                              class="platform-connect-status online">connected</code>
+                        <code v-else class="platform-connect-status">connecting..</code>
+                      </div>
+
                       <span class="platform-button toggle-control fas"
                             v-bind:class="{ 'fa-toggle-on enabled': platform.enabled, 
                                             'fa-toggle-off': !platform.enabled,
@@ -198,6 +208,65 @@
                             @click="requestPlatformDelete(platform)"></span>
                      </b-col>
                    </b-row>
+                   <div v-if="platform.serviceMeta && platform.serviceMetaEditor" class="platform-meta-container">
+
+                     <div class="head-toggle">
+                       <code @click="toggleMetaEditor(platform)">
+                         {{ platform.metaContianerVisible ? 'Hide' : 'Show' }} Metadata
+                      </code>
+                     </div>
+                     <b-collapse v-model="platform.metaContianerVisible" :id="platform._id">
+                       
+                       <div v-if="hasMetaProp('title', platform)" class="meta-row">
+                         <div class="meta-key">stream title</div>
+                         <div>
+                          <input v-model="platform.serviceMetaEditor.form.title" 
+                                 :disabled="platform.serviceMetaEditor.formProcessing.title"
+                                 class="platform-meta title" />
+                          <button v-show="canSaveMetadataProp('title', platform)"
+                                  @click="saveMetaProp('title', platform)"
+                                  :disabled="platform.serviceMetaEditor.formProcessing.title"
+                                  type="submit"
+                                  class="modal-button modal-button-sm bordered"
+                                  style="margin-left:5px;">
+                                  {{ platform.serviceMetaEditor.formProcessing.title ? 'Saving ..' : 'Save' }}
+                          </button>
+                         </div>
+                       </div>
+
+                        <div v-if="hasMetaProp('description', platform)" class="meta-row">
+                          <div class="meta-key">description</div>
+                          <div>
+                            <input v-model="platform.serviceMetaEditor.form.description" class="platform-meta desc" />
+                            <button v-show="canSaveMetadataProp('description', platform)"
+                                    @click="saveMetaProp('description', platform)"
+                                    :disabled="platform.serviceMetaEditor.formProcessing.description"
+                                    type="submit"
+                                    class="modal-button modal-button-sm bordered"
+                                    style="margin-left:5px;">
+                             {{ platform.serviceMetaEditor.formProcessing.description ? 'Saving ..' : 'Save' }}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div v-if="hasMetaProp('game', platform)" class="meta-row">
+                          <div class="meta-key">game</div>
+                          <div>
+                            <input v-model="platform.serviceMetaEditor.form.game" class="platform-meta game" />
+                            <button v-show="canSaveMetadataProp('game', platform)"
+                                    @click="saveMetaProp('game', platform)"
+                                    :disabled="platform.serviceMetaEditor.formProcessing.game"
+                                    type="submit"
+                                    class="modal-button modal-button-sm bordered"
+                                    style="margin-left:5px;">
+                             {{ platform.serviceMetaEditor.formProcessing.game ? 'Saving ..' : 'Save' }}
+                            </button>
+                          </div>
+                        </div>
+
+                     </b-collapse>
+
+                   </div>
                  </div>
               <!-- </b-col> -->
             </div>
@@ -367,6 +436,8 @@ import StreamPlayer from "./StreamPlayer.vue";
 import StreamService from "../services/StreamService";
 import UserService from "../services/UserService";
 import SubscriptionService from "../services/SubscriptionService";
+import IntegrationService from "../services/IntegrationService";
+
 import platformConfigurations from "./ChannelManage/platformConfigurations";
 
 const SourceTypes = {
@@ -647,9 +718,7 @@ export default {
         this.setupMediaPulse();
 
         // normalize data
-        _.each(this.stream.platforms, platform => {
-          platform.editorName = platform.name;
-        });
+        _.each(this.stream.platforms, this.setupStreamPlatform);
 
         this.computeGroupToggleState();
       } catch (err) {
@@ -657,6 +726,14 @@ export default {
         this.$router.push({ name: "ChannelList" });
         this.$notify({ group: "error", title: err.error, text: err.message });
       }
+    },
+    setupStreamPlatform (platform) {
+      platform.editorName = platform.name;
+      if (platform.serviceMeta)
+        platform.serviceMetaEditor = {
+          formProcessing: _.mapValues(platform.serviceMeta, () => false),
+          form: _.assign({}, platform.serviceMeta)
+        }
     },
     async onStreamNameChange() {
       if (!this.streamName) this.streamName = this.stream.name;
@@ -703,6 +780,33 @@ export default {
         });
       }
     },
+    toggleMetaEditor (platform) {
+      platform.metaContianerVisible = !platform.metaContianerVisible
+    },
+    canSaveMetadataProp (propname, platform) {
+      if (!propname || !platform) return
+      return platform.serviceMetaEditor.form[propname] !== platform.serviceMeta[propname]
+    },
+    hasMetaProp (propname, platform) {
+      if (!propname || !platform) return
+      return propname in platform.serviceMetaEditor.form
+    },
+    async saveMetaProp (propname, platform) {
+      if (!propname || !platform) return
+      const newValue = platform.serviceMetaEditor.form[propname]
+
+      platform.serviceMetaEditor.formProcessing[propname] = true
+      try {
+        await IntegrationService.updateIntegrationMetadata(platform.linkedServiceCreds, platform.serviceMetaEditor.form)
+      } catch (e) {
+        this.$notify({ group: "error", text: "could not update stream metadata" });
+      }
+
+      platform.serviceMetaEditor.formProcessing[propname] = false
+      platform.serviceMetaEditor.form
+      // save changes
+      platform.serviceMeta = _.assign({}, platform.serviceMeta, {[propname]: newValue})
+    },
     computeGroupToggleState() {
       const { platforms } = this.stream;
       const platformCount = _.size(platforms);
@@ -743,6 +847,7 @@ export default {
     },
     onNewPlatform(platform) {
       platform.editorName = platform.name;
+      this.setupStreamPlatform(platform)
       this.stream.platforms = [...this.stream.platforms, platform];
 
       // track event
@@ -1238,6 +1343,53 @@ function isValidUrl (url) {
   background-color: #17193e;
   outline-color: #ffffff;
 }
+.platform-meta-container {
+   font-size: 13px;
+   font-weight: 400;
+   margin-top: 10px;
+   margin-left: 110px;
+}
+.platform-meta-container .head-toggle {
+  font-size: 13.5px;
+  padding: 5px 0;
+  text-transform: capitalize;
+  letter-spacing: 0;
+}
+.platform-meta-container .head-toggle > *{
+  cursor: pointer;
+}
+.platform-meta-container .meta-row {
+  margin-top: 10px;
+}
+.platform-meta-container .meta-key {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  /* margin-left: 10px; */
+  color: gray;
+  font-size: 12.5px;
+  text-transform: lowercase;
+}
+
+.platform-meta-container input.platform-meta {
+  /* background-color: #17193e; */
+  background-color: transparent;
+  color: #ffffff;
+  border: none;
+  font-size: 13px;
+  width: 320px;
+  border: 1px solid transparent;
+  border-bottom-color: rgba(255,0,0,0.40);
+  padding: 8px 2px;
+}
+.platform-meta-container input.platform-meta:hover {
+  background-color: #17193e;
+}
+.platform-meta-container input.platform-meta:focus {
+  background-color: #17193e;
+  outline-color: #0075ff;
+  border-bottom-color: transparent;
+}
+
 .platform-server {
   font-size: 13px;
   color: #74769f;

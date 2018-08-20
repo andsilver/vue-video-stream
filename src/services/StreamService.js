@@ -129,9 +129,11 @@ function addStreamPlatform(streamId, platformPayload) {
     }
   }
 
-  if (platformPayload.linkedServiceCreds) {
+  if (platformPayload.linkedServiceCreds)
     config.data.platform.linkedServiceCreds = platformPayload.linkedServiceCreds
-  }
+
+  if (platformPayload.serviceMeta)
+    config.data.platform.serviceMeta = platformPayload.serviceMeta
 
   return makeRequest(config)
 }

@@ -81,7 +81,7 @@ const platforms = [{
       { text: '/live2', hidden: false }
     ],
     serverKeySegmentValues: [],
-    canLinkService: false,
+    canLinkService: true,
     serviceAuthorization: {
       enabled: true,
       metadata: {
@@ -96,7 +96,16 @@ const platforms = [{
     name: 'twitch',
     servers: twitchServers,
     icon: '/static/images/platforms/twitch.svg',
-    // canLinkService: true
+    canLinkService: true,
+    serviceAuthorization: {
+      enabled: true,
+      metadata: {
+        fields: [
+          { key: 'title', required: true },
+          { key: 'game' }
+        ]
+      }
+    }
   },
   { name: 'facebook live', servers: facebookServers, icon: '/static/images/platforms/facebook-live.svg' },
   { name: 'Vimeo', servers: vimeoServers, icon: '/static/images/platforms/vimeo-white-12dfb0dc.svg' },
@@ -115,7 +124,15 @@ const platforms = [{
     name: 'mixer',
     servers: mixerServers,
     icon: '/static/images/platforms/mixer.svg',
-    // canLinkService: true
+    canLinkService: true,
+    serviceAuthorization: {
+      metadata: {
+        fields: [
+          { key: 'title', required: true },
+          { key: 'description', disabled: true, value: 'Multistreaming with Castr.io' }
+        ]
+      }
+    }
   },
   {
     name: 'steam',

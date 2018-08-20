@@ -15,7 +15,9 @@ export default {
   checkIntegrationConflict,
   checkServiceIntegrationStatus,
   checkSiblingPlatformLinkStatus,
-  getServiceIngest
+  getServiceIngest,
+  getIntegrationMetadata,
+  updateIntegrationMetadata
 }
 
 /**
@@ -66,6 +68,28 @@ function getServiceIngest(linkedMetaId) {
 
   return makeRequest(url)
   // return makeRequest('/integrations/' + serviceName)
+}
+
+/**
+ * @param {string} linkedMetaId
+ */
+function getIntegrationMetadata(linkedMetaId) {
+  let url = `/integrations/${linkedMetaId}/metadata`
+  return makeRequest(url)
+}
+
+/**
+ * @param {string} linkedMetaId
+ */
+function updateIntegrationMetadata(linkedMetaId, metaUpdates) {
+  let url = `/integrations/${linkedMetaId}/metadata/update?isLinkedOAuth=1`
+  return makeRequest({
+    path: url,
+    method: 'put',
+    data: {
+      metadata: metaUpdates
+    }
+  })
 }
 
 /**

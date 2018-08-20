@@ -105,6 +105,14 @@ body {
   background-color: rgb(13, 15, 50);
 }
 
+.modal-button:disabled {
+  cursor: not-allowed;
+  background-color: rgb(13, 15, 61);
+}
+.modal-button:disabled:hover {
+  background-color: rgb(13, 15, 61);
+}
+
 .modal-button.highlight {
   background-color: #ab3147;
 }
@@ -320,6 +328,7 @@ body {
   max-width: 100%;
   height: 100%;
   margin: 0;
+  align-items: flex-start !important;
 }
 
 .modal-fullscreen1 .modal-header {
