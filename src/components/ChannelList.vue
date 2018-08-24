@@ -63,12 +63,17 @@ export default {
   name: "ChannelList",
   async mounted() {
     try {
-      this.streams = await StreamService.getUserStreams();
+      const streams = await StreamService.getUserStreams();
+      setTimeout(() => {
+        this.streams = streams
+        this.loading = false;
+      }, 100)
+
     } catch (err) {
       this.$notify({ group: "error", title: err.error, text: err.message });
+      this.loading = false;
+      return
     }
-
-    this.loading = false;
 
     // event tracking
     window.trackEvent("Dashboard", {
