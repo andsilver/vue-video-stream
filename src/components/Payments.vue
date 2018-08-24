@@ -1,12 +1,5 @@
 <template>
   <div class="view-wrapper container text-center" :style="{ 'min-height': minWindowHeight || 'auto' }">
-     <!-- <a href='#' 
-        data-fsc-action="Add,Checkout" 
-        data-fsc-item-path-value="broadcastx2">
-       <button data-fsc-action="Add,Checkout" 
-               data-fsc-item-path-value="broadcastx2"
-               class="btn btn-lg btn-primary">PAY NOW</button>
-     </a> -->
     <div class="form">
       <div class="text-center">
         
@@ -120,16 +113,23 @@
          </div>
        </div>
        <div class="text-center">
-         <b-button v-if="checkoutStep==0 && subscriptionPackage"
-                   size="lg"
-                   variant="success"
-                   @click="requestCheckout"
-                   :disabled="isCurrentSubscription()">
-           &nbsp; 
-           <i v-if="hasFee()" class="far fa-check-circle"></i>
-           <span>{{ hasFee() ? 'Pay Now' : 'Change Package' }}</span>
-           &nbsp;
-        </b-button>
+         <div v-if="checkoutStep==0 && subscriptionPackage">
+           <b-button size="lg"
+                     variant="success"
+                     @click="requestCheckout"
+                     :disabled="isCurrentSubscription()">
+              &nbsp; 
+              <i v-if="hasFee()" class="far fa-check-circle"></i>
+              <span>{{ hasFee() ? 'Pay Now' : 'Change Package' }}</span>
+              &nbsp;
+           </b-button>
+           <div v-if="hasFee()" 
+                style="margin: 10px;">
+                or use <a :href="gerPermalink()">permalink</a>
+           </div>
+           <br>
+           <br>
+         </div>
          <div v-else-if="checkoutStep==1" class="text-info message">Request is being validated</div>
          <div v-else-if="checkoutStep==2" class="text-info message">{{ hasFee() ? 'Validating payment' : 'Changing subscription' }}</div>
          <div v-else-if="checkoutStep==3">
@@ -175,9 +175,6 @@ import SubscriptionService from "../services/SubscriptionService";
 export default {
   name: "Payments",
   async mounted() {
-
-    setTimeout(initFastSpring, 4000)
-
     this.minWindowHeight = window.innerHeight + "px";
     
     try {
@@ -246,6 +243,11 @@ export default {
     };
   },
   methods: {
+    gerPermalink () {
+      const route = window.location
+      const host = `${route.protocol}//${route.hostname}`
+      return `${host}/billing/pay?userId=${UserService.getUserId()}&packageId=${this.subscriptionPackage._id}`
+    },
     isCurrentSubscription (pack) {
       pack = pack || this.subscriptionPackage
       return pack && _.get(this, 'userSubscription.subscription.package') === pack._id
@@ -310,14 +312,6 @@ export default {
   },
   components: {}
 };
-
-function initFastSpring () {
-  const script = document.createElement('script')
-  script.id = "fsc-api"
-  script.src="https://d1f8f9xcsvx3ha.cloudfront.net/sbl/0.7.6/fastspring-builder.min.js" 
-  script.dataset.storefront="castr.test.onfastspring.com/popup-castr"
-  document.body.appendChild(script)
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
