@@ -387,3 +387,32 @@ body {
 .form-group {
   margin-bottom: 0 !important;  
 }
+.nav-menu-inline {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.nav-menu-inline li {
+  padding: 0;
+  margin: 0;
+  margin-right: 20px;
+  font-weight: normal;
+  text-transform: uppercase;
+  display: inline-block;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.nav-menu-inline li:hover {
+  opacity: 1;
+}
+
+.nav-menu-inline li.active {
+  font-weight: 500;
+  opacity: 1;
+  font-weight: 600;
+}
+.no-pointer {
+  pointer-events: none;
+}

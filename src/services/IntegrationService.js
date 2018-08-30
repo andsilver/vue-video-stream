@@ -17,7 +17,11 @@ export default {
   checkSiblingPlatformLinkStatus,
   getServiceIngest,
   getIntegrationMetadata,
-  updateIntegrationMetadata
+  updateIntegrationMetadata,
+  getDiscordIntegrations,
+  saveDiscordIntegration,
+  updateDiscordIntegration,
+  deleteDiscordIntegration
 }
 
 /**
@@ -89,6 +93,52 @@ function updateIntegrationMetadata(linkedMetaId, metaUpdates) {
     data: {
       metadata: metaUpdates
     }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function getDiscordIntegrations(streamId) {
+  let url = `/integrations/stream/${streamId}/discord/webhooks`
+  return makeRequest(url)
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} integrationId
+ */
+function saveDiscordIntegration(streamId, discordConfig) {
+  let url = `/integrations/discord/webhooks?stream=` + streamId
+
+  return makeRequest({
+    path: url,
+    method: 'post',
+    data: { discord: discordConfig }
+  })
+}
+
+/**
+ * @param {number} channelId
+ * @param {object} updates
+ */
+function updateDiscordIntegration(integrationId, updates) {
+  let url = `/integrations/${integrationId}/discord/webhooks`
+  return makeRequest({
+    path: url,
+    method: 'put',
+    data: { updates }
+  })
+}
+
+/**
+ * @param {string} channelId
+ */
+function deleteDiscordIntegration(integrationId) {
+  let url = `/integrations/${integrationId}/discord/webhooks`
+  return makeRequest({
+    path: url,
+    method: 'delete'
   })
 }
 

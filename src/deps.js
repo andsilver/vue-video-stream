@@ -40,6 +40,11 @@ export default function(vueInstance) {
     return dHours + ':' + dMins + ':' + dSecs
   })
 
+  vueInstance.filter('ago', function(value) {
+    if (value) {
+      return moment(String(value)).fromNow()
+    }
+  })
 
   vueInstance.filter('bytes', function(num, breakSegments) {
     // jacked from: https://github.com/sindresorhus/pretty-bytes
