@@ -214,7 +214,7 @@ export default {
       }
     },
     openChatWindow() {
-      const chatAppUrl = this.chatOverlayURLCopied;
+      const chatAppUrl = this.chatOverlayURL;
       const chatAppTitle = `${this.stream.name} Chat`;
       const chatAppPopupOptions =
         "toolbar,scrollbars,resizable,top=100,left=100,width=450,height=700";
