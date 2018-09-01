@@ -16,7 +16,13 @@ export default {
   checkServiceIntegrationStatus,
   checkSiblingPlatformLinkStatus,
   getServiceIngest,
-  getMixerFTLUrl
+  getMixerFTLUrl,
+  getIntegrationMetadata,
+  updateIntegrationMetadata,
+  getDiscordIntegrations,
+  saveDiscordIntegration,
+  updateDiscordIntegration,
+  deleteDiscordIntegration
 }
 
 /**
@@ -76,6 +82,74 @@ function getMixerFTLUrl(username) {
   let url = `/integrations/mixerFTL/username/${username}`
   return makeRequest(url)
   // return makeRequest('/integrations/' + serviceName)
+}
+
+/*
+ * @param {string} linkedMetaId
+ */
+function getIntegrationMetadata(linkedMetaId) {
+  let url = `/integrations/${linkedMetaId}/metadata`
+  return makeRequest(url)
+}
+
+/**
+ * @param {string} linkedMetaId
+ */
+function updateIntegrationMetadata(linkedMetaId, metaUpdates) {
+  let url = `/integrations/${linkedMetaId}/metadata/update?isLinkedOAuth=1`
+  return makeRequest({
+    path: url,
+    method: 'put',
+    data: {
+      metadata: metaUpdates
+    }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function getDiscordIntegrations(streamId) {
+  let url = `/integrations/stream/${streamId}/discord/webhooks`
+  return makeRequest(url)
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} integrationId
+ */
+function saveDiscordIntegration(streamId, discordConfig) {
+  let url = `/integrations/discord/webhooks?stream=` + streamId
+
+  return makeRequest({
+    path: url,
+    method: 'post',
+    data: { discord: discordConfig }
+  })
+}
+
+/**
+ * @param {number} channelId
+ * @param {object} updates
+ */
+function updateDiscordIntegration(integrationId, updates) {
+  let url = `/integrations/${integrationId}/discord/webhooks`
+  return makeRequest({
+    path: url,
+    method: 'put',
+    data: { updates }
+  })
+}
+
+/**
+ * @param {string} channelId
+ */
+function deleteDiscordIntegration(integrationId) {
+  let url = `/integrations/${integrationId}/discord/webhooks`
+  return makeRequest({
+    path: url,
+    method: 'delete'
+  })
 }
 
 /**

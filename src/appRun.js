@@ -53,6 +53,7 @@ export default function appRun() {
 
     // init socket io con
 
+    // const connUrl = baseURL + `?authkey=${UserService.getUserToken()}`
     const connUrl = baseURL + `?authkey=${UserService.getUserToken()}`
     console.log('connUrl', connUrl)
     const socket = io(connUrl)
