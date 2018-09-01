@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-export default { validateURL, resolveURL, resolveStreamKey }
+export default { updateArrayItem, validateURL, resolveURL, resolveStreamKey }
 
 /**
  * @param {string} url
@@ -67,7 +67,7 @@ function resolveURL(url, trimLeadingSlash) {
   updatedUrl = _.replace(updatedUrl, /\\/i, '/')
 
   // trim down multiple slashes `/` to just one
-  let {protocol} = extractUrlSegments(url)
+  let { protocol } = extractUrlSegments(url)
   let noProtoURL = _.replace(url, protocol, '')
 
   _.split(noProtoURL, '/').forEach(() => {
@@ -89,7 +89,7 @@ function resolveURL(url, trimLeadingSlash) {
   return encodeURI(updatedUrl)
 }
 
-function resolveStreamKey (streamKey) {
+function resolveStreamKey(streamKey) {
   const trimmedKey = streamKey.replace(/\s|\//g, '')
   return trimmedKey
 }
@@ -105,4 +105,12 @@ function extractUrlSegments(url) {
     pathname = _.chain(url).replace(protocol, '').replace(host).split('/').slice(1).join('/').value()
 
   return { protocol, host, pathname, href: url }
+}
+
+function updateArrayItem(array, newValue, atIndex) {
+  return _.concat(
+    array.slice(0, atIndex),
+    [newValue],
+    array.slice(atIndex + 1)
+  )
 }

@@ -103,8 +103,10 @@
                          <div>
                           <input v-model="platform.serviceMetaEditor.form.title" 
                                  :disabled="platform.serviceMetaEditor.formProcessing.title"
+                                 @change="onMetaPropChange('title', platform)"
                                  class="platform-meta title" />
-                          <button v-show="canSaveMetadataProp('title', platform)"
+                          <!-- <button v-show="canSaveMetadataProp('title', platform)" -->
+                          <button v-if="platform.serviceMetaEditor.changes.title"
                                   @click="saveMetaProp('title', platform)"
                                   :disabled="platform.serviceMetaEditor.formProcessing.title"
                                   type="submit"
@@ -118,8 +120,11 @@
                         <div v-if="hasMetaProp('description', platform)" class="meta-row">
                           <div class="meta-key">description</div>
                           <div>
-                            <input v-model="platform.serviceMetaEditor.form.description" class="platform-meta desc" />
-                            <button v-show="canSaveMetadataProp('description', platform)"
+                            <input v-model="platform.serviceMetaEditor.form.description" 
+                                   @change="onMetaPropChange('description', platform)"
+                                   class="platform-meta desc" />
+                            <!-- <button v-show="canSaveMetadataProp('description', platform)" -->
+                            <button v-if="platform.serviceMetaEditor.changes.description"
                                     @click="saveMetaProp('description', platform)"
                                     :disabled="platform.serviceMetaEditor.formProcessing.description"
                                     type="submit"
@@ -133,8 +138,11 @@
                         <div v-if="hasMetaProp('game', platform)" class="meta-row">
                           <div class="meta-key">game</div>
                           <div>
-                            <input v-model="platform.serviceMetaEditor.form.game" class="platform-meta game" />
-                            <button v-show="canSaveMetadataProp('game', platform)"
+                            <input v-model="platform.serviceMetaEditor.form.game"
+                                   @change="onMetaPropChange('game', platform)"
+                                   class="platform-meta game" />
+                            <!-- <button v-show="canSaveMetadataProp('game', platform)" -->
+                            <button v-if="platform.serviceMetaEditor.changes.game"
                                     @click="saveMetaProp('game', platform)"
                                     :disabled="platform.serviceMetaEditor.formProcessing.game"
                                     type="submit"
@@ -283,6 +291,7 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import AddPlatformModal from "./AddPlatformModal.vue";
 import ConfigurePlatformModal from "./ConfigurePlatformModal.vue";
 import platformConfigurations from "./platformConfigurations";
+import utils from "@/utils";
 
 const SourceTypes = {
   Pull: "pull",
@@ -494,7 +503,8 @@ export default {
       if (platform.serviceMeta)
         platform.serviceMetaEditor = {
           formProcessing: _.mapValues(platform.serviceMeta, () => false),
-          form: _.assign({}, platform.serviceMeta)
+          form: _.assign({}, platform.serviceMeta),
+          changes: {}
         }
     },
     async onPlatformNameChange(platform) {
@@ -530,15 +540,33 @@ export default {
       if (!propname || !platform) return
       return platform.serviceMetaEditor.form[propname] !== platform.serviceMeta[propname]
     },
+    onMetaPropChange (propname, platform) {
+      if (!propname || !platform) return
+      const hasChanged = platform.serviceMetaEditor.form[propname] !== platform.serviceMeta[propname]
+      platform.serviceMetaEditor.changes[propname] = hasChanged
+
+      const pindex = _.findIndex(this.streamPlatforms, { _id: platform._id })
+      this.streamPlatforms = utils.updateArrayItem(this.streamPlatforms, platform, pindex)
+      // this.streamPlatforms = _.concat(
+      //   this.streamPlatforms.slice(0,pindex),
+      //   [platform],
+      //   this.streamPlatforms.slice(pindex+1),
+      // )
+      
+    },
     hasMetaProp (propname, platform) {
       if (!propname || !platform) return
       return propname in platform.serviceMetaEditor.form
     },
     async saveMetaProp (propname, platform) {
       if (!propname || !platform) return
+      const pindex = this.streamPlatforms.indexOf(platform)
+      
       const newValue = platform.serviceMetaEditor.form[propname]
-
       platform.serviceMetaEditor.formProcessing[propname] = true
+
+      this.streamPlatforms = utils.updateArrayItem(this.streamPlatforms, platform, pindex)
+
       try {
         await IntegrationService.updateIntegrationMetadata(platform.linkedServiceCreds, platform.serviceMetaEditor.form)
       } catch (e) {
@@ -549,6 +577,9 @@ export default {
       platform.serviceMetaEditor.form
       // save changes
       platform.serviceMeta = _.assign({}, platform.serviceMeta, {[propname]: newValue})
+      platform.serviceMetaEditor.changes[propname] = false
+
+      this.streamPlatforms = utils.updateArrayItem(this.streamPlatforms, platform, pindex)
     },
     computeGroupToggleState() {
       // const { platforms } = this.stream;
