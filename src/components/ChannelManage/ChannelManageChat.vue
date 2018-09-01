@@ -46,7 +46,12 @@
           </div>
           <br>
 
-          <div v-if="!discordIntegrations.length">
+          <div v-if="discordIntegrationsProcessing">
+            <div class="discord-text">
+              <p>retreiving <code>Discord</code> channels ..</p>
+            </div>
+          </div>
+          <div v-else-if="!discordIntegrations.length">
             <div class="discord-text">
               <p>Forward all your chats to a <code>Discord</code> channel instead</p>
               <p>Once integrated, Castr will send every message to your configured <code>Discord</code> channel</p>
@@ -78,7 +83,8 @@
           </div>
 
           <br>
-          <button class="btn btn-lg btn-primary discord-setup"
+          <button v-show="!discordIntegrationsProcessing" 
+                  class="btn btn-lg btn-primary discord-setup"
                   @click="setupDiscordIntegration">
             <span v-if="discordIntegrations.length">ADD #CHANNEL</span>
             <span v-else>SYNC #DISCORD</span>
@@ -127,6 +133,7 @@ export default {
 
     this.discordIntegrations = discordIntegrations;
     this.hasDiscordIntegrations = _.size(discordIntegrations) > 0;
+    this.discordIntegrationsProcessing = false
   },
   destroyed() {},
   data() {
@@ -137,6 +144,7 @@ export default {
       processingMessage: null,
       webchatPreviewFontSize: 'md',
       discordIntegrations: [],
+      discordIntegrationsProcessing: true,
       selectedDiscordChannel: null,
       hasDiscordIntegrations: false,
       chatOverlayURLCopied: false,
