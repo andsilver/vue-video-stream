@@ -87,7 +87,8 @@ const platforms = [{
       metadata: {
         fields: [
           { key: 'title', required: true },
-          { key: 'description', disabled: true, value: 'Multistreaming with Castr.io' }
+          // { key: 'description', disabled: true, value: 'Multistreaming with Castr.io' }
+          { key: 'description', value: 'Multistreaming with Castr.io' }
         ]
       }
     }
@@ -140,7 +141,8 @@ const platforms = [{
       metadata: {
         fields: [
           { key: 'title', required: true },
-          { key: 'description', disabled: true, value: 'Multistreaming with Castr.io' }
+          // { key: 'description', disabled: true, value: 'Multistreaming with Castr.io' }
+          { key: 'description', value: 'Multistreaming with Castr.io' }
         ]
       }
     }

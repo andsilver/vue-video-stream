@@ -193,17 +193,22 @@
               <div v-if="hasMetaProp('description')" class="field-container">
                 <div class="label">Stream Description</div>
 
-                <input v-if="canConfigureMetadata('description')"
+                <!-- <input v-if="canConfigureMetadata('description')"
                        v-model="platform.configurableMetadata.description"
                        class="input"
                        placeholder="Enter stream description"
-                       :disabled="!canConfigureMetadata('description')"/>
+                       :disabled="!canConfigureMetadata('description')"/> -->
+                <textarea v-if="canConfigureMetadata('description')"
+                       v-model="platform.configurableMetadata.description"
+                       class="input"
+                       placeholder="Enter stream description"
+                       :disabled="!canConfigureMetadata('description')"></textarea>
 
-                <input v-if="canConfigureMetadata('game')"
+                <!-- <input v-if="canConfigureMetadata('game')"
                        v-model="platform.configurableMetadata.game"
                        class="input"
                        placeholder="Enter stream description"
-                       :disabled="!canConfigureMetadata('description')"/>
+                       :disabled="!canConfigureMetadata('description')"/> -->
 
                 <div v-else>
                   <div class="input">
@@ -465,7 +470,7 @@ export default {
       Vue.appEvents.on(subkey, this.onServiceAuthResponse);
 
       // #ENABLED FOR DEBUG
-      // this.onServiceAuthResponse({linkedMeta: "5b75390ef8be5939f876b708"})
+      // this.onServiceAuthResponse({linkedMeta: "5b7414021f7c1701c0f89123"})
 
     },
     hasMetaProp (propname) {
@@ -821,6 +826,10 @@ export default {
   background-color: #010329;
   border: none;
   border-radius: 2px;
+}
+textarea.input {
+  min-height: 100px !important; 
+  height: auto !important; 
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);

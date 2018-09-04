@@ -9,8 +9,8 @@ export default function appRun() {
   // setup api base in http service
   const route = window.location
   // const baseURL = 'https://castr.io:22777'
-  const baseURL = 'https://staging.castr.io:22777'
-  // const baseURL = `${route.protocol}//${route.hostname}:22777`
+  // const baseURL = 'https://staging.castr.io:22777'
+  const baseURL = `${route.protocol}//${route.hostname}:22777`
   Vue.axios.defaults.baseURL = baseURL
 
   Vue.axios.defaults.timeout = 30 * 1000

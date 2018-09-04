@@ -459,13 +459,14 @@ export default {
 
       if (!sub) return;
 
+      // DISABLED TEMPORARILY
       // check if user has paid subscription
-      const pack = sub.subscription.package;
-      if (pack.baseCharge === 0) {
-        // show upgrade prompt if free subscription
-        this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
-        return;
-      }
+      // const pack = sub.subscription.package;
+      // if (pack.baseCharge === 0) {
+      //   // show upgrade prompt if free subscription
+      //   this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
+      //   return;
+      // }
 
       // try copy to clipboard
       const rtmpPullUrl = this.getStreamPullUrl();
