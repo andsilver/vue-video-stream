@@ -125,7 +125,7 @@
            </b-button>
            <div v-if="hasFee()" 
                 style="margin: 10px;">
-                or use <a :href="gerPermalink()">permalink</a>
+                or use <a :href="gerPermalink()">Paypal</a>
            </div>
            <br>
            <br>
