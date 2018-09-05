@@ -36,8 +36,9 @@
         <br>
         <section v-if="stage==0" style="text-align:center;">
           <div class="view-title">
-            Get started with Discord
-            <a target="_blank" href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks">Article</a>
+            Get started with our Discord
+            <!-- <a target="_blank" href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks">Article</a> -->
+            <a target="_blank" href="http://docs.castr.io/castr-chat/link-castr-chat-to-discord">Article</a>
             on Webhooks</div>
           <p style="margin:10px 0;">
             Once your channel webhook is ready, tap below to begin integration with Castr
