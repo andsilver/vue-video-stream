@@ -49,8 +49,10 @@
                   <b-row>
                     <b-col cols="8">
                       <div class="platform-icon">
-                        <i v-if="isCustomPlatform(platform)" :class="getPlatformIcon(platform)"></i>
-                        <img v-else :src="getPlatformIcon(platform)" />
+                        <a target="_blank" :href="platform.serviceChannelUrl">
+                          <i v-if="isCustomPlatform(platform)" :class="getPlatformIcon(platform)"></i>
+                          <img v-else :src="getPlatformIcon(platform)" />
+                        </a>
                       </div>
                       <div class="platform-name">
                         <!-- <input v-if="platform.template == 'custom'" -->
@@ -60,9 +62,17 @@
 
                         <div class="platform-server">{{getPlatformPushDestination(platform)}}</div>
                         <div v-if="platform.linkedServiceCreds" 
-                             class="platform-verified-badge">
+                             class="platform-verified-badge"
+                             style="margin-top:4px;">
                              <i class="fa fa-check-circle"></i> linked
                         </div>
+                        <br>
+                        <a v-if="platform.serviceChannelUrl"
+                          :href="platform.serviceChannelUrl"
+                          target="_blank"
+                          class="channel-link-btn">
+                          <span>channel link</span>
+                        </a>
                         
                       </div>
                     </b-col>
@@ -92,9 +102,11 @@
                    <div v-if="platform.serviceMeta && platform.serviceMetaEditor" class="platform-meta-container">
 
                      <div class="head-toggle">
+                       
                        <code @click="toggleMetaEditor(platform)">
                          {{ platform.metaContianerVisible ? 'Hide' : 'Show' }} Metadata
-                      </code>
+                       </code>
+
                      </div>
                      <b-collapse v-model="platform.metaContianerVisible" :id="platform._id">
                        
@@ -569,7 +581,13 @@ export default {
       this.streamPlatforms = utils.updateArrayItem(this.streamPlatforms, platform, pindex)
 
       try {
-        await IntegrationService.updateIntegrationMetadata(platform.linkedServiceCreds, platform.serviceMetaEditor.form)
+        await IntegrationService.updateIntegrationMetadata(
+          platform.linkedServiceCreds, 
+          platform.serviceMetaEditor.form)
+
+          // update parent model
+        this.$emit('stream-updated', { platforms: this.streamPlatforms })
+
       } catch (e) {
         this.$notify({ group: "error", text: "could not update stream metadata" });
       }
@@ -627,6 +645,9 @@ export default {
       // this.stream.platforms = [...this.stream.platforms, platform];
       this.streamPlatforms = [...this.streamPlatforms, platform];
 
+      // update parent model
+      this.$emit('stream-updated', { platforms: this.streamPlatforms })
+
       // track event
       window.trackEvent(
         `Added ${platform.name} platform in stream ${this.stream.name}`,
@@ -638,6 +659,9 @@ export default {
     onPlatformUpdated(platform, updates) {
       platform.server = updates.server;
       platform.streamKey = updates.streamKey;
+
+      // update parent model
+      this.$emit('stream-updated', { platforms: this.streamPlatforms })
     },
     toggleGroupStatus() {
       // if (!this.isAlive()) return
@@ -682,7 +706,11 @@ export default {
           platform._id,
           forceState
         );
+        
         platform.enabled = newStatus;
+
+        // update parent model
+        this.$emit('stream-updated', { platforms: this.streamPlatforms })
 
         // track event
         window.trackEvent(
@@ -772,6 +800,9 @@ export default {
           platforms.slice(0, index),
           platforms.slice(index + 1)
         );
+
+        // update parent model
+        this.$emit('stream-updated', { platforms: this.streamPlatforms })
 
         this.computeGroupToggleState();
 
@@ -993,10 +1024,16 @@ function isValidUrl (url) {
   background-color: #17193e;
   outline-color: #ffffff;
 }
+.channel-link-btn {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgb(193, 209, 245);
+  text-transform: lowercase;
+}
 .platform-meta-container {
    font-size: 13px;
    font-weight: 400;
-   margin-top: 10px;
+   margin-top: 6px;
    margin-left: 110px;
 }
 .platform-meta-container .head-toggle {
@@ -1047,7 +1084,7 @@ function isValidUrl (url) {
   text-transform: none;
 }
 .platform-verified-badge {
-  font-size: 12.5px;
+  font-size: 12px;
   border-radius: 50px;
   color: #199d19;
   display: inline-block;

@@ -108,7 +108,8 @@
 
         <router-view :stream="stream" 
                      :streamAlive="streamAlive"
-                     :mediaPulse="mediaPulse"></router-view>
+                     :mediaPulse="mediaPulse"
+                     @stream-updated="onStreamUpdates"></router-view>
 
       </div>
     </div>
@@ -208,6 +209,9 @@ export default {
     };
   },
   methods: {
+    onStreamUpdates (updates) {
+      this.stream = _.assign({}, this.stream, updates)
+    },
     async setupStream() {
       // get stream details
       try {
