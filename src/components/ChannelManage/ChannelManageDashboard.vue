@@ -175,11 +175,19 @@
           </b-col>
           <b-col class="preveiw-container">
             <div class="video-wrapper">
+              <webcam-player v-if="streamSourceType === SourceTypes.Webcam" 
+                             :stream="stream" 
+                             :push-ready="webcamPushReady"
+                             :stream-stopped="onWebcamStopped"
+                             class="video-thumb" />
+
               <!-- <div v-if="!isAlive()" class="video-thumb placeholder"> -->
-              <div v-if="!streamAlive" class="video-thumb placeholder">
+              <div v-else-if="!streamAlive" class="video-thumb placeholder">
                 <p>Waiting for stream</p>
               </div>
+
               <stream-player v-else :stream="stream" class="video-thumb" />
+
             </div>
             <br>
             <div>
@@ -194,6 +202,8 @@
                                   :disabled="streamSourceTypeProcessing">Publish</b-form-radio>
                     <b-form-radio :value="SourceTypes.Pull"
                                   :disabled="streamSourceTypeProcessing">Pull</b-form-radio>
+                    <b-form-radio :value="SourceTypes.Webcam"
+                                  :disabled="streamSourceTypeProcessing">Webcam</b-form-radio>
                   </b-form-radio-group>
                 </b-form-group>
               </div>
@@ -219,6 +229,17 @@
                          class="input" 
                          placeholder="specify source url"/>
                 </div>
+              </div>
+              <div v-else-if="streamSourceType === SourceTypes.Webcam" 
+                   class="field-container" style="padding:0;">
+                 
+                 <!-- <button v-if="!webcamPushReady"
+                         class="modal-button highlight"
+                         @click="startWebcamPush">Start Streaming</button>
+                 <button v-else 
+                         class="modal-button highlight"
+                         @click="stopWebcamPush">Stop Streaming</button> -->
+
               </div>
               <div v-else class="field-container">
                 <div class="label">Streaming Key</div>
@@ -256,6 +277,17 @@
                     <span v-else>Get RTMP Pull</span>
                   </button>
 
+                  <div v-if="streamSourceType === SourceTypes.Pull"
+                       class="hint"
+                       style="margin-top:20px;">
+                       <code style="font-szie:14px;">
+                         Restreaming Mixer FTL?
+                         <span class="btn btn-link" 
+                               style="margin-left:-2px;"
+                               @click="requestMixerUsername">Get Mixer Pull URL</span>
+                       </code>
+                   </div>
+
                   <div v-if="streamPullError && streamSourceType === SourceTypes.Pull"
                        class="text-danger"
                        style="margin-top:10px;">Source pull url is invalid</div>
@@ -288,6 +320,12 @@
                     okText="Enable Publish Mode"
                     cancelText="Cancel"
                     @modal-confirm="unsetStreamPullUrl"></confirm-modal>
+      
+      <prompt-modal modal-id="modal-mixer-username"
+                    message="Enter your Mixer username"
+                    okText="Grab Mixer Pull Url"
+                    cancelText="Cancel"
+                    @modal-prompt="onMixerUsername"></prompt-modal>
 
   </div>
 </template>
@@ -299,6 +337,9 @@ import SubscriptionService from "@/services/SubscriptionService";
 import IntegrationService from "@/services/IntegrationService";
 import StreamThumb from "@/components/StreamThumb.vue";
 import StreamPlayer from "@/components/StreamPlayer.vue";
+import WebcamPlayer from "@/components/WebcamPlayer.vue";
+
+import PromptModal from "@/components/PromptModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import AddPlatformModal from "./AddPlatformModal.vue";
 import ConfigurePlatformModal from "./ConfigurePlatformModal.vue";
@@ -307,7 +348,8 @@ import utils from "@/utils";
 
 const SourceTypes = {
   Pull: "pull",
-  Publish: "publish"
+  Publish: "publish",
+  Webcam: "webcam",
 };
 
 export default {
@@ -329,6 +371,7 @@ export default {
       streamSourceType: null,
       streamPullUrl: null,
       streamPullError: false,
+      webcamPushReady: true,
       streamSourceTypeProcessing: null,
       streamId: null,
       streamFps: null,
@@ -394,6 +437,15 @@ export default {
 
       return canSave
     },
+    onWebcamStopped () {
+      this.webcamPushReady = false
+    },
+    startWebcamPush () {
+      this.webcamPushReady=true
+    },
+    stopWebcamPush () {
+      this.webcamPushReady=false
+    },
     async onSourceTypeChange() {
       // check if new mode is `publish`
       if (this.streamSourceType === SourceTypes.Publish) {
@@ -406,6 +458,18 @@ export default {
     requestPublishPrompt () {
       this.$root.$emit("bv::show::modal", "modal-set-publish-mode");
       setTimeout(() => { this.streamSourceType = SourceTypes.Pull })
+    },
+    requestMixerUsername () {
+      // const res = await IntegrationService.getMixerFTLUrl('tidy')
+      this.$root.$emit("bv::show::modal", "modal-mixer-username");
+    },
+    async onMixerUsername (mixerUsername, ackCB) {
+      // console.log('mixerUsername', mixerUsername)
+      const res = await IntegrationService.getMixerFTLUrl(mixerUsername)
+      ackCB(!res.mixerPullURL)
+
+      const {mixerPullURL} = res
+      this.streamPullUrl = mixerPullURL
     },
     async setStreamPullUrl() {
       this.streamPullError = false
@@ -826,7 +890,9 @@ export default {
     ConfigurePlatformModal,
     ConfirmModal,
     StreamThumb,
-    StreamPlayer
+    StreamPlayer,
+    WebcamPlayer,
+    PromptModal
   }
 };
 
