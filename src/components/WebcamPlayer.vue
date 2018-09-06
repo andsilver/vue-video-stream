@@ -41,9 +41,6 @@ export default {
     
     this.$emit('stream-stopped')
   },
-  updated () {
-    console.log('updated')
-  },
   data() {
     return {
       scopeAlive: true,
@@ -150,8 +147,11 @@ export default {
       }
     },
     getStreamUrl () {
-      const hostname = _.get(this.stream, 'region.hostname')
-      return `ws://${hostname}:80/${this.stream.key}/webrtc/publish`
+      // const hostname = _.get(this.stream, 'region.hostname')
+      // return `ws://${hostname}:80/${this.stream.key}/webrtc/publish`
+      let subhost = _.get(this.stream, 'region.identifierHaxr')
+      let hostname = `${subhost}.origincdn.com`
+      return `wss://${hostname}:443/${this.stream.key}/webrtc/publish`
     }
   }
 };

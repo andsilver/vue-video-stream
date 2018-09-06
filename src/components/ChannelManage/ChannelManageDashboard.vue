@@ -71,7 +71,7 @@
                           :href="platform.serviceChannelUrl"
                           target="_blank"
                           class="channel-link-btn">
-                          <span>channel link</span>
+                          <span>video link</span>
                         </a>
                         
                       </div>
