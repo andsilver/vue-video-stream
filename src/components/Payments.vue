@@ -149,7 +149,7 @@
                             class="w-50 mt-2"
                             style="height: 10px;"></b-progress>
        </div>
-       
+
        <div v-if="checkoutStep!==3" style="margin-top:15px;">
          Not willing to change? Go to <router-link to="/manage/billing">accounts</router-link>
        </div>

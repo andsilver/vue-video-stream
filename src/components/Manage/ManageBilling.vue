@@ -33,10 +33,11 @@
               <router-link :to="subscriptionManagePage()">
                 <b-button variant="link" size="sm">{{isPaidSubscription() ? 'CHANGE' : 'UPGRADE'}}</b-button>
               </router-link>
-              <router-link v-if="isPaidSubscription()"
+              <!-- <router-link v-if="isPaidSubscription()"
                            :to="subscriptionManagePage('cancel')">
                 <b-button variant="link" size="sm">CANCEL</b-button>
-              </router-link>
+              </router-link> -->
+              <b-button variant="link" size="sm" onclick="Intercom('show')">CANCEL</b-button>
             </div>
             <div style="margin-top:7px;">
               <code style="font-size:12.5px;">USD ${{getSubscriptionFee()}}/month</code>&nbsp;
