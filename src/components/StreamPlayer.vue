@@ -28,7 +28,7 @@
 
 <script>
 import StreamService from "../services/StreamService";
-import FlussonicMsePlayer from "@flussonic/flussonic-mse-player";
+import MSEPlayer from "@flussonic/flussonic-mse-player";
 
 const playerContainerId = "#preview-player";
 
@@ -37,7 +37,10 @@ export default {
   name: "StreamPlayer",
   props: ["stream"],
   mounted() {
+
+    window.FlussonicMsePlayer = MSEPlayer
     this.initPlaybackSetup();
+   
   },
   destroyed() {
     this.scopeAlive = false;
@@ -215,9 +218,11 @@ export default {
 }
 
 .player-container {
-  border: 1px solid black;
+  /* border: 1px solid black; */
+  border: none;
   height: inherit;
   position: relative;
+  overflow: hidden;
 }
 #player {
   position: relative;

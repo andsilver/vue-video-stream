@@ -11,7 +11,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "@flussonic/flussonic-mse-player": "^18.4.3",
+    "@flussonic/flussonic-mse-player": "^18.8.5",
     "axios": "^0.18.0",
     "bootstrap-vue": "^2.0.0-rc.9",
     "lodash": "^4.17.10",
