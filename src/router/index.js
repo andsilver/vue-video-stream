@@ -7,6 +7,8 @@ import ValidatePasswordReset from '@/components/ValidatePasswordReset'
 import Payments from '@/components/Payments'
 import ChannelList from '@/components/ChannelList'
 import ChannelManage from '@/components/ChannelManage'
+import ChannelManageDashboard from '@/components/ChannelManage/ChannelManageDashboard'
+import ChannelManageChat from '@/components/ChannelManage/ChannelManageChat'
 import AppManage from '@/components/Manage'
 import ManageAccount from '@/components/Manage/ManageAccount'
 import ManagePasswordChange from '@/components/Manage/ManagePasswordChange'
@@ -54,7 +56,23 @@ const router = new Router({
     {
       path: '/streams/:streamId',
       name: 'ChannelManage',
-      component: ChannelManage
+      component: ChannelManage,
+      redirect: {
+        name: 'ChannelManageDashboard'
+      },
+      children: [{
+          path: 'dashboard',
+          name: 'ChannelManageDashboard',
+          component: ChannelManageDashboard,
+          props: true
+        },
+        {
+          path: 'chat',
+          name: 'ChannelManageChat',
+          component: ChannelManageChat,
+          props: true
+        }
+      ]
     },
     {
       path: '/manage',

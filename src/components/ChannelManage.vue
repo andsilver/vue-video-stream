@@ -4,7 +4,6 @@
       <div class="row">
         <div class="col-md-4">
           <div class="title">
-            <!-- <input v-model="stream.name" -->
             <input v-model="streamName"
                    @change="onStreamNameChange"
                    type="text" 
@@ -23,15 +22,14 @@
             <b-col cols="3">
               <div class="stat-container">
                 <div>
-                  <span class="value"
-                        :style="{color: isAlive() ? '#2ad640' : 'inherit' }">{{getStreamStatus()}}</span>
+                  <span class="value" :style="{color: streamAlive ? '#2ad640' : 'inherit' }">{{getStreamStatus()}}</span>
                 </div>
                 <div class="label">status</div>
               </div>
             </b-col>
             <b-col cols="3">
               <div class="stat-container">
-                <div v-if="isAlive()">
+                <div v-if="streamAlive">
                   <span class="value">
                     {{mediaPulse.bitrate | number}}
                     <span style="font-size:16px;">kbps</span>
@@ -44,7 +42,7 @@
             </b-col>
             <b-col>
               <div class="stat-container" style="padding-left:50px;">
-                <div v-if="isAlive()">
+                <div v-if="streamAlive">
                   <span v-if="streamFps" class="value" style="margin-right:10px;">
                     {{streamFps}}
                     <span style="font-size:16px;">fps</span>
@@ -60,13 +58,9 @@
                 </div>
                 <div v-else><span class="value">..</span></div>
 
-                <!-- <div class="label">codecs</div> -->
               </div>
             </b-col>
             <b-col cols="1" class="text-right">
-              <!-- <button class="head-button" disabled>
-                <span class="icon fa fa-redo"></span>
-              </button> -->
               
               <button class="head-button"
                       @click="requestStreamDelete">
@@ -74,8 +68,8 @@
               </button>
             </b-col>
           </b-row>
-          <!-- <br> -->
-          <b-row v-if="isAlive()"
+
+          <b-row v-if="streamAlive"
                  style="margin-top:10px;">
 
               <b-col class="stat-container xs">
@@ -97,239 +91,26 @@
                 <div class="value">{{ mediaPulse.lifetime | elapsed }}</div>
               </b-col>
             </b-row>
-            <!-- <br> -->
         </div>
       </div>
       <div class="content-container">
-        <b-row>
-          <b-col cols="8">
+        <ul class="nav-menu-inline page-menu">
+          <router-link tag="li" 
+                       :to="{name: 'ChannelManageDashboard'}"
+                       active-class="active">dashboard</router-link>
+          <router-link tag="li" 
+                       :to="{name: 'ChannelManageChat'}"
+                       active-class="active">
+            <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>&nbsp;
+            chat overlay
+          </router-link>
+        </ul>
 
-            <div v-if="!stream.platforms.length" 
-                 class="placeholder">
-                 Ready, Set ... &nbsp;Go!
-              <p style="font-size:13.5px;opacity:0.75;">Lets add a platform to get started</p>
-              <b-button variant="danger"
-                        v-b-modal.modal-add-platform>Add a Platform</b-button>
-            </div>
-            <b-row v-if="stream.platforms.length">
-              <b-col>
-                <div class="subtitle">Published Platforms</div>
-              </b-col>
-              <b-col class="text-right">
-                <!-- <b-button variant="primary"
-                          @click="openChatWindow">
-                  <i class="far fa-comment"></i> &nbsp;Chat
-                </b-button>
-                &nbsp; -->
-                <b-button variant="danger"
-                          v-b-modal.modal-add-platform>Add Platform</b-button>
-                <!-- master toggle control -->
-                <span class="toggle-control toggle-control-master"
-                      :class="{ 
-                        enabled: groupToggleState,
-                        'status-processing': groupToggleProcessing
-                      }"
-                      @click="toggleGroupStatus">
-                      <!-- 'status-processing': !isAlive() || groupToggleProcessing -->
-                  <i class="fa"
-                     :class="{
-                       'fa-toggle-on': groupToggleState,
-                       'fa-toggle-off': !groupToggleState
-                     }"></i>
-                </span>
-                <!-- <b-button variant="danger ">
-                  {{'Stop Push'}}&nbsp;
-                </b-button> -->
-              </b-col>
-            </b-row>
-            
-            <div class="platform-list">
-              <!-- <b-col> -->
-                <div v-for="(platform) in stream.platforms"
-                       :key="platform._id"
-                       class="platform-item">
-                  <div v-if="platform.removing" class="platform-item-overlay">
-                    <b-progress :value="100" 
-                                :max="100" 
-                                animated
-                                class="w-25 h-25"></b-progress>
-                  </div>
-                  <b-row>
-                    <b-col cols="8">
-                      <div class="platform-icon">
-                        <i v-if="isCustomPlatform(platform)" :class="getPlatformIcon(platform)"></i>
-                        <img v-else :src="getPlatformIcon(platform)" />
-                      </div>
-                      <div class="platform-name">
-                        <!-- <input v-if="platform.template == 'custom'" -->
-                        <input v-if="true"
-                               v-model="platform.editorName"
-                               @change="onPlatformNameChange(platform)"
-                               class="name" 
-                               spellcheck="false"/>
-                        <span v-else>
-                          {{platform.name}}
-                        </span>
-                        &nbsp;
+        <router-view :stream="stream" 
+                     :streamAlive="streamAlive"
+                     :mediaPulse="mediaPulse"
+                     @stream-updated="onStreamUpdates"></router-view>
 
-                        <div class="platform-server">{{getPlatformPushDestination(platform)}}</div>
-                        <div v-if="platform.linkedServiceCreds" 
-                             class="platform-verified-badge">
-                             <i class="fa fa-check-circle"></i> verified
-                        </div>
-
-                      </div>
-                    </b-col>
-                    <b-col class="text-right">
-                      <div v-if="isAlive() && platform.enabled" 
-                           class="inline-block"
-                           style="margin:10px 15px 0 0;">
-                          <code v-if="isPlatformConnected(platform)"
-                                class="platform-connect-status online">connected</code>
-                          <code v-else class="platform-connect-status">connecting..</code>
-                      </div>
-
-                      <span class="platform-button toggle-control fas"
-                            v-bind:class="{ 'fa-toggle-on enabled': platform.enabled, 
-                                            'fa-toggle-off': !platform.enabled,
-                                            'status-processing': platform.statusProcessing }"
-                            @click="togglePlatformStatus(platform)"></span>
-                       <!-- 'status-processing': (!isAlive() && !platform.enabled) || platform.statusProcessing }" -->
-                      
-                      <span class="platform-button fa fa-cog"
-                            @click="togglePlatformConfiguration(platform)"></span>
-                      
-                      <span class="platform-button fa fa-trash-alt" 
-                            style="margin-right:15px;font-size:16px;"
-                            @click="requestPlatformDelete(platform)"></span>
-                     </b-col>
-                   </b-row>
-                 </div>
-              <!-- </b-col> -->
-            </div>
-
-          </b-col>
-          <b-col class="preveiw-container">
-            <div class="video-wrapper">
-              <!-- <stream-thumb :stream="stream" class="video-thumb" /> -->
-              <div v-if="!isAlive()" class="video-thumb placeholder">
-                <p>Waiting for stream</p>
-              </div>
-              <!-- <div v-else class="video-thumb placeholder"> -->
-              <!-- <stream-player v-if="isAlive()"  -->
-              <stream-player v-else :stream="stream" class="video-thumb" />
-            </div>
-            <br>
-            <div>
-              <div class="source-switch-container">
-                <b-form-group label="">
-                  <b-form-radio-group id="stream-source-type" 
-                                      buttons
-                                      button-variant="outline-danger"
-                                      v-model="streamSourceType"
-                                      @input="onSourceTypeChange">
-                    <b-form-radio :value="SourceTypes.Publish"
-                                  :disabled="streamSourceTypeProcessing">Publish</b-form-radio>
-                    <b-form-radio :value="SourceTypes.Pull"
-                                  :disabled="streamSourceTypeProcessing">Pull</b-form-radio>
-                  </b-form-radio-group>
-                </b-form-group>
-              </div>
-              <div style="clear: both;"></div>
-              <div class="field-container">
-                <div class="label">Deployment Region</div>
-                <div class="input">
-                  <div style="font-size:15.5px;">
-                    <img :src="getRegionFlag()" 
-                         :alt="stream.region.name"
-                         style="width:20px;" />
-                    &nbsp;<span>{{stream.region.name}}</span>
-                  </div>
-                  <!-- <div v-show="!hasPullSource()"  -->
-                  <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div>
-                </div>
-              </div>
-              <div v-if="hasPullSource()" class="field-container">
-                <div class="label">Pull Source</div>
-                <div>
-                  <input v-model="streamPullUrl"
-                         @keypress="onPullUrlChange()"
-                         class="input" 
-                         placeholder="specify source url"/>
-                </div>
-              </div>
-              <div v-else class="field-container">
-                <div class="label">Streaming Key</div>
-                <div class="input">
-                  <button class="modal-button modal-button-sm highlight float-right"
-                          style="margin-top: -4px; margin-right: -6px;"
-                          @click="toggleStreamKeyVisibility">
-                          {{ streamKeyVisible ? 'Hide 0' + (streamKeyVisibleTimeout/1000) : 'Show' }}
-                  </button>
-                  <div v-if="streamKeyVisible" class="flaot-left">{{stream.key}}</div>
-                  <div v-else class="flaot-left">xxxxxxxxxxxxxxxxx</div>
-                </div>
-              </div>
-              <div class="field-container"
-                   style="padding-top:0;">
-                <!-- <div class="label">RTMP pull url</div> -->
-                <div style="margin-right:5px;">
-                  <!-- <button class="modal-button modal-button-sm highlight float-rights"
-                            style="margin-top: -4px; margin-right: -6px;"
-                            v-clipboard:copy="getStreamPullUrl()"
-                            v-clipboard:success="onStreamKeyCopied">Get RTMP Pull</button> -->
-                  <!-- <div v-if="hasPullSource()" style="margin: 15px 0;"> -->
-                            <!-- class="modal-button modal-button-variant2 highlight disabled" -->
-                    <b-button v-if="hasPullSource()"
-                              style="margin-right:10px;"
-                              variant="primary"
-                              @click="setStreamPullUrl"
-                              :disabled="!canSavePullUrl() || streamSourceTypeProcessing">
-                      <span v-if="streamSourceTypeProcessing">
-                        <i class="fas fa-spinner fa-spin"></i>
-                      </span>
-                      <span v-else>Save</span>
-                    </b-button>
-                  <!-- </div> -->
-
-                          <!-- style="margin-top: -4px; margin-right: -6px;" -->
-                  <button class="modal-button modal-button-sm highlight"
-                          :class="{'float-right': hasPullSource() }"
-                          :style="{'margin-top': hasPullSource() ? '4px' : 0}"
-                          @click="requestRTMPPullUrl">
-                    <span v-if="rmptPullUrlProcessing">
-                      <i class="fas fa-spinner fa-spin"></i></span>
-                    <span v-else>Get RTMP Pull</span>
-                  </button>
-
-                  <div v-if="streamSourceType === SourceTypes.Pull"
-                       class="hint"
-                       style="margin-top:20px;">
-                       <code style="font-szie:14px;">
-                         Restreaming Mixer FTL?
-                         <span class="btn btn-link" 
-                               style="margin-left:-2px;"
-                               @click="requestMixerUsername">Get Mixer Pull URL</span>
-                       </code>
-                  </div>
-
-                  <div v-if="streamPullUrlError && streamSourceType === SourceTypes.Pull"
-                       class="text-danger"
-                       style="margin-top:10px;">Doesn't look like a valid source</div>
-                </div>
-                <!-- <input class="input"
-                       :value="getStreamPullUrl(true)"
-                       readonly/> -->
-                <!-- <div class="input">
-                  <button class="modal-button modal-button-sm highlight float-right"
-                          style="margin-top: -4px; margin-right: -6px;"
-                          @click="toggleStreamKeyVisibility">Copy</button>
-                  <div class="flaot-left"></div>
-                </div> -->
-              </div>
-            </div>
-          </b-col>
-        </b-row>
       </div>
     </div>
     <div v-else 
@@ -346,55 +127,16 @@
       </div>
     </div>
 
-    <add-platform-modal :stream="stream" 
-                         @platform-saved="onNewPlatform"></add-platform-modal>
-
-    <configure-platform-modal :stream="stream"
-                              :platform="configurablePlatform" 
-                              @platform-updated="onPlatformUpdated"></configure-platform-modal>
-
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
-    
-    <confirm-modal modal-id="platform-delete-confirm"
-                   message="Would you like to remove selected publish platform"
-                   @modal-confirm="onPlatformDeleteConfirm(configurablePlatform)"></confirm-modal>
-
-    <confirm-modal modal-id="modal-sub-upgrade"
-                   message="This feature is only available in our paid subscriptions"
-                   okText="Upgrade now"
-                   cancelText="No thanks"
-                   @modal-confirm="navigatePaymentsPage"></confirm-modal>
-
-     <confirm-modal modal-id="modal-set-publish-mode"
-                    message="Switching to Publish mode will disable your pulled stream"
-                    okText="Enable Publish Mode"
-                    cancelText="Cancel"
-                    @modal-confirm="unsetStreamPullUrl"></confirm-modal>
-     
-     <prompt-modal modal-id="modal-mixer-username"
-                    message="Enter your Mixer username"
-                    okText="Grab Mixer Pull Url"
-                    cancelText="Cancel"
-                    @modal-prompt="onMixerUsername"></prompt-modal>
-
   </div>
 </template>
 
 <script>
-import AddPlatformModal from "./ChannelManage/AddPlatformModal.vue";
-import ConfigurePlatformModal from "./ChannelManage/ConfigurePlatformModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
-import PromptModal from "./PromptModal.vue";
-import StreamThumb from "./StreamThumb.vue";
-import StreamPlayer from "./StreamPlayer.vue";
 import StreamService from "../services/StreamService";
 import UserService from "../services/UserService";
 import SubscriptionService from "../services/SubscriptionService";
-import IntegrationService from "../services/IntegrationService";
-
-import platformConfigurations from "./ChannelManage/platformConfigurations";
-import utils from "@/utils"
 
 const SourceTypes = {
   Pull: "pull",
@@ -415,82 +157,38 @@ export default {
 
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Page", this.stream);
+
+    this.$root.$on('event', () => {
+
+      console.log('root event')
+      this.$root.$broadcast('event-from-parent', { message: 'hey' })
+    })
+
   },
   destroyed() {
     if (!this.stream) return;
-
     this.unsubscribeMediaPulse();
-    // const { haxrBlockId } = this.stream;
-    // this.$socket.emit('unsubscribe', { event: 'stream.summary', value: haxrBlockId });
   },
   data() {
     return {
       SourceTypes,
+      nameEdit: false,
       userSubscription: null,
       processing: true,
       processingMessage: null,
-      rmptPullUrlProcessing: false,
-      streamSourceType: null,
-      streamPullUrl: null,
-      streamPullUrlError: false,
-      streamSourceTypeProcessing: null,
       stream: null,
+      streamAlive: false,
       streamId: null,
       streamName: null,
       streamFps: null,
-      groupToggleProcessing: false,
-      groupToggleState: false,
-      streamKeyVisible: false,
-      streamKeyVisibleTimeout: 0,
-      streamKeyVisibleTimeoutCtrl: null,
       mediaPulse: null,
       windowHeight: 0,
-      nameEdit: false,
-      configurablePlatform: {},
-      hasPullSource() {
-        return this.streamSourceType === SourceTypes.Pull;
-      },
-      isCustomPlatform(platform) {
-        return platform.template === "custom";
-      },
-      isPlatformConnected(platform) {
-        const { mediaPulse } = this;
-        if (!mediaPulse || !mediaPulse.pushStreams) return;
-
-        const platformPushUrl = this.getPlatformPushUrl(platform);
-        const pushStats = _.find(mediaPulse.pushStreams, {
-          stream: platformPushUrl
-        });
-        const hasBytes = pushStats && pushStats.bytes > 0;
-
-        return hasBytes;
-      },
-      getPlatformIcon(platform) {
-        // return platform.name === "custom"
-        //   ? "fa fa-cog"
-        //   : "fab fa-" + platform.template;
-        return this.isCustomPlatform(platform)
-          ? "fa fa-cog"
-          : platformConfigurations.getPlatformIcon(platform.template);
-      },
-      getPlatformPushDestination(platform) {
-        if (!platform.server) return;
-
-        const maxLen = 40;
-        let dest = platform.server;
-        if (dest.length > maxLen) dest = dest.substr(0, maxLen) + " ..";
-
-        return dest;
-      },
       countPushedBytes() {
         const { bytesOutTotal = 0, pushStatsTotal = 0 } = this.mediaPulse;
         return _.sum([bytesOutTotal, pushStatsTotal]);
       },
-      isAlive() {
-        return this.stream.enabled && this.mediaPulse && this.mediaPulse.alive;
-      },
       getStreamStatus() {
-        return this.isAlive() ? "active" : "inactive";
+        return this.streamAlive ? "active" : "inactive";
       },
       getStreamQuality() {
         const sizes = [480, 720, 1080, 1440, 2160];
@@ -511,166 +209,8 @@ export default {
     };
   },
   methods: {
-    navigatePaymentsPage() {
-      this.$router.push({ path: "/subscribe?action=upgrade" });
-    },
-    onPullUrlChange () {
-      this.streamPullUrlError = false
-    },
-    canSavePullUrl () {
-      let canSave = false
-      // check for valid input
-      const {streamPullUrl} = this
-
-      if (streamPullUrl) {
-        // check if pull remained same
-        if (streamPullUrl !== this.stream.pullUrl)
-          canSave = true
-      }
-
-      return canSave
-    },
-    async onSourceTypeChange() {
-      // check if new mode is `publish`
-      if (this.streamSourceType === SourceTypes.Publish) {
-        // check if operational mode is `pull`
-        const hadPullUrl = this.stream.pullUrl;
-        // if (hadPullUrl) this.unsetStreamPullUrl();
-        if (hadPullUrl) this.requestPublishPrompt()
-      }
-    },
-    requestPublishPrompt () {
-      this.$root.$emit("bv::show::modal", "modal-set-publish-mode");
-      setTimeout(() => { this.streamSourceType = SourceTypes.Pull })
-    },
-    async setStreamPullUrl() {
-      this.streamPullUrlError = false
-      
-      // setTimeout(() => {
-      //   this.streamSourceType = SourceTypes.Publish
-      // })
-
-      const pullSource = this.streamPullUrl;
-
-      // check if url is valid
-      // if (!utils.validatisValidUrl(pullSource)) {
-      const {valid} = utils.validateURL(pullSource, {allowedProtos: ['https', 'http', 'hls', 'rtmp', 'rtsp'] })
-      if (!valid) {
-        this.streamPullUrlError = true
-        return
-      }
-
-      // swtich source mode to specified pull url
-      this.streamSourceTypeProcessing = true;
-
-      try {
-        await StreamService.setStreamPullUrl(this.streamId, pullSource)
-        this.stream.pullUrl = pullSource;
-        this.$notify({ group: "success", text: "stream pull url saved" });
-
-      } catch (e) {
-        this.$notify({ group: "error", text: "could not save stream pull url" });
-      }
-
-      this.streamSourceTypeProcessing = false;
-      // #SUCCESS
-      // setTimeout(() => {
-      //   this.stream.pullUrl = pullSource;
-      //   this.$notify({ group: "success", text: "stream pull url saved" });
-      //   this.streamSourceTypeProcessing = false;
-      // }, 2000);
-
-      // #FAILED
-      // setTimeout(() => {
-      //   this.$notify({ group: "error", text: "could not save stream pull url" });
-      //   this.streamSourceTypeProcessing = false;
-      // }, 2000);
-    },
-    requestMixerUsername () {
-      // const res = await IntegrationService.getMixerFTLUrl('tidy')
-      this.$root.$emit("bv::show::modal", "modal-mixer-username");
-    },
-    async onMixerUsername (mixerUsername, ackCB) {
-      // console.log('mixerUsername', mixerUsername)
-      const res = await IntegrationService.getMixerFTLUrl(mixerUsername)
-      ackCB(!res.mixerPullURL)
-
-      const {mixerPullURL} = res
-      this.streamPullUrl = mixerPullURL
-    },
-    async unsetStreamPullUrl() {
-      this.streamSourceTypeProcessing = true;
-
-      try {
-        await StreamService.unsetStreamPullUrl(this.streamId)
-        this.stream.pullUrl = null;
-        this.$notify({ group: "success", text: "Publish mode activated" });
-        
-        // change tab to publish
-        this.streamSourceType = SourceTypes.Publish
-
-      } catch(e) {
-        this.streamSourceType = SourceTypes.Pull
-        this.$notify({ group: "error", text: "could not switch to Publish mode" });
-      }
-
-      this.streamSourceTypeProcessing = false;
-      // #SUCCESS
-      // setTimeout(() => {
-      //   this.stream.pullUrl = null;
-      //   this.$notify({ group: "success", text: "Publish mode activated" });
-      //   this.streamSourceTypeProcessing = false;
-      // }, 2000);
-        
-      // #FAILED
-      // setTimeout(() => {
-      //   this.streamSourceType = SourceTypes.Pull
-      //   this.$notify({ group: "error", text: "could not switch to Publish mode" });
-      //   this.streamSourceTypeProcessing = false;
-      // }, 2000);
-    },
-    async requestRTMPPullUrl() {
-      let sub = this.userSubscription;
-      if (!sub) {
-        this.rmptPullUrlProcessing = true;
-        // get user subscription
-        try {
-          sub = await SubscriptionService.getUserSubscriptions(true);
-        } catch (e) {
-          this.$notify({ group: "error", text: e.message });
-        }
-
-        this.userSubscription = sub;
-        this.rmptPullUrlProcessing = false;
-      }
-
-      if (!sub) return;
-
-      // check if user has paid subscription
-      // const pack = sub.subscription.package;
-      // if (pack.baseCharge === 0) {
-      //   // show upgrade prompt if free subscription
-      //   this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
-      //   return;
-      // }
-
-      // try copy to clipboard
-      const rtmpPullUrl = this.getStreamPullUrl();
-      try {
-        this.$copyText(rtmpPullUrl);
-        this.onStreamKeyCopied();
-      } catch (e) {}
-    },
-    openChatWindow() {
-      const { protocol, hostname } = window.location;
-      const chatAppUrl = `${protocol}//${hostname}/chat/web?token=${
-        this.stream._id
-      }__${UserService.getUserToken()}`;
-      const chatAppTitle = `${this.stream.name} Chat`;
-      const chatAppPopupOptions =
-        "toolbar,scrollbars,resizable,top=100,left=100,width=450,height=700";
-
-      window.open(chatAppUrl, chatAppTitle, chatAppPopupOptions);
+    onStreamUpdates (updates) {
+      this.stream = _.assign({}, this.stream, updates)
     },
     async setupStream() {
       // get stream details
@@ -678,21 +218,8 @@ export default {
         const stream = await StreamService.getStream(this.streamId);
         this.stream = stream;
         this.streamName = this.stream.name;
-
-        const hasPullUrl = stream.pullUrl;
-        this.streamSourceType = hasPullUrl
-          ? SourceTypes.Pull
-          : SourceTypes.Publish;
-        if (hasPullUrl) this.streamPullUrl = stream.pullUrl;
-
         this.setupMediaPulse();
-
-        // normalize data
-        _.each(this.stream.platforms, platform => {
-          platform.editorName = platform.name;
-        });
-
-        this.computeGroupToggleState();
+        
       } catch (err) {
         // redirect to stream list
         this.$router.push({ name: "ChannelList" });
@@ -721,58 +248,6 @@ export default {
         });
       }
     },
-    async onPlatformNameChange(platform) {
-      const newName = platform.editorName;
-      if (platform.name === newName) return;
-
-      // try changing stream name
-      try {
-        await StreamService.setStreamPlatformName(
-          this.streamId,
-          platform._id,
-          newName
-        );
-      } catch (err) {
-        platform.editorName = platform.name;
-        let platforms = _.cloneDeep(this.stream.platforms);
-        this.stream.platforms = platforms;
-
-        this.$notify({
-          group: "error",
-          title: "Couldn't change platform name",
-          text: err.message
-        });
-      }
-    },
-    computeGroupToggleState() {
-      const { platforms } = this.stream;
-      const platformCount = _.size(platforms);
-      const enabledPlatformCount = _.size(_.filter(platforms, p => p.enabled));
-
-      this.groupToggleState = enabledPlatformCount > platformCount / 2;
-    },
-    toggleStreamKeyVisibility() {
-      window.clearInterval(this.streamKeyVisibleTimeoutCtrl);
-      const newState = !this.streamKeyVisible;
-      this.streamKeyVisible = newState;
-
-      if (newState) {
-        let timeout = 1000;
-        this.streamKeyVisibleTimeout = 9000;
-        this.streamKeyVisibleTimeoutCtrl = setInterval(() => {
-          this.streamKeyVisibleTimeout -= timeout;
-          if (!this.streamKeyVisibleTimeout) this.toggleStreamKeyVisibility();
-        }, timeout);
-
-        // track event
-        window.trackEvent(`Viewed Stream key in stream ${this.stream.name}`);
-      }
-    },
-    onStreamKeyCopied() {
-      this.$notify({ group: "info", text: "Copied to clipboard" });
-      // track event
-      window.trackEvent(`Copied RTMP pull for stream ${this.stream.name}`);
-    },
     getTrackType(track) {
       if (!track) return;
 
@@ -781,131 +256,6 @@ export default {
       else if (/^v/gi.test(track.id)) type = "video";
 
       return type;
-    },
-    onNewPlatform(platform) {
-      platform.editorName = platform.name;
-      this.stream.platforms = [...this.stream.platforms, platform];
-
-      // track event
-      window.trackEvent(
-        `Added ${platform.name} platform in stream ${this.stream.name}`,
-        platform
-      );
-
-      this.computeGroupToggleState();
-    },
-    onPlatformUpdated(platform, updates) {
-      platform.server = updates.server;
-      platform.streamKey = updates.streamKey;
-    },
-    toggleGroupStatus() {
-      // if (!this.isAlive()) return
-
-      const ostate = this.groupToggleState;
-      const nstate = !ostate;
-
-      this.groupToggleProcessing = true;
-
-      _toggle.call(this, 0, () => {
-        // compute group toggle state
-        this.computeGroupToggleState();
-        this.groupToggleProcessing = false;
-      });
-
-      async function _toggle(index, cb) {
-        const { platforms } = this.stream;
-
-        const platform = platforms[index];
-        if (!platform) {
-          return cb();
-        }
-
-        await this.togglePlatformStatus(platform, nstate, true);
-        _toggle.call(this, ++index, cb);
-      }
-    },
-    async togglePlatformStatus(platform, forceState, groupToggleReq) {
-      // if (!this.isAlive() && !platform.enabled) return
-
-      const oldStatus = platform.enabled;
-      const newStatus = forceState !== undefined ? forceState : !oldStatus;
-
-      if (oldStatus === newStatus) return;
-
-      platform.statusProcessing = true;
-
-      try {
-        await StreamService.toggleStreamPlatform(
-          this.streamId,
-          platform._id,
-          forceState
-        );
-        platform.enabled = newStatus;
-
-        // track event
-        window.trackEvent(
-          `${newStatus ? "Enabled" : "Disabled"} ${_.capitalize(
-            platform.name
-          )} platform in stream ${this.stream.name}`,
-          platform
-        );
-
-        if (!groupToggleReq) {
-          this.computeGroupToggleState();
-        }
-      } catch (err) {
-        platform.enabled = oldStatus;
-        this.$notify({
-          group: "error",
-          title: "Couldn't toggle platform status",
-          text: err.message
-        });
-      }
-
-      platform.statusProcessing = false;
-    },
-    togglePlatformConfiguration(platform) {
-      if (platform.linkedServiceCreds) {
-        window.alert(
-          `Platform is connected to ${
-            platform.template
-          } account and can not be edited but can be toggled or deleted`
-        );
-        return;
-      }
-
-      this.configurablePlatform = platform;
-      this.$root.$emit("bv::show::modal", "modal-configure-platform");
-    },
-    getRegionFlag() {
-      return `https://countryflags.io/${
-        this.stream.region.identifier
-      }/flat/24.png`;
-    },
-    getStreamPushUrl() {
-      const { region } = this.stream;
-      // return `rtmp://${this.stream.region.hostname}:1977/static`;
-      // return `rtmp://${region.hostname}:${region.rtmpPort}/static`;
-      // let pushUrl = `rtmp://${region.hostname}`;
-      let pushUrl = `rtmp://${region.hostname}/static`;
-      if (region.rtmpPort != 1935) {
-        pushUrl += ":" + region.rtmpPort;
-      }
-
-      // return pushUrl + '/';
-      return pushUrl;
-    },
-    getStreamPullUrl(hide) {
-      let server = this.getStreamPushUrl();
-      if (!/\/$/gi.test(server)) server += "/";
-
-      const pullUrl = server + (hide ? "xxxx" : this.stream.key);
-
-      return pullUrl;
-    },
-    getPlatformPushUrl(platform) {
-      if (!platform) return;
-      return `${platform.server}/${platform.key}`;
     },
     setupMediaPulse() {
       if (!this.stream) return;
@@ -944,6 +294,8 @@ export default {
       }, 5000);
     },
     onMediaPulse() {
+      this.streamAlive = this.stream.enabled && this.mediaPulse && this.mediaPulse.alive
+
       let codecs = _.get(this, "mediaPulse.tracks");
       if (!_.size(codecs)) return;
 
@@ -979,51 +331,10 @@ export default {
       }
 
       this.processing = false;
-    },
-    requestPlatformDelete(platform) {
-      this.configurablePlatform = platform;
-      this.$root.$emit("bv::show::modal", "platform-delete-confirm");
-    },
-    async onPlatformDeleteConfirm() {
-      const platform = this.configurablePlatform;
-      platform.removing = true;
-
-      // try deleting stream platform
-      try {
-        await StreamService.deleteStreamPlatform(this.streamId, platform._id);
-
-        // popout platform object
-        const { platforms } = this.stream;
-        const index = platforms.indexOf(this.configurablePlatform);
-        this.stream.platforms = _.concat(
-          platforms.slice(0, index),
-          platforms.slice(index + 1)
-        );
-
-        this.computeGroupToggleState();
-
-        // track event
-        window.trackEvent(
-          `Deleted ${platform.name} platform in stream ${this.stream.name}`,
-          platform
-        );
-      } catch (err) {
-        this.$notify({
-          group: "error",
-          title: "Couldn't delete publish platform",
-          text: err.message
-        });
-        platform.removing = false;
-      }
     }
   },
   components: {
-    AddPlatformModal,
-    ConfigurePlatformModal,
-    ConfirmModal,
-    PromptModal,
-    StreamThumb,
-    StreamPlayer
+    ConfirmModal
   }
 };
 
@@ -1071,7 +382,7 @@ function isValidUrl (url) {
   font-size: 16px;
 }
 .content-container {
-  padding: 50px 0 40px 0;
+  padding: 20px 0 40px 0;
 }
 .stat-container {
 }
@@ -1120,6 +431,9 @@ function isValidUrl (url) {
 }
 .media-codec.audio {
   background-color: #f33483;
+}
+.page-menu {
+  margin: 10px 0 15px 0;
 }
 .head-button {
   border: none;
@@ -1205,146 +519,5 @@ function isValidUrl (url) {
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);
-}
-.platform-list {
-  margin: 15px 0;
-}
-.platform-item {
-  position: relative;
-  padding: 18px 6px;
-  /* border-bottom: 1px solid rgb(17, 19, 64); */
-  margin-bottom: 8px;
-  background: #040634;
-  border-radius: 2px;
-  border: none;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-.platform-item:last-of-type {
-  border-bottom: none;
-}
-.platform-item-overlay {
-  position: absolute;
-  overflow: hidden;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  padding: 35px 0 0 0;
-  padding-left: 44%;
-  box-sizing: border-box;
-  /* background-color: rgba(0,0,0,0.65); */
-  background-color: rgba(24, 28, 99, 0.5);
-  z-index: 99;
-}
-.platform-icon {
-  display: inline-block;
-  font-size: 24px;
-  /* padding-top: 7px; */
-  margin-right: 10px;
-  width: 95px;
-  text-align: center;
-}
-.platform-icon img {
-  max-width: 80%;
-  max-height: 26px;
-  filter: grayscale(1);
-}
-.platform-name {
-  display: inline-block;
-  font-size: 14.5px;
-  text-transform: capitalize;
-  font-weight: 600;
-  vertical-align: top;
-}
-.platform-connect-status {
-  font-size: 12px;
-  font-weight: 400;
-  color: gray;
-  text-transform: lowercase;
-}
-.platform-connect-status.online {
-  color: #1dd240;
-}
-.platform-name .name {
-  border: 1px solid;
-  padding: 3px 5px;
-  background-color: transparent;
-  color: #ffffff;
-  border: none;
-}
-.platform-name .name:hover {
-  background-color: #17193e;
-}
-.platform-name .name:focus {
-  background-color: #17193e;
-  outline-color: #0075ff;
-}
-.platform-server {
-  font-size: 13px;
-  color: #74769f;
-  font-weight: 400;
-  text-transform: none;
-}
-.platform-verified-badge {
-  font-size: 12.5px;
-  border-radius: 50px;
-  color: #199d19;
-  display: inline-block;
-  text-transform: lowercase;
-}
-.platform-button {
-  float: right;
-  color: #ffffff;
-  font-size: 18px;
-  margin-top: 10px;
-  transition: all 0.2s linear;
-  cursor: pointer;
-}
-.platform-button:hover {
-  opacity: 0.65;
-}
-.toggle-control-master {
-  font-size: 24px;
-  margin: 0 18px 0 0;
-  display: inline-block;
-  vertical-align: middle;
-}
-.toggle-control {
-  /* margin: 15px 0 0 5px; */
-  margin-left: 15px;
-}
-.toggle-control:hover {
-  opacity: 1;
-}
-.toggle-control.enabled {
-  /* color: #3d9bff; */
-  color: greenyellow;
-}
-.toggle-control.status-processing {
-  cursor: not-allowed;
-  opacity: 0.65;
-  color: #ffffff;
-}
-.video-thumb {
-  width: inherit;
-  height: 100%;
-  background-size: 100% auto;
-  background-position: center center;
-}
-.video-thumb.placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  position: absolute;
-}
-.hint {
-  font-size: 14.5px;
-}
-.hint button {
-  font-size: 13.5px;
-  letter-spacing: -1px;
 }
 </style>

@@ -113,16 +113,23 @@
          </div>
        </div>
        <div class="text-center">
-         <b-button v-if="checkoutStep==0 && subscriptionPackage"
-                   size="lg"
-                   variant="success"
-                   @click="requestCheckout"
-                   :disabled="isCurrentSubscription()">
-           &nbsp; 
-           <i v-if="hasFee()" class="far fa-check-circle"></i>
-           <span>{{ hasFee() ? 'Pay Now' : 'Change Package' }}</span>
-           &nbsp;
-        </b-button>
+         <div v-if="checkoutStep==0 && subscriptionPackage">
+           <b-button size="lg"
+                     variant="success"
+                     @click="requestCheckout"
+                     :disabled="isCurrentSubscription()">
+              &nbsp; 
+              <i v-if="hasFee()" class="far fa-check-circle"></i>
+              <span>{{ hasFee() ? 'Pay Now' : 'Change Package' }}</span>
+              &nbsp;
+           </b-button>
+           <div v-if="hasFee()" 
+                style="margin: 10px;">
+                or use <a :href="gerPermalink()">Paypal</a>
+           </div>
+           <br>
+           <br>
+         </div>
          <div v-else-if="checkoutStep==1" class="text-info message">Request is being validated</div>
          <div v-else-if="checkoutStep==2" class="text-info message">{{ hasFee() ? 'Validating payment' : 'Changing subscription' }}</div>
          <div v-else-if="checkoutStep==3">
@@ -236,6 +243,11 @@ export default {
     };
   },
   methods: {
+    gerPermalink () {
+      const route = window.location
+      const host = `${route.protocol}//${route.hostname}`
+      return `${host}/billing/pay?userId=${UserService.getUserId()}&packageId=${this.subscriptionPackage._id}`
+    },
     isCurrentSubscription (pack) {
       pack = pack || this.subscriptionPackage
       return pack && _.get(this, 'userSubscription.subscription.package') === pack._id

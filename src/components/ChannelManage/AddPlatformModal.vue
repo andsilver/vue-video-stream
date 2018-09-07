@@ -61,8 +61,9 @@
             </div>
           </b-alert>
           <!-- form -->
+          <!-- <div v-if="platform.canLinkService" -->
           <!-- <div v-if="shouldShowServiceLinkingPrompt()" -->
-          <div v-if="platform.canLinkService"
+          <div v-if="!configRequired"
                class="text-center">
               
             <br>
@@ -76,7 +77,7 @@
 
                 &nbsp; <i class="fas fa-spinner fa-spin" style="font-size:16px;"></i>
               </p>
-              <button v-if="!linkedServiceCreds" 
+              <button v-if="!linkedServiceCreds || serviceLinkError" 
                       type="button" 
                       class="modal-button highlight" 
                       @click="cancelServiceLinking">Cancel</button>
@@ -111,23 +112,26 @@
 
           </div>
           <div v-else>
-            <div v-if="customPlatform || hasMultiplePlatformServers(platform) || platform.customServer"
+            <!-- <div v-if="customPlatform || hasMultiplePlatformServers(platform) || platform.customServer" -->
+            <div v-if="shouldConfigureServer()"
                  class="field-container">
               <div class="label">streaming {{ customPlatform && 'platform address' || 'server' }} </div>
 
-              <input v-if="customPlatform"
-                     v-model="platform.server"
-                     class="input"
-                     placeholder="rtmp://braodcaster_addr/"
-                     @keypress="onInputChange('server')" />
-              
-              <input v-else-if="platform.customServer"
+              <!-- <input v-if="customPlatform || platform.customServer" -->
+              <input v-if="checkServerInputMode('input')" 
                      v-model="platform.server"
                      class="input"
                      :placeholder="platform.serverInputPlaceholder || 'rtmp://braodcaster_addr/'"
                      @keypress="onInputChange('server')" />
               
-              <div v-else-if="platform.serverKeySegments" 
+              <!-- <input v-else-if="platform.customServer"
+                     v-model="platform.server"
+                     class="input"
+                     :placeholder="platform.serverInputPlaceholder || 'rtmp://braodcaster_addr/'"
+                     @keypress="onInputChange('server')" /> -->
+              
+              <!-- <div v-else-if="platform.serverKeySegments"  -->
+              <div v-else-if="checkServerInputMode('chunks')" 
                    class="input-container"
                    @click="focusServerKeySegment">
                 <div v-for="(segment, index) in platform.serverKeySegments" :key="index">
@@ -143,7 +147,8 @@
                 </div>
               </div>
                              <!-- :options="getPlatformServers(platform.name)" -->
-              <b-form-select v-else
+              <!-- <b-form-select v-else -->
+              <b-form-select v-else-if="checkServerInputMode('select')"
                              v-model="platform.server"
                              :options="platform.servers"
                              class="input"
@@ -157,7 +162,7 @@
             </div>
             <p v-if="linkedServiceCreds">
               <code style="font-size:14px;">
-                Stream key captured from connected {{platform.name|capitalize}} account
+                Some ingest details captured from connected {{platform.name|capitalize}} account
               </code>
             </p>
             <div v-else class="field-container">
@@ -168,6 +173,59 @@
                      @keypress="onInputChange('streamKey')" />
               <p v-show="formErrors.streamKey"
                  class="text-danger">specify stream key</p>
+            </div>
+
+            <!-- stream metadata form -->
+            <div v-if="canConfigureMetadata()">
+              <div class="field-container">
+                <div class="label">Stream Title</div>
+                <input v-if="canConfigureMetadata('title')"
+                       v-model="platform.configurableMetadata.title"
+                       class="input"
+                       placeholder="Enter stream title"/>
+                <div v-else class="input">
+                  <div class="value-placeholder">{{getMetadataPropValue('title')}}</div>
+                </div>
+                <!-- <p v-show="formErrors.metaTitle"
+                   class="text-danger">specify stream title</p> -->
+              </div>
+              
+              <div v-if="hasMetaProp('description')" class="field-container">
+                <div class="label">Stream Description</div>
+
+                <!-- <input v-if="canConfigureMetadata('description')"
+                       v-model="platform.configurableMetadata.description"
+                       class="input"
+                       placeholder="Enter stream description"
+                       :disabled="!canConfigureMetadata('description')"/> -->
+                <textarea v-if="canConfigureMetadata('description')"
+                       v-model="platform.configurableMetadata.description"
+                       class="input"
+                       placeholder="Enter stream description"
+                       :disabled="!canConfigureMetadata('description')"></textarea>
+
+                <!-- <input v-if="canConfigureMetadata('game')"
+                       v-model="platform.configurableMetadata.game"
+                       class="input"
+                       placeholder="Enter stream description"
+                       :disabled="!canConfigureMetadata('description')"/> -->
+
+                <div v-else>
+                  <div class="input">
+                    <div class="value-placeholder">{{getMetadataPropValue('description')}}</div>
+                  </div>
+                  <p class="text-info" style="font-size:12.5px;">we don't want you to change this ;)</p>
+                </div>
+              </div>
+              
+              <div v-if="hasMetaProp('game')" class="field-container">
+                <div class="label">Streaming Game</div>
+
+                <input v-model="platform.configurableMetadata.game"
+                       class="input"
+                       placeholder="Enter game name"
+                       :disabled="!canConfigureMetadata('game')"/>
+              </div>
             </div>
 
             <b-form-checkbox v-if="!linkedServiceCreds" 
@@ -187,7 +245,8 @@
                       :max="100" 
                       animated
                       class="w-75"></b-progress>
-          <div v-else-if="!serviceLinkProcessing || !platform.canLinkService">
+          <!-- <div v-else-if="!serviceLinkProcessing || !platform.canLinkService"> -->
+          <div v-else-if="!serviceLinkProcessing || configRequired">
             <button type="button" 
                     class="modal-button" 
                     @click="dismiss">Cancel</button>
@@ -231,6 +290,8 @@ export default {
       error: null,
       serviceLinkError: false,
       serviceLinkConflict: false,
+      platformServerInputMode: null,
+      configRequired: false,
       linkedServiceCreds: null,
       serviceLinkProcessing: false,
       platform: { enabled: false },
@@ -309,27 +370,66 @@ export default {
       this.platform.server = serverAddr;
     },
     onPlatformSelect(platform) {
-      this.stage = 1;
 
       this.customPlatform = !platform;
       // if (!platform) this.customPlatform = true;
       // if (!this.customPlatform)
       this.platform = _.assign({}, this.platform, _.cloneDeep(platform));
+      this.platform.configurableMetadata = {}
+
+      // compute `platformServerInputMode`
+      let platformServerInputMode = 'input'
+      if (_.size(this.platform.serverKeySegments))
+        platformServerInputMode = 'chunks'
+      else if (this.platform.servers) 
+        platformServerInputMode = 'select'
+
+      this.platformServerInputMode = platformServerInputMode
+
+      if (this.canConfigureMetadata()) {
+        this.platform.configurableMetadata = {
+          title: this.getMetadataPropValue('title'),
+          description: this.getMetadataPropValue('description'),
+        }
+      }
+
       let preselectedServer = this.platform.servers && this.platform.servers[0];
       if (preselectedServer) {
         preselectedServer = preselectedServer.value || preselectedServer;
         this.platform.server = preselectedServer;
       }
+
+      this.configRequired = !this.platform.canLinkService
+
+      // move to next step
+      this.stage = 1;
+    },
+    shouldConfigureServer () {
+      const haveConfigured = this.platform.server && this.platformServerInputMode === 'auto'
+
+      return !haveConfigured &&
+             (this.customPlatform ||
+             this.platform.customServer ||
+             this.hasMultiplePlatformServers(this.platform))
+    },
+    checkServerInputMode (matchInputMode) {
+      return this.platformServerInputMode && 
+             this.platformServerInputMode === matchInputMode
     },
     shouldShowServiceLinkingPrompt() {
-      return this.platform.canLinkService;
+      return !this.configRequired
+      // return this.platform.canLinkService && !this.configRequired
+      // return this.platform.canLinkService;
       // const bool = this.platform.canLinkService && !this.platform.ignoreServiceLinking
       // console.log('shouldShowServiceLinkingPrompt', bool)
       // return bool
     },
     ignoreServiceLinking() {
+      this.configRequired = true
+      this.platform.customServer = true
+      console.log(this.platform.platformServerInputMode)
+      // this.platform.canLinkService = false;
       // this.platform.ignoreServiceLinking=true
-      this.platform.canLinkService = false;
       // console.log(this.platform);
     },
     hasMultiplePlatformServers(platform) {
@@ -365,58 +465,152 @@ export default {
       Vue.appEvents.emit("ack.listen", ackTag, connectId);
 
       const subkey = [ackTag, connectId].join('.')
-      Vue.appEvents.on(subkey, async (response) => {
 
-        if (!response || response.error) {
-          this.serviceLinkError = true;
-          return
-        }
+      // #DISABLED FOR DEBUG
+      Vue.appEvents.on(subkey, this.onServiceAuthResponse);
 
-        const oauthMetaId = response.linkedMeta;
-        // acknowledge UI, authorization was successful 
-        this.linkedServiceCreds = oauthMetaId
+      // #ENABLED FOR DEBUG
+      // this.onServiceAuthResponse({linkedMeta: "5b7414021f7c1701c0f89123"})
 
-        // check for linking conflicts
-        let linkResult
+    },
+    hasMetaProp (propname) {
+      if (!this.linkedServiceCreds || 
+          !this.platform.serviceAuthorization || 
+          !propname) return
+
+      const {metadata} = this.platform.serviceAuthorization
+      
+      let canConfigure = false
+      const {fields} = metadata
+
+      // perform multi key matching `OR`
+      if (!_.isArray(propname))
+        propname = [propname]
+
+      let keyFound = false
+      _.each(propname, (key) => {
+        // check for property existences
+        if (keyFound) return
+        let field = _.find(fields, { key })
+        keyFound = !!field
+      })
+
+      return keyFound
+    },
+    canConfigureMetadata (propname) {
+      if (!this.linkedServiceCreds || 
+          !this.platform.serviceAuthorization) return
+
+      const {metadata} = this.platform.serviceAuthorization
+      if (propname === undefined)
+        return !!metadata
+      
+      let canConfigure = false
+      const {fields} = metadata
+
+      // check for property being disabled
+      let field = _.find(fields, { key: propname })
+      canConfigure = field && !field.disabled
+
+      return canConfigure
+    },
+    getMetadataPropValue (propname, getDefinition) {
+      const {fields} = this.platform.serviceAuthorization.metadata
+      const field = _.find(fields, { key: propname })
+      return getDefinition ? field : field && field.value
+    },
+    async onServiceAuthResponse (response) {
+      if (!response || response.error) {
+        this.serviceLinkError = true;
+        return
+      }
+
+      const oauthMetaId = response.linkedMeta;
+      // acknowledge UI, authorization was successful 
+      this.linkedServiceCreds = oauthMetaId
+
+      // check for linking conflicts
+      let linkResult
+      try {
+        linkResult = await IntegrationService.checkIntegrationConflict(this.stream._id, oauthMetaId)
+
+      } catch (E) {
+        debugger
+      }
+      
+      if (!linkResult || linkResult.linked) {
+        // conflicts are there
+        this.serviceLinkError = true;
+        this.serviceLinkConflict = true
+        this.linkedServiceCreds = null
+        return
+      }
+
+      // const linkedMetaId = response.linkedMeta;
+      // get ingest config
+      let ingest;
+      try {
+        ingest = await IntegrationService.getServiceIngest(oauthMetaId);
+      } catch (e) {
+        this.serviceLinkError = true;
+        return;
+      }
+
+      if (!ingest) {
+        this.serviceLinkError = true
+        return
+      }
+
+      // console.log('ingest', ingest)
+      // return
+      // setup service ingest
+      this.platform.enabled = true;
+      this.platform.streamKey = ingest.key;
+      this.platform.server = ingest.server;
+      this.linkedServiceCreds = ingest._id;
+
+      // if (!ingest.server)
+      // this.platformServerInputMode = 'auto'
+
+      // check if serice supports metadata integration
+      const {serviceAuthorization} = this.platform
+      let configRequired = false
+
+      // if (serviceAuthorization.metadata) {
+      //   this.ignoreServiceLinking()
+      //   return
+      // }
+
+      if (serviceAuthorization && serviceAuthorization.metadata) {
+        configRequired = true
+
+        // get existing metadata details
         try {
-          linkResult = await IntegrationService.checkIntegrationConflict(this.stream._id, oauthMetaId)
+          const streamMetadata = await IntegrationService.getIntegrationMetadata(oauthMetaId)
+          this.platform.configurableMetadata = streamMetadata
 
-        } catch(E) {
-          debugger
-        }
-        if (!linkResult || linkResult.linked) {
-          // conflicts are there
-          this.serviceLinkError = true;
-          this.serviceLinkConflict = true
-          this.linkedServiceCreds = null
-          return
-        }
+          // check for fixed/disabled fields
+          _.each(['title', 'description', 'game'], (propname) => {
+            const metaField = this.getMetadataPropValue(propname, true)
+            const { disabled, value } = metaField || {}
+            if (disabled)
+              this.platform.configurableMetadata[propname] = value
+          })
 
-        // const linkedMetaId = response.linkedMeta;
-        // get ingest config
-        let ingest;
-        try {
-          ingest = await IntegrationService.getServiceIngest(oauthMetaId);
         } catch (e) {
-          this.serviceLinkError = true;
-          return;
+          console.log(e)
         }
+      }
 
-        // console.log('ingest', ingest)
-        // return
-        // setup service ingest
-        this.platform.enabled = true;
-        this.platform.streamKey = ingest.key;
-        this.platform.server = ingest.server;
-        this.linkedServiceCreds = ingest._id;
+      if (ingest.server)
+        this.platformServerInputMode = 'auto'
+      else
+        configRequired = true
 
-        if (!ingest.server) {
-          this.ignoreServiceLinking();
-          return 
-        }
-
-        this.onSavePlatform();
-      });
+      this.configRequired = configRequired
+      if (configRequired) return
+      
+      this.onSavePlatform();
     },
     isServiceAlreadyLinked() {
       const currentTemplate = this.platform.name;
@@ -449,6 +643,22 @@ export default {
         key: streamKey,
         template: this.customPlatform ? "custom" : this.platform.name
       };
+
+      if (this.canConfigureMetadata()) {
+        const {title, description, game} = this.platform.configurableMetadata
+        const metaUpdates = {}
+        if (title) 
+          metaUpdates.title = title
+        if (description) 
+          metaUpdates.description = description
+        if (game) 
+          metaUpdates.game = game
+
+        payload.serviceMeta = metaUpdates
+      }
+
+      // debugger
+      // return
 
       if (this.linkedServiceCreds) {
         payload.enabled = true;
@@ -616,6 +826,10 @@ export default {
   background-color: #010329;
   border: none;
   border-radius: 2px;
+}
+textarea.input {
+  min-height: 100px !important; 
+  height: auto !important; 
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);
