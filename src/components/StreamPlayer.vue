@@ -110,11 +110,12 @@ export default {
       window.player = this.videoPlayer = playerInstance;
 
       // DOM events
-      element.onplaying = () => {
-        this.buffered = true;
-        clearTimeout(bufferWaitTimeout);
-        // this.playback = true;
-      };
+      if (element)
+        element.onplaying = () => {
+          this.buffered = true;
+          clearTimeout(bufferWaitTimeout);
+          // this.playback = true;
+        };
     },
     stopPlayback(cb) {
       const { player } = window;

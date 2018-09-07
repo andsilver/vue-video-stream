@@ -108,6 +108,7 @@ export default {
     togglePushReady (state) {
       this.pushReady = state
       if (state === true) {
+        this.$emit('stream-authorized')
         this.createConnection(() => {
           this.startStreaming()
         })
@@ -149,8 +150,8 @@ export default {
       }
 
       websocket.onerror = (err,e) => {
-        console.log('error', err,e)
-        console.log(websocket)
+        // console.log('error', err,e)
+        // console.log(websocket)
         this.error=true
         this.pushReady=false
       }
@@ -380,6 +381,8 @@ div.player-error-screen__code[data-error-screen] {
 }
 .video-controls button {
   background-color: #dc3545 !important;
+  /* background-color: rgba(1,3,41, 0.52) !important;
+  border: none !important; */
 }
 .video-controls button:hover {
   opacity: 0.75;
@@ -408,6 +411,10 @@ div.player-error-screen__code[data-error-screen] {
 }
 .video-controls .bottom .actions-container {
   text-shadow: 0 0 4px rgba(0,0,0, 0.15)
+}
+.video-controls .bottom button {
+  background-color: rgba(1,3,41, 0.65) !important;
+  border: none !important;
 }
 .video-controls .rec-icon {
     display: inline-block;

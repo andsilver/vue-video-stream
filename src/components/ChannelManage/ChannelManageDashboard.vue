@@ -178,8 +178,9 @@
                  :class="{'webcam-wrapper': streamSourceType === SourceTypes.Webcam}">
               <webcam-player v-if="streamSourceType === SourceTypes.Webcam" 
                              :stream="stream" 
-                             :stream-stopped="onWebcamStopped"
-                             :stream-started="onWebcamStarted"
+                             @stream-stopped="onWebcamStopped"
+                             @stream-started="onWebcamStarted"
+                             @stream-authorized="onWebcamAuthorized"
                              class="video-thumb" />
 
               <!-- <div v-if="!isAlive()" class="video-thumb placeholder"> -->
@@ -228,7 +229,7 @@
                     <div class="label">Pull Source</div>
                   </b-col>
                   <b-col>
-                    <div v-if="stream.enabled" class="text-right">
+                    <div v-if="stream.enabled && stream.pullUrl" class="text-right">
                       <code v-if="streamAlive"
                             class="platform-connect-status"
                             style="color:#1d87d2;">connected</code>
@@ -341,6 +342,12 @@
                     okText="Enable Publish Mode"
                     cancelText="Cancel"
                     @modal-confirm="unsetStreamPullUrl"></confirm-modal>
+     
+     <confirm-modal modal-id="modal-set-publish-mode-webcam"
+                    message="Switching to Webcam mode will disable your pulled stream"
+                    okText="Enable Publish Mode"
+                    cancelText="Cancel"
+                    @modal-confirm="unsetStreamPullUrl(true)"></confirm-modal>
       
       <prompt-modal modal-id="modal-mixer-username"
                     message="Enter your Mixer username"
@@ -470,11 +477,20 @@ export default {
 
       return canSave
     },
+    onWebcamAuthorized () {
+      // this.webcamPushReady = false
+      console.log('authorized')
+
+      // check if streaming pulling mode is active
+      if (this.stream.pullUrl) 
+        this.$root.$emit("bv::show::modal", "modal-set-publish-mode-webcam");
+    },
     onWebcamStopped () {
       // this.webcamPushReady = false
     },
     onWebcamStarted () {
       // this.webcamPushReady = false
+      console.log('started')
     },
     stopWebcamPush () {
       // this.webcamPushReady=false
@@ -488,8 +504,10 @@ export default {
         if (hadPullUrl) this.requestPublishPrompt()
       }
     },
-    requestPublishPrompt () {
+    requestPublishPrompt (preventSourceRestore) {
       this.$root.$emit("bv::show::modal", "modal-set-publish-mode");
+
+      if (preventSourceRestore) return
       setTimeout(() => { this.streamSourceType = SourceTypes.Pull })
     },
     requestMixerUsername () {
@@ -546,7 +564,7 @@ export default {
 
       this.streamSourceTypeProcessing = false;
     },
-    async unsetStreamPullUrl() {
+    async unsetStreamPullUrl(preventSourceRestore) {
       this.streamSourceTypeProcessing = true;
 
       try {
@@ -554,11 +572,16 @@ export default {
         this.stream.pullUrl = null;
         this.$notify({ group: "success", text: "Publish mode activated" });
         
-        // change tab to publish
-        this.streamSourceType = SourceTypes.Publish
+        if (!preventSourceRestore) {
+          // change tab to publish
+          this.streamSourceType = SourceTypes.Publish
+        }
 
       } catch(e) {
-        this.streamSourceType = SourceTypes.Pull
+        if (!preventSourceRestore) {
+          this.streamSourceType = SourceTypes.Pull
+        }
+
         this.$notify({ group: "error", text: "could not switch to Publish mode" });
       }
 
