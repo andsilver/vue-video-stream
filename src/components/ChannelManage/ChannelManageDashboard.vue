@@ -174,11 +174,12 @@
 
           </b-col>
           <b-col class="preveiw-container">
-            <div class="video-wrapper">
+            <div class="video-wrapper"
+                 :class="{'webcam-wrapper': streamSourceType === SourceTypes.Webcam}">
               <webcam-player v-if="streamSourceType === SourceTypes.Webcam" 
                              :stream="stream" 
-                             :push-ready="webcamPushReady"
                              :stream-stopped="onWebcamStopped"
+                             :stream-started="onWebcamStarted"
                              class="video-thumb" />
 
               <!-- <div v-if="!isAlive()" class="video-thumb placeholder"> -->
@@ -222,12 +223,32 @@
                 </div>
               </div>
               <div v-if="hasPullSource()" class="field-container">
-                <div class="label">Pull Source</div>
+                <b-row>
+                  <b-col>
+                    <div class="label">Pull Source</div>
+                  </b-col>
+                  <b-col>
+                    <div v-if="stream.enabled" class="text-right">
+                      <code v-if="streamAlive"
+                            class="platform-connect-status"
+                            style="color:#1d87d2;">connected</code>
+                      <code v-else class="platform-connect-status">connecting..</code>
+                    </div>
+                  </b-col>
+                </b-row>
+                <!-- <div class="label">Pull Source</div> -->
                 <div>
                   <input v-model="streamPullUrl"
                          @keypress="onPullUrlChange()"
                          class="input" 
                          placeholder="specify source url"/>
+
+                  <!-- <div v-if="!pullSourceWorking"
+                       class="text-warning">
+                    <i class="fas fa-exclamation-circle"></i>&nbsp;
+                    <span style="font-size:11.5px">No response from pull source yet</span>
+                  </div> -->
+
                 </div>
               </div>
               <div v-else-if="streamSourceType === SourceTypes.Webcam" 
@@ -371,6 +392,9 @@ export default {
       streamSourceType: null,
       streamPullUrl: null,
       streamPullError: false,
+      streamPullSourceChunksCount: 0,
+      pullSourceWorking: true,
+      pullSourceStatusTimeoutCtrl: -1,
       webcamPushReady: true,
       streamSourceTypeProcessing: null,
       streamId: null,
@@ -415,6 +439,15 @@ export default {
 
         return dest;
       },
+      isSuspiciousPullSource () {
+        var suspicious = false
+
+        if (this.stream.pullUrl) {
+
+        }
+
+        return suspicious
+      }
     };
   },
   methods: {
@@ -438,13 +471,13 @@ export default {
       return canSave
     },
     onWebcamStopped () {
-      this.webcamPushReady = false
+      // this.webcamPushReady = false
     },
-    startWebcamPush () {
-      this.webcamPushReady=true
+    onWebcamStarted () {
+      // this.webcamPushReady = false
     },
     stopWebcamPush () {
-      this.webcamPushReady=false
+      // this.webcamPushReady=false
     },
     async onSourceTypeChange() {
       // check if new mode is `publish`
@@ -471,6 +504,15 @@ export default {
       const {mixerPullURL} = res
       this.streamPullUrl = mixerPullURL
     },
+    setPullSourceStatus () {
+      let status = this.streamAlive
+      this.pullSourceWorking = status
+
+      if (status) {
+        const t = setTimeout(this.setPullSourceStatus, 5000)
+        this.pullSourceStatusTimeoutCtrl = t
+      }
+    },
     async setStreamPullUrl() {
       this.streamPullError = false
       
@@ -493,6 +535,10 @@ export default {
         await StreamService.setStreamPullUrl(this.streamId, pullSource)
         this.stream.pullUrl = pullSource;
         this.$notify({ group: "success", text: "stream pull url saved" });
+
+        // clearTimeout(this.pullSourceStatusTimeoutCtrl)
+        // this.pullSourceWorking = true
+        // this.pullSourceStatusTimeoutCtrl = setTimeout(this.setPullSourceStatus, 15000)
 
       } catch (e) {
         this.$notify({ group: "error", text: "could not save stream pull url" });
@@ -974,6 +1020,9 @@ function isValidUrl (url) {
   height: 220px;
   background-color: #000000;
   position: relative;
+}
+.video-wrapper.webcam-wrapper {
+  background-color: transparent;
 }
 .placeholder {
   font-size: 21px;
