@@ -21,7 +21,9 @@
         </div>
         <div class="main">
           <div class="actions-container">
-            <button v-if="!pushReady"
+            <code v-if="!mediaReady" class="text-danger" style="font-size:13.5px;font-weight:600">Optimizing video ..</code>
+            <!-- <button v-if="!pushReady && webcamConstraints" -->
+            <button v-if="mediaReady && !pushReady"
                     class="modal-button highlight"
                     @click="togglePushReady(true)">Stream Now</button>
           </div>
@@ -95,9 +97,11 @@ export default {
       error: null,
       scopeAlive: true,
       webrtcEnabled: false,
+      webcamConstraints: null,
       permissionHappened: false,
       playback: false,
       pushReady: false,
+      mediaReady: false,
       websocket: null,
       peerConn: null,
       videoPlayer: null,
@@ -121,10 +125,29 @@ export default {
       this.muted=newState
       this.videoPlayer.muted = newState
     },
-    requestMediaAccess(){
+    requestMediaAccess(constraints){
+      // const mediaConstraints = {
+      //   "audio": true,
+      //   "video": {
+      //     "mandatory": {
+      //       "minWidth": 1280,
+      //       "maxWidth": 1280,
+      //       "minHeight": 720,
+      //       "maxHeight": 720,
+      //       "minFrameRate": 30
+      //     },
+      //     "optional": []
+      //   }
+      // }
+
+      let mediaConstraints = { audio: true, video: true }
+      if (constraints)
+        mediaConstraints = constraints
+
       navigator
         .mediaDevices
-        .getUserMedia({ audio: true, video: true })
+        // .getUserMedia({ audio: true, video: true })
+        .getUserMedia(mediaConstraints)
         .then(this.onMediaAccess, this.onForbidMediaAccess)
     },
     createConnection (cb){
@@ -165,6 +188,48 @@ export default {
       
       this.videoPlayer.srcObject = stream;
       this.toggleMute(this.muted)
+    
+      let videoConfig = {}
+      if (!this.webcamConstraints) {
+        const vtracks = stream.getVideoTracks()
+        if (_.head(vtracks)) {
+          const vtrack = _.head(vtracks)
+          const capabilities = vtrack.getCapabilities()
+          const maxWidth = capabilities.width.max
+          const maxHeight = capabilities.height.max
+
+          if (maxHeight && maxWidth) {
+            const mediaConstraints = {
+              audio: true,
+              video: {
+                mandatory: { 
+                  minHeight: maxHeight,
+                  maxHeight: maxHeight,
+                  minWidth: maxWidth,
+                  maxWidth: maxWidth
+                },
+                optional: []
+              }
+            }
+
+            this.mediaReady = false
+            this.webcamConstraints = mediaConstraints
+            this.stopMediaAccess()
+            
+            setTimeout(() => {
+              this.requestMediaAccess(mediaConstraints)
+            }, 500)
+            return
+          }
+        }
+      }
+      
+      // lazy loading
+      setTimeout(() => {
+        this.mediaReady = true
+      }, 500)
+
+      this.webcamConstraints = videoConfig
 
       if (!this.pushReady) return
       this.startStreaming()
