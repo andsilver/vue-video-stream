@@ -254,13 +254,6 @@
               </div>
               <div v-else-if="streamSourceType === SourceTypes.Webcam" 
                    class="field-container" style="padding:0;">
-                 
-                 <!-- <button v-if="!webcamPushReady"
-                         class="modal-button highlight"
-                         @click="startWebcamPush">Start Streaming</button>
-                 <button v-else 
-                         class="modal-button highlight"
-                         @click="stopWebcamPush">Stop Streaming</button> -->
 
               </div>
               <div v-else class="field-container">
@@ -348,6 +341,12 @@
                     okText="Enable Publish Mode"
                     cancelText="Cancel"
                     @modal-confirm="unsetStreamPullUrl(true)"></confirm-modal>
+     
+     <confirm-modal modal-id="modal-webcam-leave-navigation"
+                    message="Webcam will stop streaming if you navigate"
+                    okText="Leave Anyway"
+                    cancelText="Keep Webcam"
+                    @modal-confirm="confirmWebcamLeave"></confirm-modal>
       
       <prompt-modal modal-id="modal-mixer-username"
                     message="Enter your Mixer username"
@@ -383,6 +382,16 @@ const SourceTypes = {
 export default {
   name: "ChannelManage",
   props: ['stream', 'streamAlive', 'mediaPulse'],
+  beforeRouteLeave (to, from, next) {
+
+    if (this.streamSourceType === SourceTypes.Webcam && this.webcamPushReady) {
+      this.$root.$emit('bv::show::modal', 'modal-webcam-leave-navigation')
+      this.webcamRouteLeaveNavigationCallback = () => next()
+      return
+    }
+
+    next()
+  },
   async mounted() {
     // get stream details
     await this.setupStream();
@@ -402,7 +411,7 @@ export default {
       streamPullSourceChunksCount: 0,
       pullSourceWorking: true,
       pullSourceStatusTimeoutCtrl: -1,
-      webcamPushReady: true,
+      webcamPushReady: false,
       streamSourceTypeProcessing: null,
       streamId: null,
       streamFps: null,
@@ -414,6 +423,7 @@ export default {
       streamKeyVisibleTimeoutCtrl: null,
       windowHeight: 0,
       configurablePlatform: {},
+      webcamRouteLeaveNavigationCallback: null,
       hasPullSource() {
         return this.streamSourceType === SourceTypes.Pull;
       },
@@ -478,7 +488,6 @@ export default {
       return canSave
     },
     onWebcamAuthorized () {
-      // this.webcamPushReady = false
       console.log('authorized')
 
       // check if streaming pulling mode is active
@@ -486,14 +495,14 @@ export default {
         this.$root.$emit("bv::show::modal", "modal-set-publish-mode-webcam");
     },
     onWebcamStopped () {
-      // this.webcamPushReady = false
+      this.webcamPushReady = false
     },
     onWebcamStarted () {
-      // this.webcamPushReady = false
-      console.log('started')
+      this.webcamPushReady = true
     },
-    stopWebcamPush () {
-      // this.webcamPushReady=false
+    confirmWebcamLeave () {
+      if (this.webcamRouteLeaveNavigationCallback)
+        this.webcamRouteLeaveNavigationCallback()
     },
     async onSourceTypeChange() {
       // check if new mode is `publish`
