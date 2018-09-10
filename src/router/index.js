@@ -10,6 +10,7 @@ import ChannelManage from '@/components/ChannelManage'
 import ChannelManageDashboard from '@/components/ChannelManage/ChannelManageDashboard'
 import ChannelManageChat from '@/components/ChannelManage/ChannelManageChat'
 import AppManage from '@/components/Manage'
+import AdminStats from '@/components/AdminStats'
 import ManageAccount from '@/components/Manage/ManageAccount'
 import ManagePasswordChange from '@/components/Manage/ManagePasswordChange'
 import ManageBilling from '@/components/Manage/ManageBilling'
@@ -84,6 +85,11 @@ const router = new Router({
         { path: 'change-password', component: ManagePasswordChange },
         { path: 'billing', component: ManageBilling }
       ]
+    },
+    {
+      path: '/insights/overwatch',
+      name: 'AdminStats',
+      component: AdminStats
     },
     {
       path: '*',
