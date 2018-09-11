@@ -549,6 +549,32 @@ export default {
 
       const pullSource = this.streamPullUrl;
 
+      let sub = this.userSubscription;
+      if (!sub) {
+        this.rmptPullUrlProcessing = true;
+        // get user subscription
+        try {
+          sub = await SubscriptionService.getUserSubscriptions(true);
+        } catch (e) {
+          this.$notify({ group: "error", text: e.message });
+        }
+
+        this.userSubscription = sub;
+        this.rmptPullUrlProcessing = false;
+      }
+
+      if (!sub) return
+
+      if (!isMixerFTLSource(pullSource)) {
+        // check if user has paid subscription
+        const pack = sub.subscription.package;
+        if (pack.baseCharge === 0) {
+          // show upgrade prompt if free subscription
+          this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
+          return;
+        }
+      }
+
       // check if url is valid
       if (!isValidUrl(pullSource)) {
         this.streamPullError = true
@@ -988,6 +1014,10 @@ function flushBlobUrl(blob) {
 
 function isValidUrl (url) {
   return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
+}
+
+function isMixerFTLSource(pullUrl) {
+  return /^https?\:\/\/www\.mixer\.com/gi.test(pullUrl)
 }
 </script>
 
