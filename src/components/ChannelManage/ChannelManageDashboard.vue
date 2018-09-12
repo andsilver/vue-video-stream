@@ -565,7 +565,7 @@ export default {
 
       if (!sub) return
 
-      if (!isMixerFTLSource(pullSource)) {
+      if (!isMixerFTLSource(pullSource) && !isRTSPSource(pullSource)) {
         // check if user has paid subscription
         const pack = sub.subscription.package;
         if (pack.baseCharge === 0) {
@@ -1018,6 +1018,10 @@ function isValidUrl (url) {
 
 function isMixerFTLSource(pullUrl) {
   return /^https?\:\/\/(www\.)?mixer\.com/gi.test(pullUrl)
+}
+
+function isRTSPSource(pullUrl) {
+  return /^rtsp?\:\/\//gi.test(pullUrl)
 }
 </script>
 
