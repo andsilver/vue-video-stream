@@ -1017,7 +1017,7 @@ function isValidUrl (url) {
 }
 
 function isMixerFTLSource(pullUrl) {
-  return /^https?\:\/\/www\.mixer\.com/gi.test(pullUrl)
+  return /^https?\:\/\/(www\.)?mixer\.com/gi.test(pullUrl)
 }
 </script>
 
