@@ -14,7 +14,7 @@ export default function appRun() {
   Vue.axios.defaults.baseURL = baseURL
 
   Vue.axios.defaults.timeout = 30 * 1000
-  Vue.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+  // Vue.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
   const token = UserService.getUserToken()
   if (token) {
