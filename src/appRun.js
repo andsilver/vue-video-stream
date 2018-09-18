@@ -165,4 +165,5 @@ function getApiBase() {
   }
 
   baseURL = route.protocol + '//' + baseURL
+  return baseURL
 }
