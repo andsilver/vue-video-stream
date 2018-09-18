@@ -7,10 +7,11 @@ import SubscriptionService from './services/SubscriptionService'
 
 export default function appRun() {
   // setup api base in http service
-  const route = window.location
-  // const baseURL = 'https://castr.io:22777'
-  // const baseURL = 'https://staging.castr.io:22777'
-  const baseURL = `${route.protocol}//${route.hostname}:22777`
+  // const route = window.location
+  // // const baseURL = 'https://castr.io:22777'
+  // // const baseURL = 'https://staging.castr.io:22777'
+  // const baseURL = `${route.protocol}//${route.hostname}:22777`
+  const baseURL = getApiBase()
   Vue.axios.defaults.baseURL = baseURL
 
   Vue.axios.defaults.timeout = 30 * 1000
@@ -150,4 +151,18 @@ window.trackEvent = function(event, data) {
   }
 
   mixpanel.track(event, data)
+}
+
+function getApiBase() {
+  const route = window.location
+  let baseURL = route.hostname
+  if (route.hostname === 'localhost') {
+    baseURL += ':22777'
+  } else {
+    let char = '.'
+    if (baseURL.indexOf('staging') > -1) char = '-'
+    baseURL = 'api' + char + baseURL
+  }
+
+  baseURL = route.protocol + '//' + baseURL
 }
