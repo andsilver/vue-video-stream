@@ -60,7 +60,6 @@ export default {
 }
 #thumb-temp-loader img {
 }
-@import url('https://fonts.googleapis.com/css?family=Comfortaa:400,700');
 html {
   font-size: 13px;
 }
