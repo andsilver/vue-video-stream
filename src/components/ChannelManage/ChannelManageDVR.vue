@@ -336,7 +336,7 @@
   overflow: hidden;
   display: none;
   text-align: center;
-  padding: 0px 4px;
+  padding: 0px 2px;
   border-radius: 2px;
   color: #000221;
   font-size: 12px;
