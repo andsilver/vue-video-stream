@@ -16,7 +16,7 @@
         <b-col cols="3">
           <div class="nav-links nav-links-socials">
             <div class="nav-link"><a href="https://facebook.com/castrlive" target="_blank"><i class="fab fa-facebook"></i></a></div>
-            <div class="nav-link"><a href="https://twitter.com/haxr_" target="_blank"><i class="fab fa-twitter"></i></a></div>
+            <div class="nav-link"><a href="https://twitter.com/castrHQ" target="_blank"><i class="fab fa-twitter"></i></a></div>
             <!-- <div class="nav-link"><a href="#" target="_blank"><i class="fab fa-google"></i></a></div> -->
             <div class="nav-link"><a href="https://www.linkedin.com/company/haxr/" target="_blank"><i class="fab fa-linkedin"></i></a></div>
           </div>

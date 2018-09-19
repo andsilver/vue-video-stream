@@ -34,7 +34,7 @@ const PricartoServers = [
 ]
 const bilibiliServers = ['rtmp://txy.live-send.acg.tv/live-txy/?']
 const webTvServers = ['rtmp://live3.origins.web.tv/liveext']
-const gamePlankServers = ['rtmp://www.gameplank.tv/live']
+const gamePlankServers = ['rtmp://live.gameplank.tv/app']
 const VaughnSoftServers = [
   { text: 'US: Primary', value: 'rtmp://live.vaughnsoft.net/live' },
   { text: 'US: Chicago, IL', value: 'rtmp://live-ord.vaughnsoft.net/live' },

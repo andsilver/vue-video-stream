@@ -80,7 +80,10 @@
 
                       <!-- <div v-if="isAlive() && platform.enabled" class="inline-block" style="margin:8px 16px 0 0"> -->
                       <div v-if="streamAlive && platform.enabled" class="inline-block" style="margin:8px 16px 0 0">
-                        <code v-if="isPlatformConnected(platform)"
+                        <!-- <code v-if="isPlatformConnected(platform)"
+                              class="platform-connect-status online">connected</code>
+                        <code v-else class="platform-connect-status">connecting..</code> -->
+                        <code v-if="platform.connected"
                               class="platform-connect-status online">connected</code>
                         <code v-else class="platform-connect-status">connecting..</code>
                       </div>
@@ -358,6 +361,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import StreamService from "@/services/StreamService";
 import UserService from "@/services/UserService";
 import SubscriptionService from "@/services/SubscriptionService";
@@ -397,6 +401,11 @@ export default {
     await this.setupStream();
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Dashboard Page", this.stream);
+  },
+  watch: {
+    mediaPulse () {
+      this.onMediaPulseChanged()
+    }
   },
   data() {
     return {
@@ -468,6 +477,24 @@ export default {
     };
   },
   methods: {
+    onMediaPulseChanged () {
+      const platforms = []
+      _.each(this.streamPlatforms, (platform, index) => {
+        const platformPushUrl = this.getPlatformPushUrl(platform)
+        const connectStatus = computePlatformStatus(platformPushUrl, this.mediaPulse)
+        if (platform.connected === connectStatus) return
+
+        // platform.connected = connectStatus
+        const pchanges = _.assign({}, platform, { connected: connectStatus })
+        this.$set(this.streamPlatforms, index, pchanges)
+        // this.streamPlatforms.$set(index, pchanges)
+        // platforms.push(pchanges)
+        // this.streamPlatforms[index] = platform
+      })
+
+      // this.streamPlatforms = platforms
+      this.$emit('stream-updated', { platforms: this.streamPlatforms })
+    },
     navigatePaymentsPage() {
       this.$router.push({ path: "/subscribe?action=upgrade" });
     },
@@ -999,6 +1026,16 @@ export default {
     PromptModal
   }
 };
+
+function computePlatformStatus(platformPushUrl, mediaPulse) {
+  let connected = false
+  if (!mediaPulse || !mediaPulse.pushStreams) return connected
+
+  const pushStats = _.find(mediaPulse.pushStreams, { stream: platformPushUrl });
+  connected = pushStats && pushStats.bytes > 0;
+
+  return connected || false
+}
 
 function promisify (func) {
   return new Promise((resolve) => {
