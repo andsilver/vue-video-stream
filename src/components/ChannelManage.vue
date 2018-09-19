@@ -87,8 +87,8 @@
                 <div class="value">{{ countPushedBytes() | bytes }}</div>
               </b-col>
               <b-col cols="5" class="stat-container xs">
-                <div class="label">uptime</div>
-                <div class="value">{{ mediaPulse.lifetime | elapsed }}</div>
+                <!-- <div class="label">uptime</div>
+                <div class="value">{{ mediaPulse.lifetime | elapsed }}</div> -->
               </b-col>
             </b-row>
         </div>

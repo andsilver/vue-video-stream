@@ -198,10 +198,11 @@
             <div>
               <div class="source-switch-container">
                 <b-form-group label="">
+                                      <!-- v-model="streamSourceType" -->
                   <b-form-radio-group id="stream-source-type" 
                                       buttons
                                       button-variant="outline-danger"
-                                      v-model="streamSourceType"
+                                      v-model="streamSourceTypeModel"
                                       @input="onSourceTypeChange">
                     <b-form-radio :value="SourceTypes.Publish"
                                   :disabled="streamSourceTypeProcessing">Publish</b-form-radio>
@@ -415,6 +416,7 @@ export default {
       processingMessage: null,
       rmptPullUrlProcessing: false,
       streamSourceType: null,
+      streamSourceTypeModel: null,
       streamPullUrl: null,
       streamPullError: false,
       streamPullSourceChunksCount: 0,
@@ -532,6 +534,21 @@ export default {
         this.webcamRouteLeaveNavigationCallback()
     },
     async onSourceTypeChange() {
+
+      if (this.streamSourceType === SourceTypes.Webcam && this.webcamPushReady) {
+        setTimeout(() => {
+          this.streamSourceTypeModel = this.streamSourceType
+        }, 100)
+
+        this.$root.$emit('bv::show::modal', 'modal-webcam-leave-navigation')
+        this.webcamRouteLeaveNavigationCallback = () => {
+          this.streamSourceType = this.streamSourceTypeModel
+        }
+        return
+      }
+
+      this.streamSourceType = this.streamSourceTypeModel
+
       // check if new mode is `publish`
       if (this.streamSourceType === SourceTypes.Publish) {
         // check if operational mode is `pull`
@@ -691,9 +708,9 @@ export default {
         this.streamPlatforms = _.map(this.stream.platforms, _.cloneDeep)
 
         const hasPullUrl = stream.pullUrl;
-        this.streamSourceType = hasPullUrl
-          ? SourceTypes.Pull
-          : SourceTypes.Publish;
+        // this.streamSourceType = hasPullUrl ? SourceTypes.Pull : SourceTypes.Publish;
+        this.streamSourceTypeModel = hasPullUrl ? SourceTypes.Pull : SourceTypes.Publish;
+        this.onSourceTypeChange()
         if (hasPullUrl) this.streamPullUrl = stream.pullUrl;
         
         // normalize data
