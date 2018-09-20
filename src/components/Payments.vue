@@ -25,7 +25,7 @@
              <b-col class="key">subscription</b-col>
              <b-col class="value">
 
-               <b-dropdown class="package-dropdown w-100">
+               <b-dropdown class="package-dropdown w-100" :disabled="checkoutStep===3">
                 <template slot="button-content">
                   <div v-if="!subscriptionPackage" style="display:inline-block;">Select</div>
                   <div v-else 
@@ -288,6 +288,7 @@ export default {
       );
     },
     async validatePayment(token='__token__') {
+      this.error = null
       this.checkoutStep = 2;
       try {
         const packageId = this.subscriptionPackage._id
