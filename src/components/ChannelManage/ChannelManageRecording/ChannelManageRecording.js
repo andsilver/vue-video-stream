@@ -52,7 +52,8 @@ export default {
         start: 0,
         end: 0,
         origin: Date.now(),
-        ticks: 14,
+        // ticks: 14,
+        ticks: 16,
         frame: 6 * 3600 * 1000,
         frameMoveFactor: function() { return this.frame * 0.1 },
         chunkFactor: 3600 * 1000,
@@ -186,12 +187,15 @@ export default {
 function getTicks(start, end) {
   if (!start || !end) return
   let trange = this.timelineRange
-  let ticks = trange.ticks
-  let Ticks = []
 
+  let ticks = trange.ticks
   ticks -= 1
-  let dif = Math.ceil((end.getTime() - start.getTime()) / ticks)
-  trange.chunkSize = dif
+
+  let diff = Math.ceil((end.getTime() - start.getTime()) / ticks)
+  // let diff = this.timelineRange.chunkFactor
+  trange.chunkSize = diff
+
+  console.log(diff)
 
   let dt = new Date()
   dt.setTime(start.getTime())
@@ -199,9 +203,10 @@ function getTicks(start, end) {
   let dtValue = () => dt.getTime()
 
   let tmp = {}
+  let Ticks = []
 
   for (let i = 0; dtValue() < end.getTime(); i++) {
-    dt.setTime(start.getTime() + (dif * i))
+    dt.setTime(start.getTime() + (diff * i))
     let timestamp = dt.getTime()
     let node = {
       time: new Date(timestamp)
@@ -559,7 +564,7 @@ function initSegmentExtractionControls() {
         if (pos < 0) pos = 0
         if (pos > pWidth) pos = pWidth
 
-        uiControl.style.left = (pixels = pos) + 'px';
+        uiControl.style.left = (pixels = pos) + 'px'
       }
 
       document.onmouseup = (upevent) => {
@@ -575,7 +580,16 @@ function initSegmentExtractionControls() {
 
         if (/ctrl2/g.test(el.className)) rangekey = 'end'
 
-        trange.extract[rangekey] = new Date(trange.start.getTime() + Math.floor(seekValue))
+        const newExtractTime = new Date(trange.start.getTime() + Math.floor(seekValue))
+        trange.extract[rangekey] = newExtractTime
+
+        // console.log(new Date(trange.start.getTime() + Math.floor(seekValue)))
+
+        const newExtract = _.assign({}, trange.extract, { [rangekey]: newExtractTime })
+        this.timelineRange = _.assign({}, this.timelineRange, {
+          extract: newExtract
+        })
+
         this.validDVRHits = getValidDVRHits.call(this)
       }
     }

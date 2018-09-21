@@ -18,6 +18,17 @@ const cybergameServers = [
   { text: 'RU Premium', value: 'rtmp://premium.cybergame.tv:1953/premium' },
   { text: 'EU Premium', value: 'rtmp://vod5.cybergame.tv:1953/live/' }
 ]
+const steamServers = [
+  { text: 'Chicago, US', value: 'rtmp://upload.broadcast.ord.steamstatic.com/app' },
+  { text: 'Los Angeles, US', value: 'rtmp://upload.broadcast.lax.steamstatic.com/app' },
+  { text: 'Washington DC, US', value: 'rtmp://upload.broadcast.iad.steamstatic.com/app' },
+  { text: 'Frankfurt, DE', value: 'rtmp://upload.broadcast.fra.steamstatic.com/app' },
+  { text: 'London, UK', value: 'rtmp://upload.broadcast.lon.steamstatic.com/app' },
+  { text: 'Stockholm, SW', value: 'rtmp://upload.broadcast.sto.steamstatic.com/app' },
+  { text: 'Hong Kong, HK', value: 'rtmp://upload.broadcast.hkg.steamstatic.com/app' },
+  { text: 'Singapore, SG', value: 'rtmp://upload.broadcast.sgp.steamstatic.com/app' },
+  { text: 'Sydney, AU', value: 'rtmp://upload.broadcast.syd.steamstatic.com/app' }
+]
 const StreamMeServers = [
   { text: 'Default', value: 'rtmp://uc-origin.stream.me/origin' },
   { text: 'US East', value: 'rtmp://ue-origin.stream.me/origin' },
@@ -34,7 +45,7 @@ const PricartoServers = [
 ]
 const bilibiliServers = ['rtmp://txy.live-send.acg.tv/live-txy/?']
 const webTvServers = ['rtmp://live3.origins.web.tv/liveext']
-const gamePlankServers = ['rtmp://www.gameplank.tv/live']
+const gamePlankServers = ['rtmp://live.gameplank.tv/app']
 const VaughnSoftServers = [
   { text: 'US: Primary', value: 'rtmp://live.vaughnsoft.net/live' },
   { text: 'US: Chicago, IL', value: 'rtmp://live-ord.vaughnsoft.net/live' },
@@ -109,7 +120,7 @@ const platforms = [{
     }
   },
   // { name: 'facebook live', servers: facebookServers, icon: '/static/images/platforms/facebook-live.svg' },
-  { 
+  {
     name: 'facebook live',
     // servers: [],
     customServer: true,
@@ -149,13 +160,14 @@ const platforms = [{
   },
   {
     name: 'steam',
-    serverKeySegments: [
-      { text: 'rtmp://', hidden: true },
-      { input: true, placeholder: 'br4-lhr1', width: 80 },
-      '.broadcast.steamcontent.com',
-      { text: '/app', hidden: true }
-    ],
-    serverKeySegmentValues: [],
+    servers: steamServers,
+    // serverKeySegments: [
+    //   { text: 'rtmp://', hidden: true },
+    //   { input: true, placeholder: 'br4-lhr1', width: 80 },
+    //   '.broadcast.steamcontent.com',
+    //   { text: '/app', hidden: true }
+    // ],
+    // serverKeySegmentValues: [],
     icon: '/static/images/platforms/steam.png',
     streamKeyPlaceholder: 'steam_852695447_c3886cec1233395a'
   },

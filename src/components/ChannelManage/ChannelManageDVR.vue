@@ -1,27 +1,6 @@
 <template>
   <div class="container view-wrapper" style="padding:0">
 
-    <!-- <div class="config-pane">
-      <div class="pane-label">settings</div>
-      <b-row>
-        <b-col cols="3">
-          <div class="config">
-          </div>
-        </b-col>
-        <b-col> -->
-          <!-- <div >
-            <input class="input" placeholder="hours"/>
-            <button class="btn btn-primary">Save</button>
-          </div> -->
-        <!-- </b-col>
-      </b-row>
-    <br>
-    <br>
-    </div> -->
-
-    <!-- <div class="pane-label">preview</div>
-    <br> -->
-
     <b-row>
       <b-col offset="2" cols="8">
         <div class="dvr-player-overlay">
@@ -34,12 +13,9 @@
           </div>
           <div id="dvr-player"
               class="dvr-player"></div>
-              <!-- :class="{ fullscreen: player.fullscreen }"></div> -->
         </div>
       </b-col>
     </b-row>
-
-    <div class="set-paddi:t-xs"></div>
 
     <div class="dvr-timeline-overlay font-num">
       <div class="dvr-timeline-container">
@@ -49,7 +25,7 @@
                 :style="{ width: (timelineRange.chunkPx + (4 + (index))) + 'px' }"
                 class="timeline-chunk">
             <span v-show="node.isHead" 
-                  class="text-muted">{{ node.time | date('DD-MM-YYYY') }}</span>
+                  style="color:white;">{{ node.time | date('DD-MM-YYYY') }}</span>
             <br>
             <span class="chunk-scale"></span>
             <span>{{node.time|date('HH:mm')}}</span>
@@ -77,8 +53,8 @@
       </div>
 
       <div class="dvr-player-controls">
-        <div class="text-center">
-          
+        <!-- <div class="text-center"> -->
+        <div>
           <div class="clip-time font-num">
             <span v-show="timelineRange.validHit">
               {{ player.time|date('HH:mm:ss DD-MM') }}
@@ -86,38 +62,58 @@
           </div>
 
           <b-row>
-            <b-col class="text-left" style="padding-top:10px;">
-              <span>{{timelineRange.start|date('HH:mm:ss A DD-MM')}}</span> 
-              <span class="text-muted">&nbsp; -- &nbsp;</span>
-              <span>{{timelineRange.end|date('HH:mm:ss A DD-MM')}}</span>
-            </b-col>
             <b-col>
-              <button class="btn btn-link player-control"
-                      @click="moveTimeline(-1)">
-                <span class="fa fa-chevron-left headi:md"></span>
-              </button>
-              <button class="btn btn-link player-control"
+              
+              <div class="btn-group">
+                <button class="btn btn-primary"
+                        @click="zoomTimeline(1)"><i class="fa fa-minus"></i></button>
+                <button class="btn btn-primary" 
+                        @click="zoomTimeline(-1)"><i class="fa fa-plus"></i></button>
+              </div>
+              &nbsp;
+              &nbsp;
+              <div class="btn-group">
+                <button class="btn btn-primary" 
+                        @click="moveTimeline(-1)"><i class="fa fa-chevron-left"></i></button>
+                <button class="btn btn-primary" 
+                        @click="moveTimeline(1)"><i class="fa fa-chevron-right"></i></button>
+              </div>
+              &nbsp;
+              &nbsp;
+              <div class="btn-group">
+                <button class="btn btn-primary"
                       @click="togglePlayback"
                       :disabled="!timelineRange.validHit">
-                <span :class="{ 
-                      'fa-stop': player.playback, 
-                      'fa-play': !player.playback }"
-                      class="fa headi:sm"></span>
-              </button>
-              <button class="btn btn-link player-control"
-                      @click="moveTimeline(1)">
-                <span class="fa fa-chevron-right headi:md"></span>
-              </button>
+                  <span class="fa"
+                        :class="{
+                        'fa-stop': player.playback, 
+                        'fa-play': !player.playback }"></span>
+                </button>
+                <button class="btn btn-primary"
+                      @click="toggleMute()">
+                  <span :class="{ 
+                        'fa-volume-off': player.mute, 
+                        'fa-volume-up': !player.mute }"
+                        class="fa heading-sm"></span>
+                </button>
+              </div>
             </b-col>
 
-            <b-col class="text-left">
-              <button class="btn btn-link player-control"
-                      @click="toggleMute()">
-                <span :class="{ 
-                      'fa-volume-off': player.mute, 
-                      'fa-volume-up': !player.mute }"
-                      class="fa heading-sm"></span>
-              </button>
+            <b-col class="text-right">
+
+              <button class="btn btn-success text" 
+                      :disabled="!validDVRHits.length">
+                <a :href="getDownloadHref()"
+                   target="_blank">Export MP4</a></button>
+
+              &nbsp;
+              &nbsp;
+
+              <span>
+                <span>{{timelineRange.extract.start|date('HH:mm:ss')}}</span> 
+                <span class="text-muted">-</span>
+                <span>{{timelineRange.extract.end|date('HH:mm:ss')}}</span>
+              </span>
             </b-col>
           </b-row>
 
@@ -144,95 +140,7 @@
             </div>
           </div>
 
-          <!-- <div class="text-muted set-margin-b-xs">dvr calendar</div>
-          <div class="dvr-calendar">
-            <b-button @click="toggleCalendarVisibility()"
-                      class="md-primary border-thin no-margin"
-                      md-theme="buttons"
-                      aria-label="toggle dvr calendar">
-              &nbsp;
-              <span>{{timelineRange.start | date}}</span> &nbsp;
-              <span class="fa"
-                    :class="{
-                      'fa-angle-up': showCalendar, 
-                      'fa-angle-down': !showCalendar 
-                    }"></span> &nbsp;
-            </b-button>
-            <div>
-              <b-button>Calendar Widget</b-button>
-            </div>
-          </div> -->
         </b-col>
-
-        <b-col class="text-center">
-          <!-- <div v-show="false" class="inline-block">
-            <div class="text-muted set-margin-b-xs">playback rate</div>
-            <div class="btn-group">
-              <button type="button"
-                      class="btn btn-default">
-                <span class="fa fa-angle-double-left font-md"></span>
-              </button>
-              <button type="button"
-                      class="btn btn-default">
-                <span :bind="playbackRate"></span>x
-              </button>
-              <button type="button"
-                      class="btn btn-default">
-                <span class="fa fa-angle-double-right font-md"></span>
-              </button>
-            </div>
-          </div> -->
-
-          <div class="inline-block">
-            <div class="tool-label">Zoom timeline</div>
-            <div class="btn-group">
-              <button type="button"
-                      class="btn btn-sm btn-default btn-secondary"
-                      @click="zoomTimeline(1)">
-                <span class="inline-block">zoom out</span>
-                <span style="opacity:0;margin-top:5px;">.</span>
-              </button>
-              &nbsp;
-              <button type="button"
-                      class="btn btn-sm btn-default btn-secondary"
-                      @click="zoomTimeline(-1)"><span>zoom in</span></button>
-            </div>
-
-          </div>
-
-        </b-col>
-
-        <b-col>
-          <div class="tool-label">
-            Clip Extraction&nbsp;
-            <i class="fa fa-cut"></i>
-          </div>
-          <div>
-            <a :href="getDownloadHref()"
-                       :disabled="!validDVRHits.length"
-                       target="_blank">
-                       Download Clip</a>
-
-            <div style="padding-top:10px;">
-              <div>
-                <div>
-                  <code> {{timelineRange.extract.start | date}} </code> &nbsp;-&nbsp;
-                  <code> {{timelineRange.extract.end | date}} </code>
-                </div>
-                <span class="text-muted"
-                      v-show="validDVRHits.length">
-                  {{validDVRHits.length | number}} segments
-                </span>                
-              </div>
-              <div v-show="!validDVRHits.length"
-                   class="text-danger">
-                <small>no stored segments to capture</small>
-              </div>
-            </div>
-          </div>
-        </b-col>
-
-        <b-col class="text-right hidden"></b-col>
       </b-row>
     </div>
 
@@ -244,13 +152,6 @@
   text-transform: uppercase;
   font-size: 13px;
 }
-.config-pane {
-  /* margin-bottom: 20px; */
-}
-
-.config-pane .config {
-}
-
 .timeline-header {
   font-size: 1.15em;
   margin-bottom: 10px;
@@ -284,14 +185,22 @@
 }
 
 .dvr-timeline-overlay {
-  /*border: 1px solid rgba(0,0,0,0.07);*/
   user-select: none;
   margin-top: 10px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  background: #27253c;
+  border-radius: 3px;
+  padding-top:10px;
 }
 
 .dvr-timeline-overlay .dvr-timeline-container {
   overflow: hidden;
   margin-bottom: 10px;
+  margin-left: -16px;
+  margin-right: -16px;
+  background-color: #201e33;
+  padding: 4px 16px;
 }
 
 .dvr-timeline-overlay .dvr-timeline {
@@ -332,7 +241,7 @@
   position: absolute;
   border-radius: 2px;
   z-index: 99;
-  bottom: 25px;
+  bottom: 12px;
   overflow: hidden;
   display: none;
   text-align: center;
@@ -388,10 +297,10 @@
   position: absolute;
   width: 15px;
   height: 15px;
-  /* background-color: #e8e8e8; */
+  background-color: #e8e8e8;
   /* background-color: #3380f8; */
   /* background-color: #e83e8c; */
-  background-color: #6c757d;
+  /* background-color: #6c757d; */
   box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(0, 2, 33);
   border-radius: 10px;
@@ -462,6 +371,7 @@
   padding: 0 10px;
   box-sizing: border-box;
   margin-top: 15px;
+  margin-bottom: 10px;
   /*border: 1px solid rgba(0,0,0,0.1);*/
 }
 
@@ -472,9 +382,24 @@
 .dvr-player-controls .btn {
   outline: none;
   width: 40px;
-  height: 40px;
+  height: 35px;
   color: #3380f8;
   padding: 5px 0;
+}
+.dvr-player-controls .btn .fa{
+    font-size: 12.5px;
+  }
+.dvr-player-controls .btn.text {
+  outline: none;
+  width: auto !important;
+  padding-left: 12px;
+  padding-right: 12px;
+  font-family: comfortaa;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.dvr-player-controls .btn.text a {
+  color: inherit;
 }
 
 .dvr-tools-overlay .dvr-toolbar {
