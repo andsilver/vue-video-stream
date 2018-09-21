@@ -25,7 +25,8 @@
              <b-col class="key">subscription</b-col>
              <b-col class="value">
 
-               <b-dropdown class="package-dropdown w-100">
+               <b-dropdown class="package-dropdown w-100" 
+                           :disabled="checkoutStep==3">
                 <template slot="button-content">
                   <div v-if="!subscriptionPackage" style="display:inline-block;">Select</div>
                   <div v-else 
@@ -133,8 +134,8 @@
          <div v-else-if="checkoutStep==1" class="text-info message">Request is being validated</div>
          <div v-else-if="checkoutStep==2" class="text-info message">{{ hasFee() ? 'Validating payment' : 'Changing subscription' }}</div>
          <div v-else-if="checkoutStep==3">
-         <div class="alert alert-success ">
-           <div class="message"><strong>Successfully Subscribed</strong></div>
+           <div class="alert alert-success ">
+             <div class="message"><strong>Successfully Subscribed</strong></div>
              <p>Great, we have enabled your selected package to your account.</p>
            </div>
            <br>
@@ -162,7 +163,7 @@
                show
                variant="danger"
                class="left inline"
-               style="margin:15px 0;">{{error.message}}</b-alert>
+               style="margin:15px 0;max-width:500px;">{{error.message}}</b-alert>
 
     </div>
   </div>
@@ -289,6 +290,7 @@ export default {
     },
     async validatePayment(token='__token__') {
       this.checkoutStep = 2;
+      this.error = null
       try {
         const packageId = this.subscriptionPackage._id
         const quantity = this.quantity
