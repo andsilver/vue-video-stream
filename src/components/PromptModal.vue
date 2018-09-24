@@ -19,8 +19,8 @@
                    class="input" 
                    v-model="promptInput"
                    @keypress.enter="onConfirm"/>
-            <!-- <p v-if="promptInputError"
-               class="text-danger">input can not left blank</p> -->
+            <p v-if="message2"
+               class="text-info message2" style="margin-bottom:10px;">{{message2}}</p>
             <div v-if="promptInputError"
                  class="text-danger">&nbsp;invalid mixer username</div>
           </div>
@@ -54,7 +54,7 @@ import HostingRegions from "./hostingRegions";
 
 export default {
   name: "PromptModal",
-  props: ["modalId", "message", "okText", "cancelText"],
+  props: ["modalId", "message", "message2", "okText", "cancelText"],
   mounted () {
     this.okLabel = this.okText || 'Yes' 
     this.cancelLabel = this.cancelText || 'No' 
@@ -142,6 +142,9 @@ export default {
   font-size: 12px;
   opacity: 0.65;
   text-transform: capitalize;
+}
+.message2 {
+  font-size: 12.5px;
 }
 .input {
   display: block;

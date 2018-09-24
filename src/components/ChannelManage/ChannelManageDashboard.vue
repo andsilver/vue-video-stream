@@ -354,6 +354,7 @@
       
       <prompt-modal modal-id="modal-mixer-username"
                     message="Enter your Mixer username"
+                    message2="Note: If you are pulling, please disable push to mixer"
                     okText="Grab Mixer Pull Url"
                     cancelText="Cancel"
                     @modal-prompt="onMixerUsername"></prompt-modal>
