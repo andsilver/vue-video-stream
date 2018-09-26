@@ -18,25 +18,25 @@ import AppFooter from "./components/AppFooter";
 import UserService from "./services/UserService";
 export default {
   name: "App",
-  mounted () {
-    this.computeWinHeight()
+  mounted() {
+    this.computeWinHeight();
   },
   watch: {
-    $route (to, form) {
-      setTimeout(this.computeWinHeight, 0)
+    $route(to, form) {
+      setTimeout(this.computeWinHeight, 0);
     }
   },
-  data () {
+  data() {
     return {
       winHeight: null
-    }
+    };
   },
   methods: {
-    authenticated () {
-      return UserService.authenticated()
+    authenticated() {
+      return UserService.authenticated();
     },
-    computeWinHeight () {
-      this.winHeight = (window.innerHeight-50) + 'px'
+    computeWinHeight() {
+      this.winHeight = window.innerHeight - 50 + "px";
     }
   },
   components: { AppNavbar, AppFooter }
@@ -70,6 +70,10 @@ body {
   font-family: comfortaa !important;
   color: #f7f7f7;
   background-color: #010329 !important;
+}
+
+.absolute {
+  position: absolute;
 }
 
 .inline-block {
@@ -250,7 +254,8 @@ body {
 }
 
 .region-dropdown,
-.package-dropdown {}
+.package-dropdown {
+}
 
 .region-dropdown .dropdown-menu,
 .package-dropdown .dropdown-menu {
@@ -297,7 +302,8 @@ body {
 }
 
 .region-dropdown .region-dropdown-item,
-.package-dropdown .package-dropdown-item {}
+.package-dropdown .package-dropdown-item {
+}
 
 .region-dropdown-item.selected,
 .region-dropdown-item:hover,
@@ -375,7 +381,7 @@ body {
   width: 110% !important;
 }
 
-.ringcaptcha.widget .wizard .wizard-check-step .wizard-step-content>div {
+.ringcaptcha.widget .wizard .wizard-check-step .wizard-step-content > div {
   width: 100% !important;
 }
 
@@ -444,7 +450,7 @@ body {
   float: right;
 }
 .form-group {
-  margin-bottom: 0 !important;  
+  margin-bottom: 0 !important;
 }
 .nav-menu-inline {
   margin: 0;

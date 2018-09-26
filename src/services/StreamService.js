@@ -13,6 +13,7 @@ import RequestError from './RequestError'
 export default {
   getUserStreams,
   getStream,
+  getStreamDvrRanges,
   addStream,
   setStreamName,
   toggleStream,
@@ -36,6 +37,19 @@ function getUserStreams() {
  */
 function getStream(streamId) {
   return makeRequest(`/streams/${streamId}`)
+}
+
+/**
+ * @param {string} streamId
+ * @param {number} startTime
+ * @param {number} endTime
+ */
+function getStreamDvrRanges(streamId, startTime, endTime) {
+  let uri = `/streams/${streamId}/dvrRanges`
+  uri += `?start=${startTime}`
+  uri += `&end=${endTime}`
+
+  return makeRequest(uri)
 }
 
 /**

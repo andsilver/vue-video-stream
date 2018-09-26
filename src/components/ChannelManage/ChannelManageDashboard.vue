@@ -215,6 +215,18 @@
               </div>
               <div style="clear: both;"></div>
               <div class="field-container">
+                <div class="label">Embed Url</div>
+                <input class="input"
+                       :value="getStreamEmbedUrl()"
+                       readonly/>
+              </div>
+              <div class="field-container">
+                <div class="label">HLS Url</div>
+                <input class="input"
+                       :value="getStreamHlsUrl()"
+                       readonly/>
+              </div>
+              <div class="field-container">
                 <div class="label">Deployment Region</div>
                 <div class="input">
                   <div style="font-size:15.5px;">
@@ -978,6 +990,18 @@ export default {
 
       // return pushUrl + '/';
       return pushUrl;
+    },
+    getStreamHlsUrl() {
+      const { region } = this.stream;
+      // return `rtmp://${this.stream.region.hostname}:1977/static`;
+      // return `rtmp://${region.hostname}:${region.rtmpPort}/static`;
+      // let pushUrl = `rtmp://${region.hostname}`;
+      let hlsUrl = `http://${region.hostname}/${this.stream.key}/index.m3u8`;
+      return hlsUrl;
+    },
+    getStreamEmbedUrl() {
+      let embedUrl = `https://player.haxr.io/${this.stream.key}`;
+      return embedUrl;
     },
     getStreamPullUrl(hide) {
       let server = this.getStreamPushUrl();

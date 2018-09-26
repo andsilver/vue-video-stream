@@ -447,7 +447,9 @@ export default {
       this.oauthConnectId = connectId;
 
       const searchParams = `redirect=1&user=${UserService.getUserId()}&stream=${this.stream._id}&connectId=${connectId}`;
-      return `${protocol}//${hostname}:22777/${pathname}?${searchParams}`;
+      // return `${protocol}//${hostname}:22777/${pathname}?${searchParams}`;
+      return `${getApiBase()}/${pathname}?${searchParams}`;
+
     },
     cancelServiceLinking () {
       this.serviceLinkError = false
@@ -726,6 +728,21 @@ export default {
   },
   components: {}
 };
+
+function getApiBase() {
+  const route = window.location
+  let baseURL = route.hostname
+  if (route.hostname === 'localhost') {
+    baseURL += ':22777'
+  } else {
+    let char = '.'
+    if (baseURL.indexOf('staging') > -1) char = '-'
+    baseURL = 'api' + char + baseURL
+  }
+
+  baseURL = route.protocol + '//' + baseURL
+  return baseURL
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

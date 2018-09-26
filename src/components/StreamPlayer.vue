@@ -135,6 +135,7 @@ export default {
       let subdomain = region.identifierHaxr;
       let hostname = `${subdomain}.origincdn.com`;
       const url = `wss://${hostname}/${key}/mse_ld?tracks=v1a1`;
+      // const url = `wss://${hostname}/${key}/mse_ld?tracks=a1`;
       // const url = `ws://${region.hostname}/${key}/mse_ld?tracks=v1a1`
       return url;
     },

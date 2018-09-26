@@ -13,6 +13,10 @@ body {
   background-color: #010329 !important;
 }
 
+.absolute {
+  position: absolute;
+}
+
 .inline-block {
   display: inline-block;
 }

@@ -4,6 +4,7 @@
       <div class="row">
         <div class="col-md-4">
           <div class="title">
+            <!-- <a class="title-change-placeholder">change</a> -->
             <input v-model="streamName"
                    @change="onStreamNameChange"
                    type="text" 
@@ -69,8 +70,7 @@
             </b-col>
           </b-row>
 
-          <b-row v-if="streamAlive"
-                 style="margin-top:10px;">
+          <b-row v-if="streamAlive">
 
               <b-col class="stat-container xs">
                 <div v-if="mediaPulse.alive" class="value">
@@ -101,8 +101,15 @@
           <router-link tag="li" 
                        :to="{name: 'ChannelManageChat'}"
                        active-class="active">
-            <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>&nbsp;
-            chat overlay
+            <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
+            &nbsp;chat overlay
+          </router-link>
+          <router-link v-if="stream.dvrEnabled"
+                       :to="{name: 'ChannelManageDVR'}"
+                       tag="li" 
+                       active-class="active">
+            <i class="fa fa-video" style="color:rgb(234,24,44);"></i>
+            &nbsp;recording
           </router-link>
         </ul>
 
@@ -359,6 +366,15 @@ function isValidUrl (url) {
   padding: 5px 0;
   font-size: 20px;
 }
+/* .title .title-change-placeholder {
+  position: absolute;
+  right: 50px;
+  display: inline-block;
+  color: blue;
+  font-size: 12px;
+  pointer-events: none;
+  back
+} */
 .title input {
   margin: 0;
   padding: 2px 3px;
@@ -382,13 +398,13 @@ function isValidUrl (url) {
   font-size: 16px;
 }
 .content-container {
-  padding: 20px 0 40px 0;
+  padding: 12px 0 40px 0;
 }
 .stat-container {
 }
 .stat-container .value {
   display: inline-block;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   margin-right: 3px;
   height: 34px;

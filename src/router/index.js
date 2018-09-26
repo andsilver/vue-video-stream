@@ -9,6 +9,7 @@ import ChannelList from '@/components/ChannelList'
 import ChannelManage from '@/components/ChannelManage'
 import ChannelManageDashboard from '@/components/ChannelManage/ChannelManageDashboard'
 import ChannelManageChat from '@/components/ChannelManage/ChannelManageChat'
+import ChannelManageDVR from '@/components/ChannelManage/ChannelManageDVR'
 import AppManage from '@/components/Manage'
 import AdminStats from '@/components/AdminStats'
 import ManageAccount from '@/components/Manage/ManageAccount'
@@ -71,6 +72,12 @@ const router = new Router({
           path: 'chat',
           name: 'ChannelManageChat',
           component: ChannelManageChat,
+          props: true
+        },
+        {
+          path: 'recording',
+          name: 'ChannelManageDVR',
+          component: ChannelManageDVR,
           props: true
         }
       ]
