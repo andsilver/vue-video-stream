@@ -21,8 +21,10 @@
                    @keypress.enter="onConfirm"/>
             <p v-if="message2"
                class="text-info message2" style="margin-bottom:10px;">{{message2}}</p>
+            <!-- <div v-if="promptInputError"
+                 class="text-danger">&nbsp;invalid mixer username</div> -->
             <div v-if="promptInputError"
-                 class="text-danger">&nbsp;invalid mixer username</div>
+                 class="text-danger">&nbsp;{{promptInputErrorMessage}}</div>
           </div>
         </div>
       </template>
@@ -54,10 +56,11 @@ import HostingRegions from "./hostingRegions";
 
 export default {
   name: "PromptModal",
-  props: ["modalId", "message", "message2", "okText", "cancelText"],
+  props: ["modalId", "message", "message2", "errorMessage", "okText", "cancelText"],
   mounted () {
     this.okLabel = this.okText || 'Yes' 
     this.cancelLabel = this.cancelText || 'No' 
+    this.promptInputErrorMessage = this.errorMessage || 'invalid input'
   },
   data() {
     return {
@@ -65,7 +68,8 @@ export default {
       okLabel: null,
       cancelLabel: null,
       promptInput: '',
-      promptInputError: null
+      promptInputError: null,
+      promptInputErrorMessage: null
     };
   },
   methods: {

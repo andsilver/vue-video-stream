@@ -357,6 +357,7 @@
                     message2="Note: If you are pulling, please disable push to mixer"
                     okText="Grab Mixer Pull Url"
                     cancelText="Cancel"
+                    errorMessage="No FTL broadcasts found"
                     @modal-prompt="onMixerUsername"></prompt-modal>
 
   </div>
