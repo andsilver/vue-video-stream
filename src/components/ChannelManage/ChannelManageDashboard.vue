@@ -214,7 +214,7 @@
                 </b-form-group>
               </div>
               <div style="clear: both;"></div>
-              <div class="field-container">
+              <!-- <div class="field-container">
                 <div class="label">Embed Url</div>
                 <input class="input"
                        :value="getStreamEmbedUrl()"
@@ -225,7 +225,7 @@
                 <input class="input"
                        :value="getStreamHlsUrl()"
                        readonly/>
-              </div>
+              </div> -->
               <div class="field-container">
                 <div class="label">Deployment Region</div>
                 <div class="input">
