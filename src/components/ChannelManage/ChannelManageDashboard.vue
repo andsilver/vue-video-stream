@@ -253,19 +253,11 @@
                     </div>
                   </b-col>
                 </b-row>
-                <!-- <div class="label">Pull Source</div> -->
                 <div>
                   <input v-model="streamPullUrl"
                          @keypress="onPullUrlChange()"
                          class="input" 
                          placeholder="specify source url"/>
-
-                  <!-- <div v-if="!pullSourceWorking"
-                       class="text-warning">
-                    <i class="fas fa-exclamation-circle"></i>&nbsp;
-                    <span style="font-size:11.5px">No response from pull source yet</span>
-                  </div> -->
-
                 </div>
               </div>
               <div v-else-if="streamSourceType === SourceTypes.Webcam" 
@@ -363,8 +355,12 @@
                     okText="Leave Anyway"
                     cancelText="Keep Webcam"
                     @modal-confirm="confirmWebcamLeave"></confirm-modal>
+
+     <alert-modal modal-id="alert-mixer-pull"
+                  message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
+                  okText="Got it"></alert-modal>
       
-      <prompt-modal modal-id="modal-mixer-username"
+     <prompt-modal modal-id="modal-mixer-username"
                     message="Enter your Mixer username"
                     message2="Note: If you are pulling, please disable push to mixer"
                     okText="Grab Mixer Pull Url"
@@ -386,6 +382,7 @@ import StreamPlayer from "@/components/StreamPlayer.vue";
 import WebcamPlayer from "@/components/WebcamPlayer.vue";
 
 import PromptModal from "@/components/PromptModal.vue";
+import AlertModal  from "@/components/AlertModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import AddPlatformModal from "./AddPlatformModal.vue";
 import ConfigurePlatformModal from "./ConfigurePlatformModal.vue";
@@ -517,6 +514,20 @@ export default {
     onPullUrlChange () {
       this.streamPullError = false
     },
+    isMixerPullAuthorized () {
+      const exlcudedRegions = ['br']
+      const curRegion = this.stream.region.identifier 
+      
+      let bypassed = true
+      for (let i=0;i<exlcudedRegions.length;i++) {
+        if (curRegion === exlcudedRegions[i]) {
+           bypassed = false
+           break;
+         }
+      }
+
+      return bypassed
+    },
     canSavePullUrl () {
       let canSave = false
       // check for valid input
@@ -579,6 +590,11 @@ export default {
     },
     requestMixerUsername () {
       // const res = await IntegrationService.getMixerFTLUrl('tidy')
+      if (!this.isMixerPullAuthorized()) {
+        this.$root.$emit('bv::show::modal', 'alert-mixer-pull')
+        return
+      }
+
       this.$root.$emit("bv::show::modal", "modal-mixer-username");
     },
     async onMixerUsername (mixerUsername, ackCB) {
@@ -606,6 +622,11 @@ export default {
       // })
 
       const pullSource = this.streamPullUrl;
+
+      if (isMixerFTLSource(pullSource) && !this.isMixerPullAuthorized()) {
+        this.$root.$emit('bv::show::modal', 'alert-mixer-pull')
+        return
+      }
 
       let sub = this.userSubscription;
       if (!sub) {
@@ -1063,6 +1084,7 @@ export default {
     AddPlatformModal,
     ConfigurePlatformModal,
     ConfirmModal,
+    AlertModal,
     StreamThumb,
     StreamPlayer,
     WebcamPlayer,
