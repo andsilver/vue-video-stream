@@ -29,7 +29,7 @@ export default function appRun() {
       Vue.localStorage.remove('user')
       Vue.localStorage.remove('token')
 
-      const { href } = route
+      const { href } = window.location
       // if current is not an AUTH page
       if (!/signin|signup/gi.test(href)) {
         setTimeout(() => {
