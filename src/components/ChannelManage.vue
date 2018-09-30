@@ -98,12 +98,13 @@
           <router-link tag="li" 
                        :to="{name: 'ChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
-          <!-- <router-link tag="li" 
-                       :to="{name: 'ChannelManageChat'}"
-                       active-class="active">
+                       <!-- :to="{name: 'ChannelManageChat'}" -->
+          <!-- <router-link tag="li"
+                       active-class="active"> -->
+          <li @click="requestChatStatus">
             <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
             &nbsp;chat overlay
-          </router-link> -->
+          </li>
           <!-- <router-link v-if="stream.dvrEnabled"
                        :to="{name: 'ChannelManageDVR'}"
                        tag="li" 
@@ -136,10 +137,19 @@
 
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
+
+    <!-- <alert-modal modal-id="alert-chat-down"
+                 message="We are experiencing unexpected behaviour in chat app and would appreciate your patience while our team get things back online"
+                 okText="I Understand"></alert-modal> -->
+    <alert-modal modal-id="alert-chat-down"
+                 message="We have encountered unusual behaviour in our chat app and would appreciate your patience while our team get things back online."
+                 okText="I Understand"
+                 class="text-center"></alert-modal>
   </div>
 </template>
 
 <script>
+import AlertModal from "./AlertModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import StreamService from "../services/StreamService";
 import UserService from "../services/UserService";
@@ -216,6 +226,9 @@ export default {
     };
   },
   methods: {
+    requestChatStatus () {
+      this.$root.$emit("bv::show::modal", "alert-chat-down");
+    },
     onStreamUpdates (updates) {
       this.stream = _.assign({}, this.stream, updates)
     },
@@ -341,7 +354,8 @@ export default {
     }
   },
   components: {
-    ConfirmModal
+    AlertModal,
+    ConfirmModal,
   }
 };
 
