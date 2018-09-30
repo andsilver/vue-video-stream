@@ -98,19 +98,19 @@
           <router-link tag="li" 
                        :to="{name: 'ChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
-          <router-link tag="li" 
+          <!-- <router-link tag="li" 
                        :to="{name: 'ChannelManageChat'}"
                        active-class="active">
             <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
             &nbsp;chat overlay
-          </router-link>
-          <router-link v-if="stream.dvrEnabled"
+          </router-link> -->
+          <!-- <router-link v-if="stream.dvrEnabled"
                        :to="{name: 'ChannelManageDVR'}"
                        tag="li" 
                        active-class="active">
             <i class="fa fa-video" style="color:rgb(234,24,44);"></i>
             &nbsp;recording
-          </router-link>
+          </router-link> -->
         </ul>
 
         <router-view :stream="stream" 
