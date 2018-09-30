@@ -98,13 +98,17 @@
           <router-link tag="li" 
                        :to="{name: 'ChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
-                       <!-- :to="{name: 'ChannelManageChat'}" -->
+                       
           <!-- <router-link tag="li"
-                       active-class="active"> -->
-          <li @click="requestChatStatus">
+                       :to="{name: 'ChannelManageChat'}"
+                       active-class="active">
+            <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
+            &nbsp;chat overlay -->
+          <!-- <li @click="requestChatStatus">
             <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
             &nbsp;chat overlay
-          </li>
+          </li> -->
+          <!-- </router-link> -->
           <!-- <router-link v-if="stream.dvrEnabled"
                        :to="{name: 'ChannelManageDVR'}"
                        tag="li" 
@@ -138,9 +142,6 @@
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
 
-    <!-- <alert-modal modal-id="alert-chat-down"
-                 message="We are experiencing unexpected behaviour in chat app and would appreciate your patience while our team get things back online"
-                 okText="I Understand"></alert-modal> -->
     <alert-modal modal-id="alert-chat-down"
                  message="We have encountered unusual behaviour in our chat app and would appreciate your patience while our team get things back online."
                  okText="I Understand"
