@@ -5,11 +5,6 @@ yarn-error.log*
 
 node_modules
 node_modules/
-build
-build/
-./static
-./static/
-config/
 
 # Editor directories and files
 .idea

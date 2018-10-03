@@ -8,7 +8,7 @@ export default { toArray, updateArrayItem, validateURL, resolveURL, resolveStrea
  * @param {Array<string>} options.allowedProtos
  */
 function validateURL(url, options) {
-  options = _.assign({}, options)
+  options = _.assign({ validatePathname: true }, options)
 
   let urlChunks
   try {
@@ -24,7 +24,7 @@ function validateURL(url, options) {
   if (!urlChunks.host || !validateHost(urlChunks.host))
     return { reason: 'host' }
 
-  if (!urlChunks.pathname)
+  if (!urlChunks.pathname && options.validatePathname)
     return { reason: 'pathname' }
 
   return { valid: true }
@@ -95,16 +95,26 @@ function resolveStreamKey(streamKey) {
 }
 
 function extractUrlSegments(url) {
-  let protocol, host, pathname
+  let protocol, host, pathname, auth
 
   protocol = _.head(url.match(/^\w+\:\/\//gi))
-  if (protocol)
+  if (protocol) {
     host = _.chain(url).replace(protocol, '').split('/').head().value()
+    let [creds, _host] = _.split(host, '@')
+    if (!_host) host = creds
+    else {
+      host = _host
+      auth = creds
+      if (auth) {
+        let [user, pass] = _.split(auth, ':')
+        auth = { user, pass }
+      }
+    }
+  }
 
   if (protocol && host)
     pathname = _.chain(url).replace(protocol, '').replace(host).split('/').slice(1).join('/').value()
-
-  return { protocol, host, pathname, href: url }
+  return { protocol, host, pathname, href: url, auth }
 }
 
 function updateArrayItem(array, newValue, atIndex) {
