@@ -99,16 +99,16 @@
                        :to="{name: 'ChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
                        
-          <!-- <router-link tag="li"
+          <router-link tag="li"
                        :to="{name: 'ChannelManageChat'}"
                        active-class="active">
             <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
-            &nbsp;chat overlay -->
+            &nbsp;chat overlay
           <!-- <li @click="requestChatStatus">
             <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
             &nbsp;chat overlay
           </li> -->
-          <!-- </router-link> -->
+          </router-link>
           <!-- <router-link v-if="stream.dvrEnabled"
                        :to="{name: 'ChannelManageDVR'}"
                        tag="li" 

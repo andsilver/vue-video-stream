@@ -2,7 +2,7 @@
   <div class="container view-wrapper">
 
     <b-row>
-      <b-col>
+      <b-col cols="7">
         <div class="webchat-wrapper">
           <div class="wrapper-title">
             <span class="webchat">Web</span> Chat Overlay
@@ -38,7 +38,7 @@
         </div>
       </b-col>
       <b-col>
-        <div class="discordchat-wrapper">
+        <div class="discordchat-wrapper" style="display:none;">
           <div class="wrapper-title">
             sync with 
             <img class="discord-icon"
