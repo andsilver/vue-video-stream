@@ -22,7 +22,8 @@ export default {
   getDiscordIntegrations,
   saveDiscordIntegration,
   updateDiscordIntegration,
-  deleteDiscordIntegration
+  deleteDiscordIntegration,
+  buildStreamChatUrl
 }
 
 /**
@@ -149,6 +150,17 @@ function deleteDiscordIntegration(integrationId) {
   return makeRequest({
     path: url,
     method: 'delete'
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function buildStreamChatUrl(streamId) {
+  let url = `/integrations/chat/buildStreamChatUrl/${streamId}`
+  return makeRequest({
+    path: url,
+    method: 'POST'
   })
 }
 

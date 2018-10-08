@@ -10,16 +10,23 @@
           <br>
           <p>Copy this URL to the browser plugin of your encoding software 
             or open it in a browser.</p>
-          <input class="chat-href" :value="chatOverlayURL" readonly/>
+          <input v-show="chatOverlayURL" class="chat-href" :value="chatOverlayURL" readonly/>
           <div class="buttons-container">
-            <button class="btn btn-lg btn-info variant1"
-                    :class="{ 'copied' : chatOverlayURLCopied }"
-                    @click="copyChatOverlayURL">
-              <span v-show="!chatOverlayURLCopied">Copy Overlay URL</span>
-              <strong v-show="chatOverlayURLCopied">Copied</strong>
+            <button v-if="!chatOverlayURL" class="btn btn-xs btn-primary variant2"
+                    @click="generateChatUrl">
+                <span v-if="chatOverlayURLProcessing">Generating Url ..</span>
+                <span v-else>Generate Chat Url</span>
             </button>
-            <button class="btn btn-lg btn-primary variant2"
-                    @click="openChatWindow">Open Chat App</button>
+            <div v-else>
+              <button class="btn btn-lg btn-info variant1"
+                      :class="{ 'copied' : chatOverlayURLCopied }"
+                      @click="copyChatOverlayURL">
+                <span v-show="!chatOverlayURLCopied">Copy Overlay URL</span>
+                <strong v-show="chatOverlayURLCopied">Copied</strong>
+              </button>
+              <button class="btn btn-lg btn-primary variant2"
+                      @click="openChatWindow">Open Chat App</button>
+            </div>
           </div>
 
           <br>
@@ -38,7 +45,7 @@
         </div>
       </b-col>
       <b-col>
-        <div class="discordchat-wrapper" style="display:none;">
+        <div class="discordchat-wrapper">
           <div class="wrapper-title">
             sync with 
             <img class="discord-icon"
@@ -83,7 +90,8 @@
           </div>
 
           <br>
-          <button v-show="!discordIntegrationsProcessing" 
+          <button v-if="!discordIntegrations || !discordIntegrations.length"
+                  v-show="!discordIntegrationsProcessing" 
                   class="btn btn-lg btn-primary discord-setup"
                   @click="setupDiscordIntegration">
             <span v-if="discordIntegrations.length">ADD #CHANNEL</span>
@@ -125,15 +133,17 @@ export default {
     let discordIntegrations = await IntegrationService.getDiscordIntegrations(
       this.streamId
     );
-    
-    _.each(discordIntegrations, (discordChannel) => {
+
+    _.each(discordIntegrations, discordChannel => {
       discordChannel._enabled = discordChannel.enabled;
-      discordChannel.processing = false
+      discordChannel.processing = false;
     });
 
     this.discordIntegrations = discordIntegrations;
     this.hasDiscordIntegrations = _.size(discordIntegrations) > 0;
-    this.discordIntegrationsProcessing = false
+    this.discordIntegrationsProcessing = false;
+
+    // this.chatOverlayURL = _.times(60).map(e => 'c').join('c')
   },
   destroyed() {},
   data() {
@@ -142,12 +152,14 @@ export default {
       processing: true,
       userSubscription: null,
       processingMessage: null,
-      webchatPreviewFontSize: 'md',
+      webchatPreviewFontSize: "md",
       discordIntegrations: [],
       discordIntegrationsProcessing: true,
       selectedDiscordChannel: null,
       hasDiscordIntegrations: false,
+      chatOverlayURL: null,
       chatOverlayURLCopied: false,
+      chatOverlayURLProcessing: false,
       getPlatformIcon(platform) {
         return this.isCustomPlatform(platform)
           ? "fa fa-cog"
@@ -164,7 +176,9 @@ export default {
 
       channel.processing = true;
       try {
-        await IntegrationService.updateDiscordIntegration(channel._id, {enabled:newState})
+        await IntegrationService.updateDiscordIntegration(channel._id, {
+          enabled: newState
+        });
         channel.enabled = newState;
       } catch (e) {
         this.$notify({
@@ -179,14 +193,14 @@ export default {
       this.selectedDiscordChannel = channel;
       this.$root.$emit("bv::show::modal", "discord-channel-delete-modal");
     },
-    onNewDiscordChannel(discordChannel){
-      this.discordIntegrations.unshift(discordChannel)
+    onNewDiscordChannel(discordChannel) {
+      this.discordIntegrations.unshift(discordChannel);
     },
     async deleteDiscordChannel() {
       let channel = this.selectedDiscordChannel;
       channel.procesing = true;
       try {
-        await IntegrationService.deleteDiscordIntegration(channel._id)
+        await IntegrationService.deleteDiscordIntegration(channel._id);
         const channelId = this.discordIntegrations.indexOf(channel);
         this.discordIntegrations.splice(channelId, 1);
       } catch (e) {
@@ -199,8 +213,37 @@ export default {
       channel = null;
       this.selectedDiscordChannel = null;
     },
-    copyChatOverlayURL() {
+    async generateChatUrl() {
+      if (this.chatOverlayURLProcessing) return
+
+      this.chatOverlayURLProcessing = true
+      const res = await IntegrationService.buildStreamChatUrl(this.streamId);
+      if (res && res.chatUrl) {
+        this.chatOverlayURL = res.chatUrl;
+      } else {
+        this.$notify({
+          group: "error",
+          text: "Could not build stream chat url"
+        });
+      }
+
+      this.chatOverlayURLProcessing = false
+    },
+    async copyChatOverlayURL() {
       if (this.chatOverlayURLCopied) return;
+
+      // if (!this.chatOverlayUrl) {
+      //   const res = await IntegrationService.buildStreamChatUrl(this.streamId);
+      //   if (res && res.chatUrl) {
+      //     this.chatOverlayURL = res.chatUrl;
+      //   } else {
+      //     this.$notify({
+      //       group: "error",
+      //       text: "Could not build stream chat url"
+      //     });
+      //     return;
+      //   }
+      // }
 
       try {
         this.$copyText(this.chatOverlayURL);
@@ -226,14 +269,13 @@ export default {
     }
   },
   computed: {
-    chatOverlayURL() {
-      const { protocol, hostname } = window.location;
-      const chatAppUrl = `${protocol}//${hostname}/chat/web?token=${
-        this.stream._id
-      }__${UserService.getUserToken()}`;
-
-      return chatAppUrl;
-    }
+    // chatOverlayURL() {
+    //   const { protocol, hostname } = window.location;
+    //   const chatAppUrl = `${protocol}//${hostname}/chat/web?token=${
+    //     this.stream._id
+    //   }__${UserService.getUserToken()}`;
+    //   return chatAppUrl;
+    // }
   },
   components: {
     ConfirmModal,
@@ -321,7 +363,7 @@ button.discord-setup {
   padding: 15px;
   margin-bottom: 10px;
   /* border: 2px dashed rgba(255, 255, 255, 0.5); */
-  border: 1.75px dashed rgba(112,150,232, 0.53);
+  border: 1.75px dashed rgba(112, 150, 232, 0.53);
   border-radius: 4px;
 }
 .discord-channel .channel-name {
@@ -359,7 +401,7 @@ button.discord-setup {
   color: #ffffff;
 }
 .webchat-settings {
-  margin-top:20px;
+  margin-top: 20px;
 }
 .webchat-settings .heading {
   font-size: 13.5px;
@@ -371,8 +413,16 @@ button.discord-setup {
   border-radius: 4px;
   background-color: #0d2360;
 }
-.webchat-preview.font-sm {font-size:12.5px;}
-.webchat-preview.font-md {font-size:14.5px;}
-.webchat-preview.font-lg {font-size:16.5px;}
-.webchat-preview.font-xl {font-size:18.5px;}
+.webchat-preview.font-sm {
+  font-size: 12.5px;
+}
+.webchat-preview.font-md {
+  font-size: 14.5px;
+}
+.webchat-preview.font-lg {
+  font-size: 16.5px;
+}
+.webchat-preview.font-xl {
+  font-size: 18.5px;
+}
 </style>
