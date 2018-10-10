@@ -5,10 +5,24 @@
         <div class="title">My Streams</div>
       </div>
       <div v-if="streams.length" class="col-md-6 text-right">
-        <button class="addChannel"
+        <!-- <button class="addChannel"
                 v-b-modal.modal-add-channel>
           <i class="fa fa-video"></i>&nbsp; Create New
-        </button>
+        </button> -->
+        <b-dropdown id="stream-deploy-dropdown" 
+                    class="m-md-2"
+                    size="lg" 
+                    variant="danger"
+                    right
+                    no-caret>
+          <template slot="button-content">
+            <div style="font-size:14px;"><i class="fa fa-video"></i>&nbsp; Create New</div>
+          </template>
+          <b-dropdown-item v-b-modal.modal-add-channel>
+            New Restream &nbsp;<code style="color:#9a99bb;">[default]</code>
+          </b-dropdown-item>
+          <b-dropdown-item v-b-modal.modal-add-live-channel>New Live Stream</b-dropdown-item>
+        </b-dropdown>
       </div>
     </div>
     <div v-if="loading" 
@@ -48,6 +62,7 @@
     </div>
     
     <add-channel-modal @new-channel="onNewStream"></add-channel-modal>
+    <add-live-channel-modal @new-channel="onNewStream"></add-live-channel-modal>
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
   </div>
@@ -56,6 +71,7 @@
 <script>
 import StreamCardView from "./StreamCardView.vue";
 import AddChannelModal from "./AddChannelModal.vue";
+import AddLiveChannelModal from "./AddLiveChannelModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import StreamService from "../services/StreamService";
 
@@ -93,7 +109,14 @@ export default {
     onNewStream(stream, regionDetails) {
       this.streams = [...this.streams, stream];
       this.$notify({ group: "success", text: "Stream deployed successfully" });
-      this.$router.push({ path: `/streams/${stream._id}` });
+      
+      let redirectPath = '/streams/'
+      if (stream.type === 'live') {
+        redirectPath = '/livestreams/'
+      }
+
+      redirectPath += stream._id
+      this.$router.push({ path: redirectPath });
 
       // track event 
       window.trackEvent(`Deployed new stream ${stream.name} in ${regionDetails.name}`, stream);
@@ -126,7 +149,7 @@ export default {
       this.deleteModalConfiguredStream = null;
     }
   },
-  components: { StreamCardView, AddChannelModal, ConfirmModal }
+  components: { StreamCardView, AddChannelModal, AddLiveChannelModal, ConfirmModal }
 };
 </script>
 
@@ -178,5 +201,28 @@ export default {
   color: #ffffff;
   text-align: center;
   width: 100%;
+}
+</style>
+
+<style>
+#stream-deploy-dropdown button {
+  border-radius: 3px !important;
+}
+#stream-deploy-dropdown button[aria-expanded="true"] {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+#stream-deploy-dropdown .dropdown-menu {
+  min-width: 205px;
+  background-color: rgb(61, 70, 115) !important;
+  color: #ffffff;
+}
+#stream-deploy-dropdown .dropdown-item {
+  color: inherit;
+  padding: 7px 14px !important;
+  background-color: transparent;
+}
+#stream-deploy-dropdown .dropdown-item:hover {
+  background-color: #212948;
 }
 </style>

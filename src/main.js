@@ -26,8 +26,8 @@ Vue.use(BootstrapVue)
 Vue.use(VueSocketio, 'https://www.haxr.io:1330/')
 Vue.use(VueLocalStorage, { name: 'localStorage', bind: true })
 const options = {
-  // key: 'pk_test_uhBxuU6g7MNxplqBzf6ofRpz',
-  key: 'pk_live_yIPV9HjJOfT5DiSifUT5ZKIi',
+  key: 'pk_test_uhBxuU6g7MNxplqBzf6ofRpz',
+  // key: 'pk_live_yIPV9HjJOfT5DiSifUT5ZKIi',
   image: 'https://castr.io/streamtomultiplesites.png',
   locale: 'auto',
   // currency: 'PHP',

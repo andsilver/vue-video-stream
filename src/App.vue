@@ -210,6 +210,7 @@ body {
 }
 
 .alert {
+  font-size:14px;
   padding: 5px 10px !important;
   text-align: center !important;
 }

@@ -2,6 +2,7 @@
   <div class="card"
        :class="{ restream: true, 'opacity-75 no-pointer': stream.removing }"
        @click="navigateManage">
+    <div v-if="stream.type==='live'" class="type-badge"><code>LIVESTREAM</code></div>
     <div class="thumb">
       <stream-thumb :stream="stream" class="video-thumb" />
     </div>
@@ -60,18 +61,24 @@ export default {
   name: "StreamCardView",
   props: ["stream"],
   mounted() {
-    const {haxrBlockId} = this.stream
-    
-    this.$socket.emit("stream.summary", haxrBlockId, { subscribe: true, out: "restream", timeout: 2000 });
+    const { haxrBlockId } = this.stream;
+
+    this.$socket.emit("stream.summary", haxrBlockId, {
+      subscribe: true,
+      out: "restream",
+      timeout: 2000
+    });
 
     this.$socket.on("stream.summary", summary => {
       if (summary._id !== haxrBlockId) return;
       this.mediaPulse = summary;
     });
-
   },
   destroyed() {
-    this.$socket.emit("unsubscribe", { event: "stream.summary", value: this.stream.haxrBlockId });
+    this.$socket.emit("unsubscribe", {
+      event: "stream.summary",
+      value: this.stream.haxrBlockId
+    });
   },
   data() {
     return {
@@ -82,23 +89,30 @@ export default {
   },
   methods: {
     requestDelete(ev) {
-      ev.preventDefault()
-      ev.stopPropagation()
+      ev.preventDefault();
+      ev.stopPropagation();
 
-      this.$emit('delete-stream', this.stream)
+      this.$emit("delete-stream", this.stream);
     },
-    navigateManage () {
-      this.$router.push({ name: 'ChannelManage' , params: { streamId: this.stream._id } })
+    navigateManage() {
+      let viewName = 'ChannelManage'
+      if (this.stream.type === 'live')
+        viewName = 'LiveChannelManage'
+
+      this.$router.push({
+        name: viewName,
+        params: { streamId: this.stream._id }
+      });
     },
     getCountryFlag(stream) {
       return `https://countryflags.io/${stream.region.identifier}/flat/24.png`;
     },
-    isStreamAlive () {
-      return this.streamStatus && this.mediaPulse && this.mediaPulse.alive
+    isStreamAlive() {
+      return this.streamStatus && this.mediaPulse && this.mediaPulse.alive;
     },
     async toggleStatus(ev) {
-      ev.preventDefault()
-      ev.stopPropagation()
+      ev.preventDefault();
+      ev.stopPropagation();
 
       const oldStatus = this.streamStatus;
       const newStatus = !oldStatus;
@@ -109,8 +123,10 @@ export default {
         await StreamService.toggleStream(this.stream._id);
         this.streamStatus = newStatus;
 
-        window.trackEvent(`${ newStatus ? 'Enabled' : 'Disabled' } stream: ${this.stream.name}`, this.stream);
-
+        window.trackEvent(
+          `${newStatus ? "Enabled" : "Disabled"} stream: ${this.stream.name}`,
+          this.stream
+        );
       } catch (err) {
         streamStatus = oldStatus;
         this.$notify({
@@ -143,6 +159,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .card {
+  position: relative;
   margin: 0;
   padding: 0;
   color: #f7f7f7;
@@ -230,7 +247,7 @@ export default {
   display: inline-block;
   font-size: 13px;
   text-transform: uppercase;
-  border: 1px solid gray; 
+  border: 1px solid gray;
   font-weight: 400;
   border-radius: 29px;
   z-index: 99;
@@ -328,5 +345,19 @@ export default {
   cursor: not-allowed;
   opacity: 0.65;
   color: #ffffff;
+}
+.type-badge {
+  display: inline-block;
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  z-index: 1;
+  color: #ffffff;
+  background-color: #282c83;
+  padding: 3px 12px;
+  border-radius: 0 0 0 10px;
+}
+.type-badge * {
+  color: inherit;
 }
 </style>

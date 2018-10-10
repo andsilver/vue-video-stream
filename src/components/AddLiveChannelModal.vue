@@ -1,8 +1,8 @@
 <template>
   <div class="">
     <!-- Modal Component -->
-    <b-modal ref="modalAddChannel" 
-             id="modal-add-channel"
+    <b-modal ref="modalAddLiveChannel" 
+             id="modal-add-live-channel"
              class="modal-fullscreen1 modal-fullscreen-right modal-platform"
              size="sm"
              centered
@@ -11,79 +11,95 @@
         <div style="width: 100%">
           <b-row>
             <!-- <b-col><span v-html="modalTitle()"></span></b-col> -->
-            <b-col><span>New Restream</span></b-col>
+            <b-col><span>New LiveStream</span></b-col>
           </b-row>
         </div>
       </template>
       <div>
         <!-- error placeholder -->
         <b-alert v-if="error" show variant="danger">
-          <div>{{error.message}}</div>
+          <div v-show="error.message">{{error.message}}</div>
           <div v-if="error.subscription"
                class="text-center" style="margin-top:10px">
-            <router-link to="/subscribe">
+            <router-link to="/subscribe?category=live">
               <button class="btn btn-sm btn-link" style="text-transform:uppercase;color: gold;"><strong>upgrade now</strong></button>
             </router-link>
           </div>
+
+          <div v-else-if="error.role"
+               class="" style="margin-top:10px">
+            <p>You do not have an active Live Streaming subscription. Please subscribe if you wish to use this feature.</p>
+            <br>
+            <button class="modal-button" @click="dismiss">cancel</button>
+            <router-link to="/subscribe?category=live">
+              <button class="modal-button highlight">subscribe</button>
+            </router-link>
+            <br>
+            <br>
+          </div>
         </b-alert>
 
-        <!-- form -->
-        <div class="field-container">
-          <div class="label">stream name</div>
-          <input v-model="channel.name"
-                 class="input"
-                 placeholder="#stream_name"
-                 @keypress="onInputChange('name')" />
-          <p v-show="formErrors.name"
-             class="text-danger">specify stream name</p>
-        </div>
-        <div class="field-container">
-          <div class="label">hosting region</div>
-          
-          <b-dropdown no-caret class="region-dropdown w-100" style="margin:7px 0;">
-            <template slot="button-content">
-              <div v-if="!selectedRegion">Select Region</div>
-              <div v-else class="region-dropdown-item region-dropdown-item-placeholder">
-                <img :src="getCountryFlag(selectedRegion)" class="region-flag"/>
-                <span class="region-name">{{selectedRegion.name}}</span>
-              </div>
-            </template>
-            <b-dropdown-item v-for="(region, index) in regions || []"
-                             :key="index"
-                             @click="selectRegion(region)"
-                             :disabled="!!region.status">
-              <div class="a region-dropdown-item" 
-                   :class="{ selected: selectedRegion === region }">
-                <img :src="getCountryFlag(region)" class="region-flag"/>
-                <span class="region-name">
-                  {{region.name}}
-                  <span v-if="region.status" 
-                        class="badge">&nbsp;{{region.status}}</span>
-                </span>
-              </div>
-            </b-dropdown-item>
-          </b-dropdown>
+        <div v-show="operational">
+          <!-- form -->
+          <div class="field-container">
+            <div class="label">stream name</div>
+            <input v-model="channel.name"
+                  class="input"
+                  placeholder="#stream_name"
+                  @keypress="onInputChange('name')" />
+            <p v-show="formErrors.name"
+              class="text-danger">specify stream name</p>
+          </div>
+          <div class="field-container">
+            <div class="label">hosting region</div>
+            
+            <b-dropdown no-caret class="region-dropdown w-100" style="margin:7px 0;">
+              <template slot="button-content">
+                <div v-if="!selectedRegion">Select Region</div>
+                <div v-else class="region-dropdown-item region-dropdown-item-placeholder">
+                  <img :src="getCountryFlag(selectedRegion)" class="region-flag"/>
+                  <span class="region-name">{{selectedRegion.name}}</span>
+                </div>
+              </template>
+              <b-dropdown-item v-for="(region, index) in regions || []"
+                              :key="index"
+                              @click="selectRegion(region)"
+                              :disabled="!!region.status">
+                <div class="a region-dropdown-item" 
+                    :class="{ selected: selectedRegion === region }">
+                  <img :src="getCountryFlag(region)" class="region-flag"/>
+                  <span class="region-name">
+                    {{region.name}}
+                    <span v-if="region.status" 
+                          class="badge">&nbsp;{{region.status}}</span>
+                  </span>
+                </div>
+              </b-dropdown-item>
+            </b-dropdown>
 
-          <p v-show="formErrors.region"
-             class="text-danger">specify hosting region</p>
+            <p v-show="formErrors.region"
+              class="text-danger">specify hosting region</p>
+          </div>
         </div>
         <!-- <br> -->
       </div>
 
       <template slot="modal-footer" class="text-left">
-        <!-- <br> -->
-        <b-progress v-if="processing" 
-                    :value="100" 
-                    :max="100" 
-                    animated
-                    class="w-75"></b-progress>
-        <div v-else>
-          <button type="button" 
-                  class="modal-button" 
-                  @click="dismiss">Cancel</button>
-          <button @click="onSaveChannel"
-                  type="submit"
-                  class="modal-button highlight">Save</button>
+        <div v-show="operational">
+          <!-- <br> -->
+          <b-progress v-if="processing" 
+                      :value="100" 
+                      :max="100" 
+                      animated
+                      class="w-75"></b-progress>
+          <div v-else>
+            <button type="button" 
+                    class="modal-button" 
+                    @click="dismiss">Cancel</button>
+            <button @click="onSaveChannel"
+                    type="submit"
+                    class="modal-button highlight">Save</button>
+          </div>
         </div>
       </template>
     </b-modal>
@@ -93,17 +109,19 @@
 <script>
 import _ from "lodash";
 import StreamService from "../services/StreamService";
+import SubscriptionService from "../services/SubscriptionService";
 
 export default {
-  name: "AddChannelModal",
+  name: "AddLiveChannelModal",
   async mounted() {
-    this.$refs.modalAddChannel.$on("hide", this.onDismiss);
-    this.$refs.modalAddChannel.$on("shown", this.onInit);
-    this.regions = await StreamService.getAvailableRegions();
+    this.$refs.modalAddLiveChannel.$on("hide", this.onDismiss);
+    this.$refs.modalAddLiveChannel.$on("shown", this.onInit);
+    this.regions = await StreamService.getAvailableRegions('live');
   },
   data() {
     return {
       processing: false,
+      operational: true,
       error: null,
       channel: {
         name: null,
@@ -118,7 +136,21 @@ export default {
     };
   },
   methods: {
-    onInit() {},
+    async onInit() {
+      this.operational = true
+      this.error = null
+      this.processing = true
+
+      const sub = await SubscriptionService.getUserSubscriptions()
+      this.processing = false
+
+      const hasLiveStreamSub = !!_.find(sub.addonSubscriptions, { category: 'live' })
+      if (!hasLiveStreamSub) {
+        this.operational = false
+        this.error = {role: true}
+        return
+      }
+    },
     selectRegion(region) {
       this.selectedRegion = region;
       this.channel.region = region._id;
@@ -135,7 +167,7 @@ export default {
       this.processing = true;
 
       try {
-        const stream = await StreamService.addStream(
+        const stream = await StreamService.addLiveStream(
           this.channel.name,
           this.channel.region
         );
@@ -151,7 +183,7 @@ export default {
       }
     },
     dismiss() {
-      this.$refs.modalAddChannel.hide();
+      this.$refs.modalAddLiveChannel.hide();
       this.onDismiss();
     },
     onDismiss() {

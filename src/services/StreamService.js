@@ -1,4 +1,4 @@
-// import _ from 'lodash'
+import _ from 'lodash'
 import Vue from 'vue'
 import RequestError from './RequestError'
 
@@ -15,6 +15,7 @@ export default {
   getStream,
   getStreamDvrRanges,
   addStream,
+  addLiveStream,
   setStreamName,
   toggleStream,
   setStreamPullUrl,
@@ -62,6 +63,20 @@ function addStream(name, regionId) {
     method: 'post',
     data: {
       stream: { name, region: regionId }
+    }
+  })
+}
+
+/**
+ * @param {string} name
+ * @param {string} regionId
+ */
+function addLiveStream(name, regionId) {
+  return makeRequest({
+    path: '/streams/deploy',
+    method: 'post',
+    data: {
+      stream: { name, region: regionId, type: 'live' }
     }
   })
 }
@@ -215,12 +230,20 @@ function deleteStreamPlatform(streamId, platformId) {
 }
 
 let regions
-async function getAvailableRegions() {
+/**
+ * @param {string} [category]
+ */
+async function getAvailableRegions(category) {
   if (!regions) {
     regions = await makeRequest('/regions/list')
   }
 
-  return regions
+  let result = regions
+  if (category) {
+    result = _.filter(result, region => region.platforms.indexOf(category) > -1)
+  }
+
+  return result
 }
 
 /**

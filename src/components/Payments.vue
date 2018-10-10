@@ -22,11 +22,39 @@
        <div class="receipt-wrapper">
          <div class="reciept-row">
            <b-row class="reciept-row">
-             <b-col class="key">subscription</b-col>
+             <b-col class="key">package type</b-col>
              <b-col class="value">
 
                <b-dropdown class="package-dropdown w-100" 
                            :disabled="checkoutStep==3">
+                <template slot="button-content">
+                  <div v-if="!packCategory" style="display:inline-block;">Select</div>
+                  <div v-else 
+                       class="package-dropdown-item package-dropdown-item-placeholder text-uppercase" 
+                       style="display: inline-block;margin-right: 10px;">
+                    <span class="package-name">{{packCategory.label}}</span>
+                  </div>
+                </template>
+                <b-dropdown-item v-for="(packCat, index) in packCategories"
+                                 :key="index"
+                                 @click="selectSubscriptionPackageCategory(packCat)">
+                  <div class="a package-dropdown-item" 
+                       :class="{ selected: packCategory && packCategory.value === packCat.value }">
+                    <span class="package-name">{{packCat.label}}</span>
+                  </div>
+                </b-dropdown-item>
+              </b-dropdown>
+
+             </b-col>
+           </b-row>
+         </div>
+         <div class="reciept-row">
+           <b-row class="reciept-row">
+             <b-col class="key">subscription</b-col>
+             <b-col class="value">
+
+               <b-dropdown class="package-dropdown w-100" 
+                           :disabled="!packCategory || checkoutStep==3">
                 <template slot="button-content">
                   <div v-if="!subscriptionPackage" style="display:inline-block;">Select</div>
                   <div v-else 
@@ -124,7 +152,7 @@
               <span>{{ hasFee() ? 'Pay Now' : 'Change Package' }}</span>
               &nbsp;
            </b-button>
-           <div v-if="hasFee()" 
+           <div v-if="hasFee() && packCategory.value === 'restream'" 
                 style="margin: 10px;">
                 or use <a :href="gerPermalink()">Paypal</a>
            </div>
@@ -182,7 +210,8 @@ export default {
       // fetch available subscriptions packages
       const packages = await SubscriptionService.getSubscriptionPackages()
       // this.packages = _.filter(packages, p => p.baseCharge > 0)
-      this.packages = packages
+      // this.packages = packages
+      this.subscriptionPackages = packages
 
       // set selected subscription
       const packageId = this.$route.query && this.$route.query.package
@@ -207,8 +236,9 @@ export default {
 
     } catch (e) {
       this.error = e
-    }  
-    
+    }
+
+    this.processURLSearchParams()
     window.trackEvent(`Payments Page`)
   },
   data() {
@@ -220,7 +250,13 @@ export default {
       cardValidated: false,
       packages: [],
       userSubscription: null,
+      packCategory: null,
       subscriptionPackage: null,
+      subscriptionPackages: [],
+      packCategories: [
+        { label: 'restreaming', value: 'restream' },
+        { label: 'live stremaing', value: 'live' },
+      ],
       quantity: 1,
       getEndingDate() {
         const today = new Date();
@@ -244,6 +280,20 @@ export default {
     };
   },
   methods: {
+    processURLSearchParams () {
+      const searchParams = _.reduce((window.location.search||'').split('&'), (o, e) => {
+        let pars = _.split(e, '=')
+        return _.assign({}, o, { [_.replace(pars[0], /^\?/, '')]: pars[1] } )
+      } , {})
+
+      const predefinedCat = searchParams.category
+      if (predefinedCat) {
+        const packCat = _.find(this.packCategories, { value: predefinedCat })
+        if (packCat) {
+          this.selectSubscriptionPackageCategory(packCat)
+        }
+      }
+    },
     gerPermalink () {
       const route = window.location
       const host = `${route.protocol}//${route.hostname}`
@@ -255,6 +305,19 @@ export default {
     },
     selectSubscriptionPackage (pack) {
       this.subscriptionPackage = pack
+    },
+    selectSubscriptionPackageCategory (packCat) {
+      const oldPackCat = this.packCategory
+      this.packCategory = packCat
+      this.filterSubscriptionPacks()
+
+      if (oldPackCat && oldPackCat !== packCat)
+        this.selectSubscriptionPackage(null)
+    },
+    filterSubscriptionPacks () {
+      const packCat = this.packCategory
+      const catPackages = _.filter(this.subscriptionPackages, { category: packCat.value })
+      this.packages = catPackages
     },
     requestCheckout() {
       this.checkoutStep = 1;

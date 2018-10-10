@@ -6,10 +6,15 @@ import RequestPasswordReset from '@/components/RequestPasswordReset'
 import ValidatePasswordReset from '@/components/ValidatePasswordReset'
 import Payments from '@/components/Payments'
 import ChannelList from '@/components/ChannelList'
+
 import ChannelManage from '@/components/ChannelManage'
 import ChannelManageDashboard from '@/components/ChannelManage/ChannelManageDashboard'
 import ChannelManageChat from '@/components/ChannelManage/ChannelManageChat'
 import ChannelManageDVR from '@/components/ChannelManage/ChannelManageDVR'
+
+import LiveChannelManage from '@/components/LiveChannelManage'
+import LiveChannelManageDashboard from '@/components/ChannelManage/LiveChannelManageDashboard'
+
 import AppManage from '@/components/Manage'
 import AdminStats from '@/components/AdminStats'
 import ManageAccount from '@/components/Manage/ManageAccount'
@@ -78,6 +83,21 @@ const router = new Router({
           path: 'recording',
           name: 'ChannelManageDVR',
           component: ChannelManageDVR,
+          props: true
+        }
+      ]
+    },
+    {
+      path: '/livestreams/:streamId',
+      name: 'LiveChannelManage',
+      component: LiveChannelManage,
+      redirect: {
+        name: 'LiveChannelManageDashboard'
+      },
+      children: [{
+          path: 'dashboard',
+          name: 'LiveChannelManageDashboard',
+          component: LiveChannelManageDashboard,
           props: true
         }
       ]

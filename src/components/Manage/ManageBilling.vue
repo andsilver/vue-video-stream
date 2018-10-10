@@ -21,29 +21,56 @@
     <div class="row-container">
       <b-row>
         <b-col>
-          <div class="para-title">Subscription</div>
+          <div class="para-title">Subscriptions</div>
         </b-col>
         <b-col class="text-right text-dimm">
           <div v-if="processing">Please wait ..</div>
           <div v-else>
             <div>
-              <span class="subscription-badge">{{getSubscriptionName()}}</span>&nbsp;
-              <a href="/#pricing" target="_blank"><b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge></a>
+              <div>
 
-              <router-link :to="subscriptionManagePage()">
-                <b-button variant="link" size="sm">{{isPaidSubscription() ? 'CHANGE' : 'UPGRADE'}}</b-button>
-              </router-link>
-              <!-- <router-link v-if="isPaidSubscription()"
-                           :to="subscriptionManagePage('cancel')">
-                <b-button variant="link" size="sm">CANCEL</b-button>
-              </router-link> -->
-              <b-button variant="link" size="sm" onclick="Intercom('show')">CANCEL</b-button>
+                <div class="subscription-badge package-category-badge sm">restream</div>
+                <span class="subscription-badge">{{getSubscriptionName()}}</span>&nbsp;
+                <a href="/#pricing" target="_blank"><b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge></a>
+
+                <router-link :to="subscriptionManagePage(null, 'restream')">
+                  <b-button variant="link" size="sm">{{isPaidSubscription() ? 'CHANGE' : 'UPGRADE'}}</b-button>
+                </router-link>
+                <!-- <router-link v-if="isPaidSubscription()"
+                            :to="subscriptionManagePage('cancel')">
+                  <b-button variant="link" size="sm">CANCEL</b-button>
+                </router-link> -->
+                <b-button variant="link" size="sm" onclick="Intercom('show')">CANCEL</b-button>
+              </div>
+              <div style="margin-top:7px;">
+                <code style="font-size:12.5px;">USD ${{getSubscriptionFee()}}/month</code>&nbsp;
+                <span v-if="isPaidSubscription()">
+                  valid through <strong>{{ getSubscriptionAge() | date('DD MMM, YYYY') }}</strong>
+                </span>
+              </div>
             </div>
-            <div style="margin-top:7px;">
-              <code style="font-size:12.5px;">USD ${{getSubscriptionFee()}}/month</code>&nbsp;
-              <span v-if="isPaidSubscription()">
-                 valid through <strong>{{ getSubscriptionAge() | date('DD MMM, YYYY') }}</strong>
-              </span>
+            <div v-if="hasAddonSubscripitons()">
+              <hr>
+              <div v-for="sub in userSubscription.addonSubscriptions"
+                   :key="sub._id">
+                <div>
+
+                  <div class="subscription-badge package-category-badge sm">{{sub.category}}</div>
+                  <span class="subscription-badge">{{getSubscriptionName(sub)}}</span>&nbsp;
+                  <a href="/#pricing" target="_blank"><b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge></a>
+
+                  <router-link :to="subscriptionManagePage(null, 'live')">
+                    <b-button variant="link" size="sm">CHANGE</b-button>
+                  </router-link>
+                  <b-button variant="link" size="sm" onclick="Intercom('show')">CANCEL</b-button>
+                </div>
+                <div style="margin-top:7px;">
+                  <code style="font-size:12.5px;">USD ${{getSubscriptionFee(sub)}}/month</code>&nbsp;
+                  <span>
+                    valid through <strong>{{ getSubscriptionAge(sub) | date('DD MMM, YYYY') }}</strong>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </b-col>
@@ -160,15 +187,19 @@ export default {
 
         return cend.toString()
       },
-      subscriptionManagePage (action) {
-        let suffix = ''
+      subscriptionManagePage (action, category) {
+        let suffix = '?'
         if (action === 'cancel') {
           const freePack = this.basicPackage
-          suffix = freePack && `?package=${freePack._id}` || ''
+          suffix += freePack && `package=${freePack._id}&` || ''
 
         } else {
           const supPack = this.superiorPackage
-          suffix = supPack && `?package=${supPack._id}` || ''
+          suffix += supPack && `package=${supPack._id}&` || ''
+        }
+
+        if (category) {
+          suffix += `category=${category}`
         }
 
         return '/subscribe' + suffix
@@ -176,17 +207,23 @@ export default {
     };
   },
   methods: {
-    getSubscriptionName() {
-      return this.userSubscription.subscription.package.name
+    getSubscriptionName(sub) {
+      sub = sub || this.userSubscription.subscription
+      return sub.package.name
     },
-    getSubscriptionAge() {
-      return this.userSubscription.subscription.cend
+    getSubscriptionAge(sub) {
+      sub = sub || this.userSubscription.subscription
+      return sub.cend
     },
     isPaidSubscription() {
       return this.getSubscriptionFee() > 0
     },
-    getSubscriptionFee() {
-      return this.userSubscription.subscription.package.baseCharge
+    getSubscriptionFee(sub) {
+      sub = sub || this.userSubscription.subscription
+      return sub.package.baseCharge
+    },
+    hasAddonSubscripitons() {
+      return _.size(this.userSubscription.addonSubscriptions) > 0
     }
   }
 };
@@ -252,5 +289,12 @@ export default {
 .subscription-badge.sm {
   font-size:12px;
   padding: 2px 6px;
+}
+
+.package-category-badge {
+  background: #282c83;
+  margin-right: 5px;
+  letter-spacing: 0;
+  text-transform: lowercase;
 }
 </style>
