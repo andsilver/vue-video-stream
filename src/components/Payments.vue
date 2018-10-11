@@ -219,26 +219,36 @@ export default {
         this.subscriptionPackage = _.find(packages, { _id: packageId })
       }
 
+      // read url query params
+      this.processURLSearchParams()
+
       // fetch user subscriptions
       const userSubscription = await SubscriptionService.getUserSubscriptions(true)
       this.userSubscription = userSubscription
-      this.processing = false
+
+      let baseSub = userSubscription.subscription
+      const packCategoryType = this.packCategory.value
+      if (packCategoryType !== 'restream') {
+        baseSub = _.find(userSubscription.addonSubscriptions, { category: packCategoryType })
+        baseSub = baseSub || { package: { baseCharge: 0 } }
+      }
 
       const action = this.$route.query && this.$route.query.action
       if (action === 'upgrade') {
-        const userPackage = userSubscription.subscription.package
-        const superiorPackage = _.find(packages, p => p.baseCharge > userPackage.baseCharge)
-
+        // const userPackage = userSubscription.subscription.package
+        const userPackage = baseSub.package
+        const superiorPackage = _.find(this.packages, p => p.baseCharge > userPackage.baseCharge)
         if (superiorPackage) {
           this.subscriptionPackage = superiorPackage
         }
       }
 
+      this.processing = false
+
     } catch (e) {
       this.error = e
     }
 
-    this.processURLSearchParams()
     window.trackEvent(`Payments Page`)
   },
   data() {
@@ -286,7 +296,7 @@ export default {
         return _.assign({}, o, { [_.replace(pars[0], /^\?/, '')]: pars[1] } )
       } , {})
 
-      const predefinedCat = searchParams.category
+      const predefinedCat = searchParams.category || 'restream'
       if (predefinedCat) {
         const packCat = _.find(this.packCategories, { value: predefinedCat })
         if (packCat) {

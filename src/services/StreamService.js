@@ -62,7 +62,7 @@ function addStream(name, regionId) {
     path: '/streams/deploy',
     method: 'post',
     data: {
-      stream: { name, region: regionId }
+      stream: { name, region: regionId, type: 'restream' }
     }
   })
 }

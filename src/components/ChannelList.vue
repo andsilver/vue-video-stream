@@ -44,9 +44,22 @@
              class="placeholder">
           Get Started Now!
           <p style="font-size:13.5px;opacity:0.75;">Lets add a stream and begin publishing</p>
-          <b-button variant="danger"
+          <!-- <b-button variant="danger"
                     size="lg"
-                    v-b-modal.modal-add-channel>Add Stream</b-button>
+                    v-b-modal.modal-add-channel>Add Stream</b-button> -->
+          <b-dropdown id="stream-deploy-dropdown" 
+                    class="m-md-2"
+                    size="lg" 
+                    variant="danger"
+                    no-caret>
+            <template slot="button-content">
+                <div style="font-size:14px;"><i class="fa fa-video"></i>&nbsp; Add Stream</div>
+              </template>
+              <b-dropdown-item v-b-modal.modal-add-channel>
+                New Restream &nbsp;<code style="color:#9a99bb;">[default]</code>
+              </b-dropdown-item>
+              <b-dropdown-item v-b-modal.modal-add-live-channel>New Live Stream</b-dropdown-item>
+          </b-dropdown>
         </div>
 
         <li v-for="stream in streams"
@@ -110,13 +123,15 @@ export default {
       this.streams = [...this.streams, stream];
       this.$notify({ group: "success", text: "Stream deployed successfully" });
       
-      let redirectPath = '/streams/'
-      if (stream.type === 'live') {
-        redirectPath = '/livestreams/'
-      }
+      // setTimeout(() => {
+        let redirectPath = '/streams/'
+        if (stream.type === 'live') {
+          redirectPath = '/livestreams/'
+        }
 
-      redirectPath += stream._id
-      this.$router.push({ path: redirectPath });
+        redirectPath += stream._id
+        this.$router.push({ path: redirectPath });
+      // }, 3000)
 
       // track event 
       window.trackEvent(`Deployed new stream ${stream.name} in ${regionDetails.name}`, stream);

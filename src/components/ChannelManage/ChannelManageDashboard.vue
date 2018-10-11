@@ -8,7 +8,7 @@
                  Ready, Set ... &nbsp;Go!
               <p style="font-size:13.5px;opacity:0.75;">Lets add a platform to get started</p>
               <b-button variant="danger"
-                        v-b-modal.modal-add-platform>Add a Platform</b-button>
+                        v-b-modal.modal-add-platform>Add Platform</b-button>
             </div>
             <b-row v-else>
               <b-col>

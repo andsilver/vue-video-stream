@@ -21,7 +21,7 @@
           <div>{{error.message}}</div>
           <div v-if="error.subscription"
                class="text-center" style="margin-top:10px">
-            <router-link to="/subscribe">
+            <router-link to="/subscribe?category=restream&action=upgrade">
               <button class="btn btn-sm btn-link" style="text-transform:uppercase;color: gold;"><strong>upgrade now</strong></button>
             </router-link>
           </div>

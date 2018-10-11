@@ -31,7 +31,7 @@
             <p>You do not have an active Live Streaming subscription. Please subscribe if you wish to use this feature.</p>
             <br>
             <button class="modal-button" @click="dismiss">cancel</button>
-            <router-link to="/subscribe?category=live">
+            <router-link to="/subscribe?category=live&action=upgrade">
               <button class="modal-button highlight">subscribe</button>
             </router-link>
             <br>

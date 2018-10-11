@@ -88,7 +88,11 @@
                           @click="toggleStreamKeyVisibility">
                           {{ streamKeyVisible ? 'Hide 0' + (streamKeyVisibleTimeout/1000) : 'Show' }}
                   </button>
-                  <div v-if="streamKeyVisible" class="flaot-left">{{stream.key}}</div>
+                  <div v-if="streamKeyVisible" class="flaot-left">
+                    <!-- <span>{{stream.key}}</span> -->
+                    <!-- <span v-if="stream.config && stream.config.password">?password={{stream.config.password}}</span> -->
+                    {{streamKey}}
+                  </div>
                   <div v-else class="flaot-left">xxxxxxxxxxxxxxxxx</div>
                 </div>
               </div>
@@ -118,10 +122,10 @@
 
             <div v-if="!streamPlatforms.length" 
                  class="placeholder">
-                 Ready, Set ... &nbsp;Go!
-              <p style="font-size:13.5px;opacity:0.75;">Lets add a platform to get started</p>
+                 <!-- Ready, Set ... &nbsp;Go! -->
+              <p style="font-size:14px;opacity:1;">Add a platform to get started</p>
               <b-button variant="danger"
-                        v-b-modal.modal-add-platform>Add a Platform</b-button>
+                        v-b-modal.modal-add-platform>Add Platform</b-button>
             </div>
             <b-row v-else>
               <b-col>
@@ -399,6 +403,21 @@ export default {
         return suspicious;
       }
     };
+  },
+  computed: {
+    streamKey () {
+      let streamingKey = ''
+      const stream = this.stream
+      if (stream) {
+        streamingKey = stream.key
+      }
+
+      const streamPassword = stream.config && stream.config.password
+      if (streamPassword)
+        streamingKey += '?password='+streamPassword
+
+      return streamingKey
+    }
   },
   methods: {
     onMediaPulseChanged() {
