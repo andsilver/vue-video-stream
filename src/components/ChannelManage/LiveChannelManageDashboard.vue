@@ -14,6 +14,12 @@
             <br>
             <div>
               <div class="field-container">
+                <div class="label">Iframe Snippet</div>
+                <input class="input"
+                       :value="getStreamIframeCode()"
+                       readonly/>
+              </div>
+              <div class="field-container">
                 <div class="label">Embed Url</div>
                 <input class="input"
                        :value="getStreamEmbedUrl()"
@@ -902,14 +908,19 @@ export default {
     },
     getStreamHlsUrl() {
       const { region } = this.stream;
-      // return `rtmp://${this.stream.region.hostname}:1977/static`;
-      // return `rtmp://${region.hostname}:${region.rtmpPort}/static`;
-      // let pushUrl = `rtmp://${region.hostname}`;
-      let hlsUrl = `http://${region.hostname}/${this.stream.key}/index.m3u8`;
+      // let hlsUrl = `http://${region.hostname}/${this.stream.key}/index.m3u8`;
+      const hostname = region.hostnameCDN || region.hostname
+      let hlsUrl = `http://${hostname}/${this.stream.key}/index.m3u8`;
       return hlsUrl;
     },
+    getStreamIframeCode() {
+      let embedUrl = this.getStreamEmbedUrl();
+      let htmlCode = `<iframe src="${embedUrl}" width="590" height="431" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+      return htmlCode;
+    },
     getStreamEmbedUrl() {
-      let embedUrl = `https://player.haxr.io/${this.stream.key}`;
+      // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
+      let embedUrl = `http://player.castr.io/${this.stream.key}`;
       return embedUrl;
     },
     getStreamPullUrl(hide) {

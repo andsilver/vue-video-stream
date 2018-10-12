@@ -464,6 +464,7 @@ async function resolveTimelineHits() {
   const rangeStart = trange.start
   trange.hits = []
   _.each(ranges, (range) => {
+    if (!range) return
     const offset = range.from * 1000 - rangeStart.getTime()
     const node = {
       start: offset,

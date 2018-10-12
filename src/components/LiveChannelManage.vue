@@ -114,6 +114,9 @@
           <router-link tag="li" 
                        :to="{name: 'LiveChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
+          <router-link tag="li" 
+                       :to="{name: 'LiveChannelManageDVR'}"
+                       active-class="active">recording</router-link>
         </ul>
 
         <router-view :stream="stream" 
@@ -139,11 +142,6 @@
 
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
-
-    <alert-modal modal-id="alert-chat-down"
-                 message="We have encountered unusual behaviour in our chat app and would appreciate your patience while our team get things back online."
-                 okText="I Understand"
-                 class="text-center"></alert-modal>
   </div>
 </template>
 

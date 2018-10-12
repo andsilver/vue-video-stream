@@ -208,17 +208,18 @@ export default {
       getStreamStatus() {
         return this.streamAlive ? "active" : "inactive";
       },
-      getStreamQuality() {
+      getStreamQuality(height) {
         const sizes = [480, 720, 1080, 1440, 2160];
         const sizesFmt = ["sd", "hd", "fhd", "qhd", "uhd"];
 
-        const { height } = this.mediaPulse;
-
         let quality = "sd";
         for (let i = 0; i < sizes.length; i++) {
-          if (height <= sizes[i]) {
-            quality = sizesFmt[i];
-            break;
+          let nsize = sizes[i + 1]
+          if (height >= sizes[i]) {
+            if (!nsize || (height < nsize)) {
+              quality = sizesFmt[i];
+              break;
+            }
           }
         }
 
