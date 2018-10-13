@@ -85,7 +85,9 @@
       </div>
 
       <template slot="modal-footer" class="text-left">
-        <div v-show="operational">
+        <div v-show="operational || processing" 
+             class="modal-footer" 
+             style="width:100%;">
           <!-- <br> -->
           <b-progress v-if="processing" 
                       :value="100" 

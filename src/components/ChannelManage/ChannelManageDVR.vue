@@ -20,9 +20,10 @@
     <div class="dvr-timeline-overlay font-num">
       <div class="dvr-timeline-container">
         <div class="dvr-timeline">
+                <!-- :style="{ width: (timelineRange.chunkPx + (4 + (index))) + 'px' }" -->
           <code v-for="(node, index) in timeline"
                 :key="index"
-                :style="{ width: (timelineRange.chunkPx + (4 + (index))) + 'px' }"
+                :style="{ width: timelineRange.chunkPx + 'px' }"
                 class="timeline-chunk">
             <span v-show="node.isHead" 
                   style="color:white;">{{ node.time | date('DD-MM-YYYY') }}</span>
@@ -132,9 +133,9 @@
             <div class="config">
               <div class="tool-label">Recording Settings</div>
               <div class="config-value">
-                <code class="text-uppercase">BASIC- 2 hours</code>
+                <code class="text-uppercase">{{stream.dvrHours}} hours</code>
                 <div style="margin-top:5px;">
-                  <router-link to="/manage/billing">Change</router-link>
+                  <a href="JavaScript:Intercom('show')">Change</a>
                 </div>
               </div>
             </div>
@@ -197,10 +198,10 @@
 .dvr-timeline-overlay .dvr-timeline-container {
   overflow: hidden;
   margin-bottom: 10px;
-  margin-left: -16px;
-  margin-right: -16px;
+  /* margin-left: -16px;
+  margin-right: -16px; */
   background-color: #201e33;
-  padding: 4px 16px;
+  /* padding: 4px 16px; */
 }
 
 .dvr-timeline-overlay .dvr-timeline {
@@ -241,7 +242,7 @@
   position: absolute;
   border-radius: 2px;
   z-index: 99;
-  bottom: 12px;
+  bottom: 15px;
   overflow: hidden;
   display: none;
   text-align: center;

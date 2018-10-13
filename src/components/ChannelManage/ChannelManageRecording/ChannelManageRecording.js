@@ -2,7 +2,6 @@ import _ from 'lodash'
 import moment from 'moment'
 import d3Extent from 'd3-array/src/extent'
 import StreamService from '@/services/StreamService'
-import StreamDvrService from '@/services/StreamDvrService'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import Utils from '@/utils'
 
@@ -53,7 +52,7 @@ export default {
         end: 0,
         origin: Date.now(),
         // ticks: 14,
-        ticks: 16,
+        ticks: 12,
         frame: 6 * 3600 * 1000,
         frameMoveFactor: function() { return this.frame * 0.1 },
         chunkFactor: 3600 * 1000,
@@ -132,8 +131,14 @@ export default {
       if (!direction) return
 
       let trange = this.timelineRange
-      let inc = trange.chunkSize * direction
+      // let inc = trange.chunkSize * direction
+      // let diff = trange.end - trange.start
+      let inc = (trange.chunkSize * trange.ticks) / 4
+      inc *= direction
 
+      // let inc = trange.chunkSize * (direction * 2)
+//       console.log(trange.chunkSize,inc)
+// return
       let start = trange.start.getTime()
       let end = trange.end.getTime()
 
@@ -189,13 +194,11 @@ function getTicks(start, end) {
   let trange = this.timelineRange
 
   let ticks = trange.ticks
-  ticks -= 1
+  // ticks -= 1
 
   let diff = Math.ceil((end.getTime() - start.getTime()) / ticks)
   // let diff = this.timelineRange.chunkFactor
   trange.chunkSize = diff
-
-  console.log(diff)
 
   let dt = new Date()
   dt.setTime(start.getTime())
@@ -213,7 +216,6 @@ function getTicks(start, end) {
     }
 
     let tmpkey = dt.getFullYear() + '-' + dt.getMonth() + '-' + dt.getDate()
-
     tmp[tmpkey] = _.isArray(tmp[tmpkey]) ? tmp[tmpkey] : [tmp[tmpkey]]
     tmp[tmpkey].push(node)
     Ticks.push(node)
@@ -492,7 +494,6 @@ async function resolveTimelineHits() {
 function setTimeline() {
   let tstart = this.timelineRange.start
   let tend = this.timelineRange.end
-
   this.timeline = []
   const ticks = getTicks.call(this, tstart, tend)
 
@@ -586,7 +587,9 @@ function initSegmentExtractionControls() {
 
         // console.log(new Date(trange.start.getTime() + Math.floor(seekValue)))
 
-        const newExtract = _.assign({}, trange.extract, { [rangekey]: newExtractTime })
+        const newExtract = _.assign({}, trange.extract, {
+          [rangekey]: newExtractTime
+        })
         this.timelineRange = _.assign({}, this.timelineRange, {
           extract: newExtract
         })

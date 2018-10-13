@@ -14,7 +14,6 @@ import ChannelManageDVR from '@/components/ChannelManage/ChannelManageDVR'
 
 import LiveChannelManage from '@/components/LiveChannelManage'
 import LiveChannelManageDashboard from '@/components/ChannelManage/LiveChannelManageDashboard'
-import LiveChannelManageDVR from '@/components/ChannelManage/LiveChannelManageDVR'
 
 import AppManage from '@/components/Manage'
 import AdminStats from '@/components/AdminStats'
