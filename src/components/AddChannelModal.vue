@@ -99,7 +99,7 @@ export default {
   async mounted() {
     this.$refs.modalAddChannel.$on("hide", this.onDismiss);
     this.$refs.modalAddChannel.$on("shown", this.onInit);
-    this.regions = await StreamService.getAvailableRegions();
+    this.regions = await StreamService.getAvailableRegions('restream');
   },
   data() {
     return {
