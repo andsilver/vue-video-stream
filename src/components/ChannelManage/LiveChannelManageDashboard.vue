@@ -920,7 +920,7 @@ export default {
     },
     getStreamEmbedUrl() {
       // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
-      let embedUrl = `http://player.castr.io/${this.stream.key}`;
+      let embedUrl = `https://player.castr.io/${this.stream.key}`;
       const {hostnameCDN} = this.stream.region || {}
       if (hostnameCDN) {
         let cdnPop = _.replace(hostnameCDN, /\D/g, '')
