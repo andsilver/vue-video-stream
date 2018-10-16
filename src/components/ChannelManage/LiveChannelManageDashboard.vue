@@ -14,18 +14,24 @@
             <br>
             <div>
               <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamIframeCode)">Copy</button>
                 <div class="label">Iframe Snippet</div>
                 <input class="input"
                        :value="getStreamIframeCode()"
                        readonly/>
               </div>
               <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamEmbedUrl)">Copy</button>
                 <div class="label">Embed Url</div>
                 <input class="input"
                        :value="getStreamEmbedUrl()"
                        readonly/>
               </div>
               <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamHlsUrl)">Copy</button>
                 <div class="label">HLS Url</div>
                 <input class="input"
                        :value="getStreamHlsUrl()"
@@ -36,7 +42,7 @@
           <b-col cols="8">
 
             <div class="ingest-wrapper">
-              <div class="field-container" style="padding-top:0;">
+              <div class="field-container" style="padding:0;">
                 <div class="label">Deployment Region</div>
                 
                 <div class="source-switch-container">
@@ -61,8 +67,17 @@
                          style="width:20px;" />
                     &nbsp;<span>{{stream.region.name}}</span>
                   </div>
-                  <!-- <div v-show="!hasPullSource()"  -->
-                  <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div>
+                  <!-- <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div> -->
+                </div>
+                <!-- <div class="input">
+                  <div style="">{{getStreamPushUrl()}}</div>
+                </div> -->
+              </div>
+              <div class="field-container field-container-sm">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamPushUrl)">Copy</button>
+                <div class="input">
+                  <div style="">{{getStreamPushUrl()}}</div>
                 </div>
               </div>
               <div v-if="hasPullSource()" class="field-container">
@@ -92,7 +107,7 @@
                   <button class="modal-button modal-button-sm highlight float-right"
                           style="margin-top: -4px; margin-right: -6px;"
                           @click="toggleStreamKeyVisibility">
-                          {{ streamKeyVisible ? 'Hide 0' + (streamKeyVisibleTimeout/1000) : 'Show' }}
+                          {{ streamKeyVisible ? 'Hide ' + (streamKeyVisibleTimeout/1000) : 'Show' }}
                   </button>
                   <div v-if="streamKeyVisible" class="flaot-left">
                     <!-- <span>{{stream.key}}</span> -->
@@ -124,7 +139,7 @@
 
             <hr style="border-color:#ffffff24;"/>
 
-            <div style="margin-bottom:30px;"></div>
+            <div style="margin-bottom:25px;"></div>
 
             <div v-if="!streamPlatforms.length" 
                  class="placeholder">
@@ -426,6 +441,15 @@ export default {
     }
   },
   methods: {
+    clipboardCopy (text) {
+      try {
+        if (text instanceof Function) 
+          text = text()
+
+        this.$copyText(text);
+        this.$notify({ group: "info", text: "Copied to clipboard" });
+      } catch (e) {}
+    },
     onMediaPulseChanged() {
       const platforms = [];
       _.each(this.streamPlatforms, (platform, index) => {
@@ -756,7 +780,7 @@ export default {
 
       if (newState) {
         let timeout = 1000;
-        this.streamKeyVisibleTimeout = 9000;
+        this.streamKeyVisibleTimeout = 19000;
         this.streamKeyVisibleTimeoutCtrl = setInterval(() => {
           this.streamKeyVisibleTimeout -= timeout;
           if (!this.streamKeyVisibleTimeout) this.toggleStreamKeyVisibility();
@@ -1100,7 +1124,7 @@ function isRTSPSource(pullUrl) {
   margin: 15px 0;
 }
 .source-switch-container {
-  margin-top: 28px;
+  margin-top: 16px;
   margin-right: 15px;
   float: right;
   clear: both;
@@ -1110,6 +1134,10 @@ function isRTSPSource(pullUrl) {
   /* width: 235px; */
   width: 100%;
   padding: 10px 0;
+  position:relative;
+}
+.field-container-sm {
+  padding:0;
 }
 .field-container:last-of-type {
   border-bottom: none;
@@ -1133,6 +1161,29 @@ function isRTSPSource(pullUrl) {
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);
+}
+.input:read-only:focus {
+  background-color: #17193e;
+}
+.field-container-sm .input {
+  margin-top:0;
+}
+.field-container .badge-button {
+  opacity: 0;
+  font-size:11px;
+  padding: 4px 9px;
+  position: absolute;
+  right: 10px;
+  top: 46px;
+  pointer-events: none;
+  transition: all 0.15s linear;
+}
+.field-container:hover .badge-button {
+  opacity:1;
+  pointer-events: inherit;
+}
+.field-container-sm .badge-button {
+  top: 8px;
 }
 .platform-list {
   margin: 15px 0;
