@@ -14,9 +14,20 @@
             <br>
             <div>
               <div class="field-container">
+
                 <button class="modal-button modal-button-sm highlight badge-button"
                         @click="clipboardCopy(getStreamIframeCode)">Copy</button>
-                <div class="label">Iframe Snippet</div>
+                <b-row>
+                  <b-col><div class="label">Iframe Snippet</div></b-col>
+                  <b-col class="text-right">
+                    <span class="label">Enable DVR</span>
+                    <span class="fas toggle-control"
+                          :class="{ 'fa-toggle-on enabled': dvrEmbedEnabled, 
+                                  'fa-toggle-off': !dvrEmbedEnabled }"
+                          @click="toggleDvrEmbedStatus"></span>
+                  </b-col>
+                </b-row>
+                <!-- <div class="label">Iframe Snippet</div> -->
                 <input class="input"
                        :value="getStreamIframeCode()"
                        readonly/>
@@ -383,6 +394,7 @@ export default {
       streamKeyVisibleTimeoutCtrl: null,
       windowHeight: 0,
       configurablePlatform: {},
+      dvrEmbedEnabled: false,
       hasPullSource() {
         return this.streamSourceType === SourceTypes.Pull;
       },
@@ -441,6 +453,11 @@ export default {
     }
   },
   methods: {
+    toggleDvrEmbedStatus () {
+      const ostate = this.dvrEmbedEnabled
+      const nstate = !ostate
+      this.dvrEmbedEnabled = nstate
+    },
     clipboardCopy (text) {
       try {
         if (text instanceof Function) 
@@ -944,11 +961,15 @@ export default {
     },
     getStreamEmbedUrl() {
       // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
-      let embedUrl = `https://player.castr.io/${this.stream.key}`;
+      let embedUrl = `https://player.castr.io/${this.stream.key}?`;
       const {hostnameCDN} = this.stream.region || {}
       if (hostnameCDN) {
         let cdnPop = _.replace(hostnameCDN, /\D/g, '')
-        embedUrl += `?cdnsrc=${cdnPop}`
+        embedUrl += `cdnsrc=${cdnPop}&`
+      }
+
+      if (this.dvrEmbedEnabled) {
+        embedUrl += 'dvr=true'
       }
 
       return embedUrl;
@@ -1368,5 +1389,13 @@ function isRTSPSource(pullUrl) {
   justify-content: center;
   font-size: 18px;
   position: absolute;
+}
+.field-container .toggle-control {
+  color: #ffffff;
+  font-size: 16px;
+  margin: 0 0 0 5px;
+}
+.toggle-control.enabled {
+  color: #02ffa2;
 }
 </style>
