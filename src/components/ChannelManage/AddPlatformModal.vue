@@ -732,13 +732,14 @@ export default {
 function getApiBase() {
   const route = window.location
   let baseURL = route.hostname
-  // if (route.hostname === 'localhost') {
+  if (route.hostname === 'localhost') {
     baseURL += ':22777'
-  // } else {
-  //   let char = '.'
-  //   if (baseURL.indexOf('staging') > -1) char = '-'
-  //   baseURL = 'api' + char + baseURL
-  // }
+  } else {
+    let char = '.'
+    if (baseURL.indexOf('staging') > -1) 
+      char = '-'
+    baseURL = 'api' + char + baseURL
+  }
 
   baseURL = route.protocol + '//' + baseURL
   return baseURL
