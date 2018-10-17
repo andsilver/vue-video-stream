@@ -733,7 +733,7 @@ function getApiBase() {
   const route = window.location
   let baseURL = route.hostname
   if (route.hostname === 'localhost') {
-    baseURL += ':22777'
+    baseURL += ':22776'
   } else {
     let char = '.'
     if (baseURL.indexOf('staging') > -1) 
