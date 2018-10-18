@@ -339,9 +339,11 @@ export default {
 
       // this.$checkout.close()
       // is also available.
-      const checkoutLabel = `${_.toUpper(this.subscriptionPackage.name)} x${
-        this.quantity
-      }`;
+      // let checkoutLabel = `${_.toUpper(this.subscriptionPackage.name)} x${
+      //   this.quantity
+      // }`;
+      const checkoutLabel = `${_.toUpper(this.subscriptionPackage.name)}`;
+
       const amount = this.getTotalFee() * 100;
 
       this.$checkout.open(
