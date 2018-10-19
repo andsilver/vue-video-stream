@@ -234,12 +234,19 @@ export default {
       }
 
       const action = this.$route.query && this.$route.query.action
+      const baseCharge = parseFloat(this.$route.query.bycharge)
+
       if (action === 'upgrade') {
         // const userPackage = userSubscription.subscription.package
         const userPackage = baseSub.package
         const superiorPackage = _.find(this.packages, p => p.baseCharge > userPackage.baseCharge)
         if (superiorPackage) {
           this.subscriptionPackage = superiorPackage
+        }
+      } else if (baseCharge) {
+        const subPack = _.find(this.packages, p => p.baseCharge === baseCharge)
+        if (subPack) {
+          this.subscriptionPackage = subPack
         }
       }
 
