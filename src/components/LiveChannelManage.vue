@@ -118,6 +118,10 @@
                        tag="li" 
                        :to="{name: 'LiveChannelManageDVR'}"
                        active-class="active">recording</router-link>
+          <router-link v-if="stream.dvrHours"
+                       tag="li" 
+                       :to="{name: 'LiveChannelManageSettings'}"
+                       active-class="active">video settings</router-link>
         </ul>
 
         <router-view :stream="stream" 

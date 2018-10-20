@@ -14,6 +14,7 @@ import ChannelManageDVR from '@/components/ChannelManage/ChannelManageDVR'
 
 import LiveChannelManage from '@/components/LiveChannelManage'
 import LiveChannelManageDashboard from '@/components/ChannelManage/LiveChannelManageDashboard'
+import LiveChannelManageSettings from '@/components/ChannelManage/LiveChannelManageSettings'
 
 import AppManage from '@/components/Manage'
 import AdminStats from '@/components/AdminStats'
@@ -104,6 +105,12 @@ const router = new Router({
           path: 'recording',
           name: 'LiveChannelManageDVR',
           component: ChannelManageDVR,
+          props: true
+        },
+        {
+          path: 'settings',
+          name: 'LiveChannelManageSettings',
+          component: LiveChannelManageSettings,
           props: true
         }
       ]

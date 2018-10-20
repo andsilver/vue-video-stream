@@ -26,7 +26,9 @@ export default {
   setStreamPlatformName,
   setStreamPlatformAddress,
   deleteStreamPlatform,
-  getAvailableRegions
+  getAvailableRegions,
+  getStreamMetadata,
+  saveStreamMetadata
 }
 
 function getUserStreams() {
@@ -226,6 +228,26 @@ function deleteStreamPlatform(streamId, platformId) {
   return makeRequest({
     path: `/streams/${streamId}/platforms/${platformId}`,
     method: 'delete'
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function getStreamMetadata(streamId) {
+  return makeRequest(`/streams/${streamId}/metadata`)
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} key
+ * @param {string} value
+ */
+function saveStreamMetadata(streamId, key, value) {
+  return makeRequest({
+    path: `/streams/${streamId}/metadata/save`,
+    method: 'put',
+    data: { updates: { key, value } }
   })
 }
 
