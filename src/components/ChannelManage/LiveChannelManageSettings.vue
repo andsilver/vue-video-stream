@@ -579,7 +579,7 @@ function isRTSPSource(pullUrl) {
   margin-left: 8px;
   display: inline-block;
   width: unset;
-  padding: 6px 12px;
+  padding: 8px 12px;
 }
 .feature-item .btn {
   padding: 4px 10px;

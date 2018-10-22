@@ -951,7 +951,7 @@ export default {
       const { region } = this.stream;
       // let hlsUrl = `http://${region.hostname}/${this.stream.key}/index.m3u8`;
       const hostname = region.hostnameCDN || region.hostname
-      let hlsUrl = `http://${hostname}/${this.stream.key}/index.m3u8`;
+      let hlsUrl = `https://${hostname}/${this.stream.key}/index.m3u8`;
       return hlsUrl;
     },
     getStreamIframeCode() {
