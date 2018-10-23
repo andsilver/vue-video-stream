@@ -194,8 +194,12 @@ export default {
           suffix += freePack && `package=${freePack._id}&` || ''
 
         } else {
-          const supPack = this.superiorPackage
-          suffix += supPack && `package=${supPack._id}&` || ''
+          if (category === 'restream') {
+            const supPack = this.superiorPackage
+            suffix += supPack && `package=${supPack._id}&` || ''
+          } else {
+              suffix += 'action=upgrade&'
+          }
         }
 
         if (category) {

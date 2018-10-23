@@ -32,7 +32,7 @@ const options = {
 
   // newkeys
   key: 'pk_test_3CqyR5dPd6by5H8IQNT6r8Uq',
-  // key: 'pk_test_uhBxuU6g7MNxplqBzf6ofRpz',
+  // key: 'pk_live_......',
 
   image: 'https://castr.io/streamtomultiplesites.png',
   locale: 'auto',
