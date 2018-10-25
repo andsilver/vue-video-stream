@@ -2,7 +2,7 @@
   <div class="view">
     <div class="title">Billing</div>
     <br>
-    <div class="row-container">
+    <!-- <div class="row-container">
       <b-row>
         <b-col>
           <div class="para-title">Payment Method</div>
@@ -12,12 +12,9 @@
              <strong class="text-uppercase">visa</strong> ending in
           </span>
           <span v-else>Not available</span>
-          <!-- <router-link to="/subscribe">
-            <b-button variant="link" size="sm">Change</b-button>
-          </router-link> -->
         </b-col>
       </b-row>
-    </div>
+    </div> -->
     <div class="row-container">
       <b-row>
         <b-col>
@@ -53,18 +50,22 @@
               <hr>
               <div v-for="sub in userSubscription.addonSubscriptions"
                    :key="sub._id">
-                <div>
+                <div :class="{expired: !sub.enabled}">
 
+                  <div v-if="!sub.enabled" 
+                       class="inline-block" 
+                       style="color:red;">Expired&nbsp;&nbsp;</div>
                   <div class="subscription-badge package-category-badge sm">{{sub.category}}</div>
                   <span class="subscription-badge">{{getSubscriptionName(sub)}}</span>&nbsp;
                   <a href="/#pricing" target="_blank"><b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge></a>
 
-                  <router-link :to="subscriptionManagePage(null, 'live')">
-                    <b-button variant="link" size="sm">CHANGE</b-button>
+                  <!-- <router-link :to="subscriptionManagePage(null, sub.category'live')"> -->
+                  <router-link :to="subscriptionManagePage(sub.enabled ? null : 'resubscribe', sub.category)">
+                    <b-button variant="link" size="sm">{{ sub.enabled ? 'CHANGE' : 'PAY NOW'}}</b-button>
                   </router-link>
-                  <b-button variant="link" size="sm" onclick="Intercom('show')">CANCEL</b-button>
+                  <b-button v-if="sub.enabled" variant="link" size="sm" onclick="Intercom('show')">CANCEL</b-button>
                 </div>
-                <div style="margin-top:7px;">
+                <div v-show="sub.enabled" style="margin-top:7px;">
                   <code style="font-size:12.5px;">USD ${{getSubscriptionFee(sub)}}/month</code>&nbsp;
                   <span>
                     valid through <strong>{{ getSubscriptionAge(sub) | date('DD MMM, YYYY') }}</strong>
@@ -193,13 +194,15 @@ export default {
           const freePack = this.basicPackage
           suffix += freePack && `package=${freePack._id}&` || ''
 
-        } else {
+        } else if (action === 'upgrade') {
           if (category === 'restream') {
             const supPack = this.superiorPackage
             suffix += supPack && `package=${supPack._id}&` || ''
           } else {
               suffix += 'action=upgrade&'
           }
+        } else if (action) {
+          suffix += `action=${action}&`
         }
 
         if (category) {
@@ -300,5 +303,9 @@ export default {
   margin-right: 5px;
   letter-spacing: 0;
   text-transform: lowercase;
+}
+.expired {
+  padding: 10px;
+  background-color: rgba(220, 220, 220, 0.09)
 }
 </style>

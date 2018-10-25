@@ -14,6 +14,7 @@ export default {
   getUserStreams,
   getStream,
   getStreamDvrRanges,
+  getStreamViewership,
   addStream,
   addLiveStream,
   setStreamName,
@@ -52,6 +53,14 @@ function getStreamDvrRanges(streamId, startTime, endTime) {
   uri += `?start=${startTime}`
   uri += `&end=${endTime}`
 
+  return makeRequest(uri)
+}
+
+/**
+ * @param {string} streamId
+ */
+function getStreamViewership(streamId) {
+  let uri = `/streams/${streamId}/viewership`
   return makeRequest(uri)
 }
 

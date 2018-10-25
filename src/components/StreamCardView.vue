@@ -50,12 +50,19 @@
               @click="toggleStatus($event)"></span>
       </div>
     </div>
+
+    <confirm-modal modal-id="billing-prompt"
+                   message="Please settle pending subscription invoices before continue."
+                   okText="See Billing"
+                   cancelText="Close"
+                   @modal-confirm="navigateToBilling()"></confirm-modal>
   </div>
 </template>
 
 <script>
 import StreamThumb from "./StreamThumb.vue";
 import StreamService from "../services/StreamService";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default {
   name: "StreamCardView",
@@ -88,6 +95,9 @@ export default {
     };
   },
   methods: {
+    navigateToBilling () {
+      this.$router.push({ path: '/manage/billing' });
+    },
     requestDelete(ev) {
       ev.preventDefault();
       ev.stopPropagation();
@@ -128,12 +138,17 @@ export default {
           this.stream
         );
       } catch (err) {
-        streamStatus = oldStatus;
+        this.streamStatus = oldStatus;
         this.$notify({
           group: "error",
           title: "Couldn't toggle stream status",
           text: err.message
         });
+
+        if (err.message && err.message.indexOf('upgrade') > -1) {
+          this.$root.$emit("bv::show::modal", "billing-prompt");
+        }
+
       }
 
       this.statusProcessing = false;
@@ -152,7 +167,10 @@ export default {
       return "stream was last edited on " + this.stream.last_edit;
     }
   },
-  components: { StreamThumb }
+  components: { 
+    StreamThumb,
+    ConfirmModal
+  }
 };
 </script>
 

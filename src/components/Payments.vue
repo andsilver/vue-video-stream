@@ -243,6 +243,11 @@ export default {
         if (superiorPackage) {
           this.subscriptionPackage = superiorPackage
         }
+      } else if (action === 'resubscribe') {
+        // const userPackage = userSubscription.subscription.package
+        const userPackage = baseSub.package
+        const curPack = _.find(this.packages, p => p.baseCharge === userPackage.baseCharge)
+        this.subscriptionPackage = curPack
       } else if (baseCharge) {
         const subPack = _.find(this.packages, p => p.baseCharge === baseCharge)
         if (subPack) {

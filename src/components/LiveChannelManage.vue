@@ -32,7 +32,8 @@
               <div class="stat-container">
                 <div v-if="streamAlive">
                   <span class="value">
-                    {{mediaPulse.clients | number}}
+                    <!-- {{mediaPulse.clients | number}} -->
+                    {{clientsCount | number}}
                   </span>
                 </div>
                 <div v-else><span class="value">..</span></div>
@@ -187,9 +188,11 @@ export default {
   destroyed() {
     if (!this.stream) return;
     this.unsubscribeMediaPulse();
+    this.scopeAlive = false
   },
   data() {
     return {
+      scopeAlive: true,
       SourceTypes,
       nameEdit: false,
       userSubscription: null,
@@ -201,6 +204,7 @@ export default {
       streamName: null,
       streamFps: null,
       mediaPulse: null,
+      clientsCount: null,
       windowHeight: 0,
       countPushedBytes() {
         const { bytesOutTotal = 0, pushStatsTotal = 0 } = this.mediaPulse;
@@ -241,6 +245,7 @@ export default {
         this.stream = stream;
         this.streamName = this.stream.name;
         this.setupMediaPulse();
+        this.setupViewershipCounter();
         
       } catch (err) {
         // redirect to stream list
@@ -314,6 +319,20 @@ export default {
           this.setupMediaPulse();
         }, 1000);
       }, 5000);
+    },
+    setupViewershipCounter () {
+
+      (async function updateCounter() {
+        try {
+          let viewers = await StreamService.getStreamViewership(this.streamId)
+          this.clientsCount = viewers || 0
+        } catch (e) {}
+
+        if (this.scopeAlive)
+          setTimeout(updateCounter.bind(this), 3000)
+
+      }.bind(this))()
+
     },
     onMediaPulse() {
       this.streamAlive = this.stream.enabled && this.mediaPulse && this.mediaPulse.alive
