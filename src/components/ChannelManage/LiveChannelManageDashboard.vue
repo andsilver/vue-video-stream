@@ -40,14 +40,14 @@
                        :value="getStreamEmbedUrl()"
                        readonly/>
               </div>
-              <div class="field-container">
+              <!-- <div class="field-container">
                 <button class="modal-button modal-button-sm highlight badge-button"
                         @click="clipboardCopy(getStreamHlsUrl)">Copy</button>
                 <div class="label">HLS Url</div>
                 <input class="input"
                        :value="getStreamHlsUrl()"
                        readonly/>
-              </div>
+              </div> -->
             </div>
           </b-col>
           <b-col cols="8">
