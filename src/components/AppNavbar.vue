@@ -2,7 +2,6 @@
   <div class="navbar container">
       <div class="row">
         <div class="col-md-4">
-          <!-- <img class="logo-icon" src="../assets/logo.png" alt=""> -->
           <a href="/app/dashboard"><img class="logo-icon" src="../assets/castr.png" alt="castr"></a>
           <!-- <h3 class="logo">Castr</h3> -->
         </div>
@@ -92,7 +91,8 @@ export default {
   display: block;
 }
 .logo-icon {
-  width: 92px;
+  width: 122px;
+  height: auto;
   display: inline-block;
   vertical-align: top;
 }

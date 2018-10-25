@@ -50,7 +50,8 @@ export default {
   display: block;
 }
 .logo-icon {
-  width: 92px;
+  width: 112px;
+  height: auto;
   display: inline-block;
   vertical-align: top;
 }
