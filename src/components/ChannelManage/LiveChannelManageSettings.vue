@@ -159,6 +159,12 @@ export default {
       
       const feature = this.features[featureName]
       if (!feature) return
+
+      if (featureName === 'bar') {
+        if (window.Intercom)
+          window.Intercom('show')
+        return
+      }
       
       const nstate = !feature.enabled
       feature.enabled = nstate
