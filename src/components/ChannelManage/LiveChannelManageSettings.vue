@@ -160,7 +160,7 @@ export default {
       const feature = this.features[featureName]
       if (!feature) return
 
-      if (featureName === 'bar') {
+      if (featureName === 'abr') {
         if (window.Intercom)
           window.Intercom('show')
         return
