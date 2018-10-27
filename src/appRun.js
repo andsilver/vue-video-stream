@@ -91,8 +91,21 @@ async function activateIntercom() {
   }
 
   if (userSub) {
-    const packageName = _.get(userSub, 'subscription.package.name')
-    _.assign(intercomConfig, { subscription: packageName })
+    const userPacks = []
+    // push restream pack
+    const restreamPackName = _.get(userSub, 'subscription.package.name')
+    userPacks.push(restreamPackName)
+    // get any addon pack
+
+    _.each(userSub.addonSubscriptions, (addonSub) => {
+      const packName = _.get(addonSub, 'package.name')
+      if (packName) userPacks.push(packName)
+    })
+
+    _.assign(intercomConfig, { 
+      subscription: userPacks.join(', '),
+      // liveSubscriptionPack: livePackName
+    })
   }
 
   window.Intercom('boot', intercomConfig)

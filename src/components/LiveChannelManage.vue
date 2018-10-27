@@ -115,15 +115,22 @@
           <router-link tag="li" 
                        :to="{name: 'LiveChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
-          <router-link v-if="stream.dvrHours"
-                       tag="li" 
+          <!-- <router-link v-if="stream.dvrHours" -->
+          <router-link tag="li" 
                        :to="{name: 'LiveChannelManageDVR'}"
                        active-class="active">recording</router-link>
-          <router-link v-if="stream.dvrHours"
-                       tag="li" 
+          <!-- <router-link v-if="stream.dvrHours" -->
+          <router-link tag="li" 
                        :to="{name: 'LiveChannelManageSettings'}"
                        active-class="active">video settings</router-link>
         </ul>
+
+        <div v-if="trialSubscription && !isRecording()" 
+             class="text-danger" 
+             style="font-size:14px;">
+          You are using a Trial plan with max 4 viewers at a time. 
+          Please <router-link to="/subscribe?category=live&action=upgrade">upgrade</router-link> to remove this cap.
+        </div>
 
         <router-view :stream="stream" 
                      :streamAlive="streamAlive"
@@ -174,6 +181,12 @@ export default {
     this.processing = false;
 
     if (!this.stream) return;
+    
+    const userSub = await SubscriptionService.getUserSubscriptions(true)
+    const baseSub = _.find(userSub.addonSubscriptions, { category: 'live' })
+    if (baseSub) {
+      this.trialSubscription = /trial/gi.test(baseSub.package.name)
+    }
 
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Page", this.stream);
@@ -200,6 +213,7 @@ export default {
       processingMessage: null,
       stream: null,
       streamAlive: false,
+      trialSubscription: false,
       streamId: null,
       streamName: null,
       streamFps: null,
@@ -232,6 +246,9 @@ export default {
     };
   },
   methods: {
+    isRecording () {
+      return /recording$/gi.test(this.$router.currentRoute.path)
+    },
     requestChatStatus () {
       this.$root.$emit("bv::show::modal", "alert-chat-down");
     },

@@ -19,7 +19,8 @@
             <div style="font-size:14px;"><i class="fa fa-video"></i>&nbsp; Create New</div>
           </template>
           <b-dropdown-item v-b-modal.modal-add-channel>
-            New Restream &nbsp;<code style="color:#9a99bb;">[default]</code>
+            <!-- New Restream &nbsp;<code style="color:#9a99bb;">[default]</code> -->
+            New Restream
           </b-dropdown-item>
           <b-dropdown-item v-b-modal.modal-add-live-channel>New Live Stream</b-dropdown-item>
         </b-dropdown>
@@ -56,7 +57,8 @@
                 <div style="font-size:14px;"><i class="fa fa-video"></i>&nbsp; Add Stream</div>
               </template>
               <b-dropdown-item v-b-modal.modal-add-channel>
-                New Restream &nbsp;<code style="color:#9a99bb;">[default]</code>
+                <!-- New Restream &nbsp;<code style="color:#9a99bb;">[default]</code> -->
+                New Restream
               </b-dropdown-item>
               <b-dropdown-item v-b-modal.modal-add-live-channel>New Live Stream</b-dropdown-item>
           </b-dropdown>

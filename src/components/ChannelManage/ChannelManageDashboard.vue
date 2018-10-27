@@ -1182,7 +1182,8 @@ function isRTSPSource(pullUrl) {
   margin: 10px 0 15px 0;
 }
 .preveiw-container {
-  padding: 0 10px 0 20px;
+  /* padding: 0 10px 0 20px; */
+  padding: 0 10px 0 10px;
 }
 .video-wrapper {
   width: 100%;

@@ -327,6 +327,13 @@
                   message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
                   okText="Got it"></alert-modal>
 
+                   <!-- message="This Feature is not included in current subscription. Please upgrade your subscription " -->
+                   <!-- message="Feature is not included in your current subscription. Please upgrade your subscription plan to continue." -->
+    <confirm-modal modal-id="feature-upgrade"
+                   message="Please upgrade your subscription plan to access this feature"
+                   okText="Upgrade Now"
+                   cancelText="Later"
+                   @modal-confirm="navigateToBilling()"></confirm-modal>
   </div>
 </template>
 
@@ -453,9 +460,21 @@ export default {
     }
   },
   methods: {
+    navigateToBilling () {
+      // /manage/billing?category=live
+      this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
+      // this.$root.$emit('bv::show::modal', 'feature-upgrade')
+    },
     toggleDvrEmbedStatus () {
       const ostate = this.dvrEmbedEnabled
       const nstate = !ostate
+
+      if (!this.stream.dvrHours) {
+        // window.alertt('not available in trial pack')
+        this.$root.$emit('bv::show::modal', 'feature-upgrade')
+        return
+      }
+
       this.dvrEmbedEnabled = nstate
     },
     clipboardCopy (text) {

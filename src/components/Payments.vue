@@ -208,9 +208,11 @@ export default {
     
     try {
       // fetch available subscriptions packages
-      const packages = await SubscriptionService.getSubscriptionPackages()
+      let packages = await SubscriptionService.getSubscriptionPackages()
       // this.packages = _.filter(packages, p => p.baseCharge > 0)
       // this.packages = packages
+      packages = _.sortBy(packages, p => p.name[0])
+
       this.subscriptionPackages = packages
 
       // set selected subscription

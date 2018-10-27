@@ -38,7 +38,10 @@
                 <a href="#" @click="forceLogout">Logout</a>
               </b-dropdown-item>
           </b-dropdown>
-
+          <router-link to="/subscribe">
+            <button class="btn btn-danger float-right"
+                   style="margin-top:5px;margin-right:5px;letter-spacing:1px;">UPGRADE</button>
+          </router-link>
         </div>
       </div>
   </div>

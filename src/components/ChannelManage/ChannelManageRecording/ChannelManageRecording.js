@@ -280,7 +280,8 @@ function setSeekBarByTime(time, preventUpdate) {
 
   if (this.seekBarControlLock !== true) {
     let controlEl = _.get(this.seekBarControl, 0)
-    controlEl.style.left = px + 'px'
+    if (controlEl)
+      controlEl.style.left = px + 'px'
   }
 }
 

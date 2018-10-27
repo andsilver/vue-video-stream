@@ -79,6 +79,11 @@
                   message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
                   okText="Got it"></alert-modal>
 
+    <confirm-modal modal-id="feature-upgrade"
+                   message="Please upgrade your subscription plan to access this feature"
+                   okText="Upgrade Now"
+                   cancelText="Later"
+                   @modal-confirm="navigateToBilling()"></confirm-modal>
   </div>
 </template>
 
@@ -150,10 +155,15 @@ export default {
         }
       }
     })
-    
+
     console.log('stream meta', meta)
   },
   methods: {
+    navigateToBilling () {
+      // /manage/billing?category=live
+      this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
+      // this.$root.$emit('bv::show::modal', 'feature-upgrade')
+    },
     async toggleFeature(featureName) {
       if (this.featureProcessing[featureName]) return
       
@@ -163,6 +173,12 @@ export default {
       if (featureName === 'abr') {
         if (window.Intercom)
           window.Intercom('show')
+        return
+      }
+
+      if (featureName === 'embedRewind' && !this.stream.dvrHours) {
+        // window.alertt('not available in trial pack')
+        this.$root.$emit('bv::show::modal', 'feature-upgrade')
         return
       }
       
