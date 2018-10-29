@@ -18,7 +18,6 @@
         <div class="feature-desc">
           <div>Enable Google Analytics</div>
           <div v-if="features.ga.enabled" class="pane">
-
             <span>GA ID</span>
             <input class="input" 
                    v-model="features.ga.value"
@@ -49,7 +48,7 @@
           Enable Embed Player Rewind
         </div>
       </div>
-      
+
       <div class="feature-item">
         <div class="feature-control">
           <span class="toggle-control"
@@ -65,6 +64,83 @@
         </div>
         <div class="feature-desc">
           Enable Multi-Bitrate Transcoding
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-control">
+          <!-- <span class="toggle-control"
+                :class="{ enabled: features.embedPoster.enabled }"
+                @click="toggleFeature('embedPoster')">
+            <i class="fa"
+               :class="{
+                 'fa-toggle-on enabled': features.embedPoster.enabled,
+                 'fa-toggle-off': !features.embedPoster.enabled,
+                 'status-processing': featureProcessing.embedPoster
+               }"></i>
+          </span> -->
+        </div>
+        <div class="feature-desc">
+          <div>Custom Embed Poster</div>
+          <div class="pane">
+            <div v-if="posterUrl" 
+                 class="poster-thumb-wrapper">
+              <img :src="posterUrl" class="poster-thumb" />
+            </div>
+            
+            <span class="hidden">Image File</span>
+            <input type="file"
+                   id="embed-poster-input"
+                   class="input hidden" 
+                   @change="onEmbedPosterPreview"
+                   placeholder="UA-00000.." />
+
+            <button v-if="!embedPosterTemp"
+                    class="btn btn-danger"
+                    :disabled="featureProcessing.embedPoster"
+                    @click="hitUpload"
+                    style="margin:0;">
+              <span v-if="features.embedPoster.value">Change</span>
+              <span v-else>Select Poster</span>
+            </button>
+            
+            <button v-if="embedPosterTemp"
+                    class="btn btn-success"
+                    :disabled="featureProcessing.embedPoster"
+                    @click="saveEmbedPoster"
+                    style="margin:0;">
+              <!-- <span v-if="features.embedPoster.value">Save Poster</span> -->
+              <span>
+                {{ featureProcessing.embedPoster ? 'Saving ..' : 'Save Poster' }}
+              </span>
+            </button>
+            
+            <button v-if="embedPosterTemp || features.embedPoster.value"
+                    class="btn btn-link"
+                    :disabled="featureProcessing.embedPoster"
+                    @click="cancelUpload">
+              <span v-if="embedPosterTemp && features.embedPoster.value">Restore</span>
+              <span v-else-if="embedPosterTemp">Cancel</span>
+              <span v-else>Remove</span>
+            </button>
+
+            <!-- <div v-else class="inline-block">
+              <div v-if="features.embedPoster.value" 
+                  class="inline-block">
+                <button class="btn btn-primary"
+                        @click="saveEmbedPoster">
+                        {{ featureProcessing.embedPoster ? 'saving ..' :  'save' }}</button>
+            </div> -->
+
+
+            <!-- <button v-if="features.embedPoster.value"
+                    class="btn btn-link"
+                    :disabled="featureProcessing.embedPoster"
+                    @click="removePoster">Remove</button> -->
+            <div v-show="features.embedPoster.error"
+                 class="alert alert-danger"
+                 style="margin-top:10px;">{{features.embedPoster.error}}</div>
+          </div>
         </div>
       </div>
       
@@ -135,12 +211,20 @@ export default {
           enabled: false,
           valueType: 'bool' 
         },
+        embedPoster: { 
+          error: false,
+          enabled: false,
+          value: null,
+          valueType: 'string',
+        },
       },
       featureProcessing: {
         ga: false,
+        abr: false,
         embedRewind: false,
-        abr: false
-      }
+        embedPoster: false,
+      },
+      embedPosterTemp: null
     };
   },
   async mounted () {
@@ -157,6 +241,17 @@ export default {
     })
 
     console.log('stream meta', meta)
+  },
+  computed: {
+    posterUrl () {
+      if (this.embedPosterTemp)
+        return this.embedPosterTemp
+
+      const imageId = this.features.embedPoster.value
+      if (!imageId) return
+
+      return `https://static.castr.io/embedPosters/${imageId}`
+    }
   },
   methods: {
     navigateToBilling () {
@@ -195,16 +290,72 @@ export default {
       if(!gaId) return
 
       await this.saveSetting('ga', gaId)
-      // try {
-      //   const nmeta = await StreamService.saveStreamMetadata(this.streamId, 'ga', gaId)
-      //   console.log('new meta', nmeta)
-      // } catch (e) {
-      //   console.log(e)
-      // }
     },
-    onMediaPulseChanged() {
+    hitUpload () {
+      document.querySelector('#embed-poster-input').click()
+    },
+    onEmbedPosterPreview () {
+      let imageInput = document.querySelector('#embed-poster-input')
+      let imageFile = imageInput.files[0]
+      if (!imageFile) return
 
+      imageReader(imageFile, (base64) => {
+        this.embedPosterTemp = base64
+      })
     },
+    async saveEmbedPoster (event) {
+      this.features.embedPoster.error = false
+
+      let imageInput = document.querySelector('#embed-poster-input')
+      let imageFile = imageInput.files[0]
+      
+      if (!imageInput.value || !imageFile) {
+        this.features.embedPoster.error = 'please pick an image file'
+        return
+      }
+
+      this.featureProcessing.embedPoster = true
+      
+      // -- upload reuqest --
+      const fdata = new FormData()
+      fdata.append('file', imageFile)
+      const fdataConfig = {
+        headers: {
+          'content-type': 'multipart/form-data'
+        }
+      }
+
+      const res = await StreamService.uploadStreamPoster(this.streamId, fdata)
+      if (res.success) {
+        this.embedPosterTemp = null
+        this.features.embedPoster.value = res.uploadId
+        this.$notify({ group: 'success', text: 'Poster uploaded with success' })
+      } else {
+        this.features.embedPoster.error = 'could not handle image upload. Please try again later'
+      }
+      // -- upload reuqest ends --
+
+      this.featureProcessing.embedPoster = false
+    },
+    async cancelUpload () {
+      if (this.embedPosterTemp) {
+        this.embedPosterTemp = null
+        document.querySelector('#embed-poster-input').value = null
+        return
+      }
+
+      this.removePoster()
+      
+    },
+    async removePoster () {
+      try {
+        await this.saveSetting('embedPoster', null)
+        this.features.embedPoster.value = null
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    onMediaPulseChanged() {},
     async saveSetting (key, value) {
       this.featureProcessing[key]=true
       try {
@@ -222,6 +373,21 @@ export default {
     PromptModal
   }
 };
+
+function imageReader(file, cb) {
+  if (!file) {
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function() {
+    if (cb) {
+      cb(reader.result);
+    }
+  };
+
+  reader.readAsDataURL(file);
+}
 
 function promisify(func) {
   return new Promise(resolve => {
@@ -582,6 +748,7 @@ function isRTSPSource(pullUrl) {
 .feature-item .feature-control {
   font-size: 15px;
   margin-right: 20px;
+  width: 14px;
   vertical-align: top;
 }
 .feature-control .toggle-control {
@@ -610,5 +777,13 @@ function isRTSPSource(pullUrl) {
 }
 .toggle-control.enabled {
   color: #02ffa2;
+}
+.poster-thumb-wrapper {
+  margin-bottom: 20px;
+}
+.poster-thumb {
+  display: inline-block;
+  width: 196px;
+  border: 1px solid #010329; 
 }
 </style>

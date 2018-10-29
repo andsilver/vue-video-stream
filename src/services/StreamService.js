@@ -29,7 +29,8 @@ export default {
   deleteStreamPlatform,
   getAvailableRegions,
   getStreamMetadata,
-  saveStreamMetadata
+  saveStreamMetadata,
+  uploadStreamPoster
 }
 
 function getUserStreams() {
@@ -257,6 +258,21 @@ function saveStreamMetadata(streamId, key, value) {
     path: `/streams/${streamId}/metadata/save`,
     method: 'put',
     data: { updates: { key, value } }
+  })
+}
+
+/**
+ * @param {string} streamId
+ * @param {FormData} fdata
+ */
+function uploadStreamPoster(streamId, fdata) {
+  return makeRequest({
+    path: `/streams/${streamId}/metadata/poster`,
+    method: 'post',
+    data: fdata,
+    headers: {
+      'content-type': 'multipart/form-data'
+    }
   })
 }
 

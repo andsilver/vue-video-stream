@@ -279,7 +279,7 @@ export default {
       subscriptionPackages: [],
       packCategories: [
         { label: 'restreaming', value: 'restream' },
-        { label: 'live stremaing', value: 'live' },
+        { label: 'live streaming', value: 'live' },
       ],
       quantity: 1,
       getEndingDate() {
