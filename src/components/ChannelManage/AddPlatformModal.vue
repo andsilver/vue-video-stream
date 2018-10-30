@@ -808,7 +808,7 @@ function getApiBase() {
   display: inline-block;
 }
 .input-container .input {
-  padding: unset;
+  padding: 3px;
   color: #ffffff;
   background-color: transparent;
   width: 20px;
@@ -817,13 +817,13 @@ function getApiBase() {
   outline: none !important;
   background-color: #141642;
   border-radius: 0;
-  border-bottom: 1px solid transparent;
+  border: 1px solid transparent;
   margin-left: 2px;
   margin-right: 2px;
 }
 .input-container .input:focus {
   background-color: #0a0d49;
-  border-bottom-color: #ffffff;
+  border-color:rgba(236,236,236, 0.45);
 }
 .input-container .value-placeholder {
   color: #b7b7b7;

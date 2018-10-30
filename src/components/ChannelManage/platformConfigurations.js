@@ -174,6 +174,17 @@ const platforms = [{
   { name: 'smashcast', servers: smashcastServers, icon: '/static/images/platforms/smashcast.svg' },
   { name: 'mobcrush', servers: mobcrushServers, icon: '/static/images/platforms/mobcrush.svg' },
   {
+    name: 'dlive',
+    icon: '/static/images/platforms/dlive.png',
+    serverKeySegments: [
+      { text: 'rtmp://stream.', hidden: true },
+      'dlive.tv/live?key=',
+      { input: true, placeholder: ' xxx_xxxxxxxxxx==', width: 200 }
+    ],
+    serverKeySegmentValues: [],
+    canLinkService: false
+  },
+  {
     name: 'USTREAM',
     serverKeySegments: [
       { text: 'rtmp://', hidden: true },
