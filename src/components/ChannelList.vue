@@ -14,9 +14,18 @@
                     size="lg" 
                     variant="danger"
                     right
-                    no-caret>
+                    no-caret
+                    @show="onStreamCreateToggle(true)"
+                    @hide="onStreamCreateToggle(false)">
           <template slot="button-content">
-            <div style="font-size:14px;"><i class="fa fa-video"></i>&nbsp; Create New</div>
+            <div style="font-size:14px;">
+              <i class="fa fa-video"></i>&nbsp; Create New
+              <i class="fa" 
+                     :class="{
+                       'fa-chevron-down': !streamCreateDropdownActive, 
+                       'fa-chevron-up': streamCreateDropdownActive}"
+                     style="font-size: 12px;"></i>
+            </div>
           </template>
           <b-dropdown-item v-b-modal.modal-add-channel>
             <div class="dropdown-icon">
@@ -63,12 +72,21 @@
                     size="lg"
                     v-b-modal.modal-add-channel>Add Stream</b-button> -->
           <b-dropdown id="stream-deploy-dropdown" 
-                    class="m-md-2"
+                    class="m-md-2 stream-deploy-dropdown-promo"
                     size="lg" 
                     variant="danger"
-                    no-caret>
+                    no-caret
+                    @show="onStreamCreateToggle(true)"
+                    @hide="onStreamCreateToggle(false)">
             <template slot="button-content">
-                <div style="font-size:14px;"><i class="fa fa-video"></i>&nbsp; Add Stream</div>
+                <div style="font-size:14px;">
+                  <i class="fa fa-video"></i>&nbsp; Add Stream
+                  <i class="fa" 
+                     :class="{
+                       'fa-chevron-down': !streamCreateDropdownActive, 
+                       'fa-chevron-up': streamCreateDropdownActive}"
+                     style="font-size: 12px;"></i>
+                </div>
               </template>
               <b-dropdown-item v-b-modal.modal-add-channel>
                 <div class="dropdown-icon">
@@ -123,14 +141,13 @@ export default {
     try {
       const streams = await StreamService.getUserStreams();
       setTimeout(() => {
-        this.streams = streams
+        this.streams = streams;
         this.loading = false;
-      }, 100)
-
+      }, 100);
     } catch (err) {
       this.$notify({ group: "error", title: err.error, text: err.message });
       this.loading = false;
-      return
+      return;
     }
 
     // event tracking
@@ -138,32 +155,38 @@ export default {
       totalStreams: _.size(this.streams),
       enabledStreams: _.size(_.filter(this.streams, { enabled: true }))
     });
-
   },
   data() {
     return {
       deleteModalConfiguredStream: null,
       loading: true,
-      streams: []
+      streams: [],
+      streamCreateDropdownActive: false
     };
   },
   methods: {
+    onStreamCreateToggle(state) {
+      this.streamCreateDropdownActive = state;
+    },
     onNewStream(stream, regionDetails) {
       this.streams = [...this.streams, stream];
       this.$notify({ group: "success", text: "Stream deployed successfully" });
-      
-      // setTimeout(() => {
-        let redirectPath = '/streams/'
-        if (stream.type === 'live') {
-          redirectPath = '/livestreams/'
-        }
 
-        redirectPath += stream._id
-        this.$router.push({ path: redirectPath });
+      // setTimeout(() => {
+      let redirectPath = "/streams/";
+      if (stream.type === "live") {
+        redirectPath = "/livestreams/";
+      }
+
+      redirectPath += stream._id;
+      this.$router.push({ path: redirectPath });
       // }, 3000)
 
-      // track event 
-      window.trackEvent(`Deployed new stream ${stream.name} in ${regionDetails.name}`, stream);
+      // track event
+      window.trackEvent(
+        `Deployed new stream ${stream.name} in ${regionDetails.name}`,
+        stream
+      );
     },
     onStreamDeleteRequest(stream) {
       this.deleteModalConfiguredStream = stream;
@@ -180,10 +203,12 @@ export default {
       try {
         await StreamService.deleteStream(this.deleteModalConfiguredStream._id);
 
-        // track event 
-        const removedStream = this.deleteModalConfiguredStream
-        window.trackEvent(`Deleted stream ${removedStream.name}`, removedStream);
-        
+        // track event
+        const removedStream = this.deleteModalConfiguredStream;
+        window.trackEvent(
+          `Deleted stream ${removedStream.name}`,
+          removedStream
+        );
       } catch (err) {
         this.$notify({ group: "error", title: err.error, text: err.message });
         // push stream back to list
@@ -193,7 +218,12 @@ export default {
       this.deleteModalConfiguredStream = null;
     }
   },
-  components: { StreamCardView, AddChannelModal, AddLiveChannelModal, ConfirmModal }
+  components: {
+    StreamCardView,
+    AddChannelModal,
+    AddLiveChannelModal,
+    ConfirmModal
+  }
 };
 </script>
 
@@ -260,12 +290,38 @@ export default {
   min-width: 275px;
   background-color: rgb(61, 70, 115) !important;
   color: #ffffff;
-  left: 2px !important;
+  left: 1px !important;
+  top: 16px !important;
+  padding-top:10px;
+  padding-bottom:10px;
+}
+#stream-deploy-dropdown .dropdown-menu::before {
+  content: '.';
+  display: inline-block;
+  position: absolute;
+  background: #3f4672;
+  width: 20px;
+  height: 20px;
+  color: transparent;
+  transform: rotate(45deg);
+  top: -5.5px;
+  right:25px;
+  z-index: -1;
+}
+
+#stream-deploy-dropdown.stream-deploy-dropdown-promo .dropdown-menu {
+  left: 0px !important;
+}
+#stream-deploy-dropdown.stream-deploy-dropdown-promo .dropdown-menu::before {
+  right:unset !important;
+  left:25px !important;
 }
 #stream-deploy-dropdown .dropdown-item {
   color: inherit;
   padding: 7px 14px !important;
   background-color: transparent;
+  position:relative;
+  z-index: 1;
 }
 #stream-deploy-dropdown .dropdown-item:hover {
   background-color: #212948;
@@ -289,6 +345,6 @@ export default {
   opacity: 0.7;
 }
 .dropdown-divider {
-  border-color: rgba(1,3,41,0.14)
+  border-color: rgba(1, 3, 41, 0.14);
 }
 </style>
