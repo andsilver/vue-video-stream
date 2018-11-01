@@ -19,10 +19,24 @@
             <div style="font-size:14px;"><i class="fa fa-video"></i>&nbsp; Create New</div>
           </template>
           <b-dropdown-item v-b-modal.modal-add-channel>
-            <!-- New Restream &nbsp;<code style="color:#9a99bb;">[default]</code> -->
-            New Restream
+            <div class="dropdown-icon">
+              <img src="../assets/restreaming.svg" />
+            </div>
+            <div class="dropdown-text">
+              <div class="main">New Restream</div>
+              <div class="desc">Restream To Multiple Sites</div>
+            </div>
           </b-dropdown-item>
-          <b-dropdown-item v-b-modal.modal-add-live-channel>New Live Stream</b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item v-b-modal.modal-add-live-channel>
+            <div class="dropdown-icon">
+              <img src="../assets/live-streaming.svg" />
+            </div>
+            <div class="dropdown-text">
+              <div class="main">New Live Stream</div>
+              <div class="desc">Live Stream Using Your Own Player</div>
+            </div>
+          </b-dropdown-item>
         </b-dropdown>
       </div>
     </div>
@@ -57,10 +71,23 @@
                 <div style="font-size:14px;"><i class="fa fa-video"></i>&nbsp; Add Stream</div>
               </template>
               <b-dropdown-item v-b-modal.modal-add-channel>
-                <!-- New Restream &nbsp;<code style="color:#9a99bb;">[default]</code> -->
-                New Restream
+                <div class="dropdown-icon">
+                  <img src="../assets/restreaming.svg" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New Restream</div>
+                  <div class="desc">Restream To Multiple Sites</div>
+                </div>
               </b-dropdown-item>
-              <b-dropdown-item v-b-modal.modal-add-live-channel>New Live Stream</b-dropdown-item>
+              <b-dropdown-item v-b-modal.modal-add-live-channel>
+                <div class="dropdown-icon">
+                  <img src="../assets/live-streaming.svg" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New Live Stream</div>
+                  <div class="desc">Live Stream Using Your Own Player</div>
+                </div>
+              </b-dropdown-item>
           </b-dropdown>
         </div>
 
@@ -230,9 +257,10 @@ export default {
   border-bottom-right-radius: 0 !important;
 }
 #stream-deploy-dropdown .dropdown-menu {
-  min-width: 205px;
+  min-width: 275px;
   background-color: rgb(61, 70, 115) !important;
   color: #ffffff;
+  left: 2px !important;
 }
 #stream-deploy-dropdown .dropdown-item {
   color: inherit;
@@ -241,5 +269,26 @@ export default {
 }
 #stream-deploy-dropdown .dropdown-item:hover {
   background-color: #212948;
+}
+.dropdown-icon {
+  display: inline-block;
+  width: 32px;
+}
+.dropdown-icon img {
+  width: 20px;
+  vertical-align: super;
+}
+.dropdown-text {
+  display: inline-block;
+}
+.dropdown-text .main {
+  font-size: 15px;
+}
+.dropdown-text .desc {
+  font-size: 12.5px;
+  opacity: 0.7;
+}
+.dropdown-divider {
+  border-color: rgba(1,3,41,0.14)
 }
 </style>
