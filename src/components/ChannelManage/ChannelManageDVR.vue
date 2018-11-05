@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!stream.dvrHours" class="container" style="padding:0">
+    <div v-if="!stream.dvrHours" class="container" style="padding:0">
       <p class="text-danger" style="font-size:14px;">
         Video Recording is not included in your current subscription. Kindly upgrade your subscription plan to access this feature.
       </p>
@@ -7,157 +7,69 @@
         <button class="btn btn-danger">Upgrade Now</button>
       </router-link>
     </div>
-    <div v-else class="container view-wrapper" style="padding:0">
-      <b-row>
-        <b-col offset="2" cols="8">
-          <div class="dvr-player-overlay">
-            <div v-show="!timelineRange.validHit"
-                class="dvr-invalid-hit">
-              <p class="message">
-                <i class="fa fa-video-slash"></i>&nbsp;&nbsp;
-                Recording not available
-              </p>
-            </div>
-            <div id="dvr-player"
-                class="dvr-player"></div>
-          </div>
-        </b-col>
-      </b-row>
-
-      <div class="dvr-timeline-overlay font-num">
-        <div class="dvr-timeline-container">
-          <div class="dvr-timeline">
-                  <!-- :style="{ width: (timelineRange.chunkPx + (4 + (index))) + 'px' }" -->
-            <code v-for="(node, index) in timeline"
-                  :key="index"
-                  :style="{ width: timelineRange.chunkPx + 'px' }"
-                  class="timeline-chunk">
-              <span v-show="node.isHead" 
-                    style="color:white;">{{ node.time | date('DD-MM-YYYY') }}</span>
-              <br>
-              <span class="chunk-scale"></span>
-              <span>{{node.time|date('HH:mm')}}</span>
-            </code>
-          </div>
-        </div>
-
-        <div class="dvr-timeline-seekbar-overlay">
-          <div class="seekbar-frame-snapshot">
-            <img v-show="seekbarFrameSnapshot" :src="seekbarFrameSnapshot">
-            <div class="snapshot-seektime">{{ seekbarFrameTime|date('HH:mm:ss DD-MM') }}</div>
-          </div>
-          <div class="timeline-segment-controls">
-            <div class="segment-extract-control ctrl1"></div>
-            <div class="segment-extract-control ctrl2"></div>
-          </div>
-          <div class="timeline-seekbar-guide">
-            <div v-for="(hit, index) in timelineRange.hits"
-                :key="index"
-                :style="hit.css"
-                class="hit"></div>
-          </div>
-          <div class="timeline-seekbar"></div>
-          <div class="timeline-seekbar-control"></div>
-        </div>
-
-        <div class="dvr-player-controls">
-          <!-- <div class="text-center"> -->
-          <div>
-            <div class="clip-time font-num">
-              <span v-show="timelineRange.validHit">
-                {{ player.time|date('HH:mm:ss DD-MM') }}
-              </span>
-            </div>
-
-            <b-row>
-              <b-col>
-                
-                <div class="btn-group">
-                  <button class="btn btn-primary"
-                          @click="zoomTimeline(1)"><i class="fa fa-minus"></i></button>
-                  <button class="btn btn-primary" 
-                          @click="zoomTimeline(-1)"><i class="fa fa-plus"></i></button>
-                </div>
-                &nbsp;
-                &nbsp;
-                <div class="btn-group">
-                  <button class="btn btn-primary" 
-                          @click="moveTimeline(-1)"><i class="fa fa-chevron-left"></i></button>
-                  <button class="btn btn-primary" 
-                          @click="moveTimeline(1)"><i class="fa fa-chevron-right"></i></button>
-                </div>
-                &nbsp;
-                &nbsp;
-                <div class="btn-group">
-                  <button class="btn btn-primary"
-                        @click="togglePlayback"
-                        :disabled="!timelineRange.validHit">
-                    <span class="fa"
-                          :class="{
-                          'fa-stop': player.playback, 
-                          'fa-play': !player.playback }"></span>
-                  </button>
-                  <button class="btn btn-primary"
-                        @click="toggleMute()">
-                    <span :class="{ 
-                          'fa-volume-off': player.mute, 
-                          'fa-volume-up': !player.mute }"
-                          class="fa heading-sm"></span>
-                  </button>
-                </div>
-              </b-col>
-
-              <b-col class="text-right">
-
-                <button class="btn btn-success text" 
-                        :disabled="!validDVRHits.length">
-                  <a :href="getDownloadHref()"
-                    target="_blank">Export MP4</a></button>
-
-                &nbsp;
-                &nbsp;
-
-                <span>
-                  <span>{{timelineRange.extract.start|date('HH:mm:ss')}}</span> 
-                  <span class="text-muted">-</span>
-                  <span>{{timelineRange.extract.end|date('HH:mm:ss')}}</span>
-                </span>
-              </b-col>
-            </b-row>
-
+    <div v-else class="container view-wrapper dvr-widget-wrapper" style="padding:0">
+      <div v-if="processing">
+        <div class="page-placeholder" style="height:400px">
+          <div class="page-placeholder-content" style="font-size:16px;">
+            &nbsp; Please wait .. &nbsp; 
+            <br>
+            <b-progress :value="100"
+                        :max="100" 
+                        animated
+                        class="w-100 mt-2"
+                        style="height: 10px;"></b-progress>
           </div>
         </div>
       </div>
-
-      <br>
-
-      <div class="dvr-tools-overlay">
-        <div class="dvr-toolbar"></div>
-        <b-row>
-          <b-col >
-            
-            <div class="config-pane">
-              <div class="config">
-                <div class="tool-label">Recording Settings</div>
-                <div class="config-value">
-                  <code class="text-uppercase">{{stream.dvrHours}} hours</code>
-                  <div style="margin-top:5px;">
-                    <a href="JavaScript:Intercom('show')">Change</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </b-col>
-        </b-row>
-      </div>
+      <iframe v-if="dvrIframeUrl"
+              width="650" 
+              height="0" 
+              :src="dvrIframeUrl"
+              class="dvr-widget"
+              allowfullscreen
+              border="0"
+              :style="{ opacity: processing?0:1 }"></iframe>
+              <!-- :style="{ height: (processing?0:560)+'px'  }"></iframe> -->
   </div>
 </template>
-<script src="./ChannelManageRecording/ChannelManageRecording.js"></script>
+// <script src="./ChannelManageRecording/ChannelManageRecording.js"></script>
+<script>
+export default {
+  name: "ChannelManageDVR",
+  props: ['stream'],
+  mounted () {
+    setTimeout(() => {
+    this.processing = false
+    }, 5000)
+  },
+  data () {
+    return {
+      processing: true
+    }
+  },
+  computed: {
+    dvrIframeUrl () {
+      const {stream} = this
+      if (!stream) return ''
+      return `https://${stream.region.identifierHaxr}.origincdn.com/${stream.key}/embed.html?dvr=true`
+    }
+  }
+};
+</script>
 <style scoped>
 .pane-label {
   text-transform: uppercase;
   font-size: 13px;
+}
+.dvr-widget-wrapper {
+  text-align: center;
+  padding:0;
+}
+.dvr-widget {
+  width: 100%;
+  height: 560px;
+  /* border: 1px solid #363640; */
+  border: none;
 }
 .timeline-header {
   font-size: 1.15em;
