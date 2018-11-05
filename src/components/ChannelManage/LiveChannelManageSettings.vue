@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <div class="feature-item">
+      <div class="feature-item" style="display:none !important;">
         <div class="feature-control">
           <span class="toggle-control"
                 :class="{ enabled: features.chatEnabled.enabled }"
