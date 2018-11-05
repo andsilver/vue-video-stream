@@ -34,6 +34,24 @@
       <div class="feature-item">
         <div class="feature-control">
           <span class="toggle-control"
+                :class="{ enabled: features.chatEnabled.enabled }"
+                @click="toggleFeature('chatEnabled')">
+            <i class="fa"
+               :class="{
+                 'fa-toggle-on': features.chatEnabled.enabled,
+                 'fa-toggle-off': !features.chatEnabled.enabled,
+                 'status-processing': featureProcessing.chatEnabled,
+               }"></i>
+          </span>
+        </div>
+        <div class="feature-desc">
+          Enable Chat in Embed Player
+        </div>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-control">
+          <span class="toggle-control"
                 :class="{ enabled: features.embedRewind.enabled }"
                 @click="toggleFeature('embedRewind')">
             <i class="fa"
@@ -203,6 +221,10 @@ export default {
           value: null,
           valueType: 'string'
         },
+        chatEnabled: { 
+          enabled: false,
+          valueType: 'bool' 
+        },
         embedRewind: { 
           enabled: false,
           valueType: 'bool' 
@@ -221,6 +243,7 @@ export default {
       featureProcessing: {
         ga: false,
         abr: false,
+        chatEnabled: false,
         embedRewind: false,
         embedPoster: false,
       },
