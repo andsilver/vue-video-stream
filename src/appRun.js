@@ -99,10 +99,11 @@ async function activateIntercom() {
 
     _.each(userSub.addonSubscriptions, (addonSub) => {
       const packName = _.get(addonSub, 'package.name')
-      if (packName) userPacks.push(packName)
+      if (packName && /trial/gi.test(packName))
+        userPacks.push(packName)
     })
 
-    _.assign(intercomConfig, { 
+    _.assign(intercomConfig, {
       subscription: userPacks.join(', '),
       // liveSubscriptionPack: livePackName
     })
@@ -173,7 +174,7 @@ function getApiBase() {
     baseURL += ':22776'
   } else {
     let char = '.'
-    if (baseURL.indexOf('staging') > -1) 
+    if (baseURL.indexOf('staging') > -1)
       char = '-'
     baseURL = 'api' + char + baseURL
   }
