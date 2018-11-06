@@ -30,24 +30,6 @@
           </div>
         </div>
       </div>
-
-      <div class="feature-item" style="display:none !important;">
-        <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.chatEnabled.enabled }"
-                @click="toggleFeature('chatEnabled')">
-            <i class="fa"
-               :class="{
-                 'fa-toggle-on': features.chatEnabled.enabled,
-                 'fa-toggle-off': !features.chatEnabled.enabled,
-                 'status-processing': featureProcessing.chatEnabled,
-               }"></i>
-          </span>
-        </div>
-        <div class="feature-desc">
-          Enable Chat in Embed Player
-        </div>
-      </div>
       
       <div class="feature-item">
         <div class="feature-control">
@@ -82,6 +64,34 @@
         </div>
         <div class="feature-desc">
           Enable Multi-Bitrate Transcoding
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-control">
+          <span class="toggle-control"
+                :class="{ enabled: features.chatEnabled.enabled }"
+                @click="toggleFeature('chatEnabled')">
+            <i class="fa"
+               :class="{
+                 'fa-toggle-on': features.chatEnabled.enabled,
+                 'fa-toggle-off': !features.chatEnabled.enabled,
+                 'status-processing': featureProcessing.chatEnabled,
+               }"></i>
+          </span>
+        </div>
+        <div class="feature-desc">
+          <div>Chat Embed Snippet</div>
+          <div v-if="features.chatEnabled.enabled" class="pane">
+                       <!-- :value="chatEmbedUrl" -->
+                <input class="input" 
+                       :value="chatEmbedIframeSnippet"
+                       readonly
+                       style="width:500px;margin-left:0;"/>
+                &nbsp;
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(chatEmbedIframeSnippet)">Copy</button>
+          </div>
         </div>
       </div>
 
@@ -263,9 +273,18 @@ export default {
       }
     })
 
-    console.log('stream meta', meta)
+    // console.log('stream meta', meta)
   },
   computed: {
+    chatEmbedUrl () {
+      if (this.stream)
+        return `https://voice.castr.io/${this.stream.key}`
+    },
+    chatEmbedIframeSnippet () {
+      let chatUrl = this.chatEmbedUrl
+      if (chatUrl)
+      return `<iframe src="${chatUrl}" width="350" height="500" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+    },
     posterUrl () {
       if (this.embedPosterTemp)
         return this.embedPosterTemp
@@ -277,6 +296,15 @@ export default {
     }
   },
   methods: {
+    clipboardCopy (text) {
+      try {
+        if (text instanceof Function) 
+          text = text()
+
+        this.$copyText(text);
+        this.$notify({ group: "info", text: "Copied to clipboard" });
+      } catch (e) {}
+    },
     navigateToBilling () {
       // /manage/billing?category=live
       this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
@@ -291,6 +319,12 @@ export default {
       if (featureName === 'abr') {
         if (window.Intercom)
           window.Intercom('show')
+        return
+      }
+      
+      // ignore if chat toggled
+      if (featureName === 'chatEnabled') {
+        this.features.chatEnabled.enabled = !feature.enabled
         return
       }
 
