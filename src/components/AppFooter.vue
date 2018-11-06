@@ -8,9 +8,12 @@
         </b-col>
         <b-col>
           <div class="nav-links">
-            <div class="nav-link"><a href="/">company</a></div>
+            <!-- <div class="nav-link"><a href="/">company</a></div>
             <div class="nav-link"><a href="/#pricing">pricing</a></div>
-            <div class="nav-link"><a href="/#faq">FAQ</a></div>
+            <div class="nav-link"><a href="/#faq">FAQ</a></div> -->
+            <div class="nav-link"><router-link to="/">Dashboard</router-link></div>
+            <div class="nav-link"><router-link to="/manage/account">Account</router-link></div>
+            <div class="nav-link"><router-link to="/manage/billing">Billing</router-link></div>
           </div>
         </b-col>
         <b-col cols="3">
