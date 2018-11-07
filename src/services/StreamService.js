@@ -62,8 +62,8 @@ function getStreamDvrRanges(streamId, startTime, endTime) {
  * @param {string} streamId
  */
 function getStreamDvrEpisodes(streamId) {
-  // return makeRequest(`/streams/${streamId}/dvrEpisodes`)
-  return makeRequest(`http://api-staging.castr.io:22776/streams/5be297af95f06137e7081b3e/dvrEpisodes`)
+  return makeRequest(`/streams/${streamId}/dvrEpisodes`)
+  // return makeRequest(`http://api-staging.castr.io:22776/streams/5be297af95f06137e7081b3e/dvrEpisodes`)
 }
 
 /**
