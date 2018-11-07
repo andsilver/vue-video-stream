@@ -121,6 +121,10 @@
                        active-class="active">recording</router-link>
           <!-- <router-link v-if="stream.dvrHours" -->
           <router-link tag="li" 
+                       :to="{name: 'LiveChannelManageVodEpisodes'}"
+                       active-class="active">vod episodes</router-link>
+          <!-- <router-link v-if="stream.dvrHours" -->
+          <router-link tag="li" 
                        :to="{name: 'LiveChannelManageSettings'}"
                        active-class="active">video settings</router-link>
         </ul>

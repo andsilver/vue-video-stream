@@ -68,7 +68,7 @@
       </div>
 
       <div class="feature-item">
-        <div class="feature-control">
+        <!-- <div class="feature-control">
           <span class="toggle-control"
                 :class="{ enabled: features.chatEnabled.enabled }"
                 @click="toggleFeature('chatEnabled')">
@@ -78,11 +78,12 @@
                  'fa-toggle-off': !features.chatEnabled.enabled,
                  'status-processing': featureProcessing.chatEnabled,
                }"></i>
-          </span>
-        </div>
+          </span> 
+        </div>-->
         <div class="feature-desc">
           <div>Chat Embed Snippet</div>
-          <div v-if="features.chatEnabled.enabled" class="pane">
+          <!-- <div v-if="features.chatEnabled.enabled" class="pane"> -->
+          <div class="pane">
                        <!-- :value="chatEmbedUrl" -->
                 <input class="input" 
                        :value="chatEmbedIframeSnippet"
@@ -96,8 +97,8 @@
       </div>
 
       <div class="feature-item">
-        <div class="feature-control">
-          <!-- <span class="toggle-control"
+        <!-- <div class="feature-control">
+           <span class="toggle-control"
                 :class="{ enabled: features.embedPoster.enabled }"
                 @click="toggleFeature('embedPoster')">
             <i class="fa"
@@ -106,8 +107,8 @@
                  'fa-toggle-off': !features.embedPoster.enabled,
                  'status-processing': featureProcessing.embedPoster
                }"></i>
-          </span> -->
-        </div>
+          </span>
+        </div> -->
         <div class="feature-desc">
           <div>Custom Embed Poster</div>
           <div class="pane">
