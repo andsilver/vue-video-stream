@@ -51,8 +51,8 @@ export default {
     dvrIframeUrl () {
       const {stream} = this
       if (!stream) return ''
-      return `https://${stream.region.identifierHaxr}.origincdn.com/${stream.key}/embed.html?dvr=true`
-      // return `http://dvr.castr.io/${stream.key}/embed.html?dvr=true&region=${stream.region.identifierHaxr}`
+      // return `https://${stream.region.identifierHaxr}.origincdn.com/${stream.key}/embed.html?dvr=true`
+      return `https://dvr.castr.io/${stream.key}/embed.html?dvr=true&region=${stream.region.identifierHaxr}`
     }
   }
 };
