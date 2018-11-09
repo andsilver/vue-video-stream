@@ -67,24 +67,10 @@
         </div>
       </div>
 
-      <div class="feature-item">
-        <!-- <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.chatEnabled.enabled }"
-                @click="toggleFeature('chatEnabled')">
-            <i class="fa"
-               :class="{
-                 'fa-toggle-on': features.chatEnabled.enabled,
-                 'fa-toggle-off': !features.chatEnabled.enabled,
-                 'status-processing': featureProcessing.chatEnabled,
-               }"></i>
-          </span> 
-        </div>-->
+      <!-- <div class="feature-item">
         <div class="feature-desc">
           <div>Chat Embed Snippet</div>
-          <!-- <div v-if="features.chatEnabled.enabled" class="pane"> -->
           <div class="pane">
-                       <!-- :value="chatEmbedUrl" -->
                 <input class="input" 
                        :value="chatEmbedIframeSnippet"
                        readonly
@@ -94,7 +80,7 @@
                         @click="clipboardCopy(chatEmbedIframeSnippet)">Copy</button>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div class="feature-item">
         <!-- <div class="feature-control">
