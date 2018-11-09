@@ -251,7 +251,7 @@ export default {
   },
   methods: {
     isRecording () {
-      return /recording$/gi.test(this.$router.currentRoute.path)
+      return /(recording|vodepisodes)$/gi.test(this.$router.currentRoute.path)
     },
     requestChatStatus () {
       this.$root.$emit("bv::show::modal", "alert-chat-down");

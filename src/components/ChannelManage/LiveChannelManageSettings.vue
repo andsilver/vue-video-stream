@@ -279,7 +279,7 @@ export default {
   computed: {
     chatEmbedUrl () {
       if (this.stream)
-        return `https://voice.castr.io/${this.stream.key}`
+        return `https://voice.castr.io/chat/${this.stream.key}`
     },
     chatEmbedIframeSnippet () {
       let chatUrl = this.chatEmbedUrl
