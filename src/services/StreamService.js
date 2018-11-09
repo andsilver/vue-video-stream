@@ -14,6 +14,7 @@ export default {
   getUserStreams,
   getStream,
   getStreamDvrRanges,
+  getStreamDvrEpisodes,
   getStreamViewership,
   addStream,
   addLiveStream,
@@ -55,6 +56,14 @@ function getStreamDvrRanges(streamId, startTime, endTime) {
   uri += `&end=${endTime}`
 
   return makeRequest(uri)
+}
+
+/**
+ * @param {string} streamId
+ */
+function getStreamDvrEpisodes(streamId) {
+  return makeRequest(`/streams/${streamId}/dvrEpisodes`)
+  // return makeRequest(`http://api-staging.castr.io:22776/streams/5be297af95f06137e7081b3e/dvrEpisodes`)
 }
 
 /**
