@@ -691,7 +691,7 @@ export default {
       _.each(props, prop => {
         let val = this.platform[prop];
         if (prop === 'server') {
-          let {valid} = utils.validateURL(val, { validatePathname: false })
+          let {valid} = utils.validateURL(val, { validatePathname: false })          
           if (!valid) val = null
         }
 

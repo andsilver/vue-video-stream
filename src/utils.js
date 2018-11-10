@@ -13,6 +13,7 @@ function validateURL(url, options) {
   let urlChunks
   try {
     urlChunks = extractUrlSegments(url)
+    // console.log(url, urlChunks)
   } catch (e) {}
 
   if (!urlChunks) return {}
@@ -100,20 +101,42 @@ function extractUrlSegments(url) {
   protocol = _.head(url.match(/^\w+\:\/\//gi))
   if (protocol) {
     host = _.chain(url).replace(protocol, '').split('/').head().value()
-    let [creds, _host] = _.split(host, '@')
-    if (!_host) host = creds
-    else {
-      host = _host
-      auth = creds
-      if (auth) {
-        let [user, pass] = _.split(auth, ':')
+
+    let _host = host
+    let authSegmentIndex = host.lastIndexOf('@')
+    if (authSegmentIndex > -1) {
+      let authSegment = host.substr(0, authSegmentIndex)
+      if (authSegment) {
+        let [user, pass] = _.split(authSegment, ':')
         auth = { user, pass }
       }
+
+      _host = host.substr(authSegmentIndex+1)
     }
+
+    host = _host
+    // let [creds, _host] = _.split(host, '@')
+    // if (!_host) host = creds
+    // else {
+    //   host = _host
+    //   auth = creds
+    //   if (auth) {
+    //     let [user, pass] = _.split(auth, ':')
+    //     auth = { user, pass }
+    //   }
+    // }
   }
 
-  if (protocol && host)
-    pathname = _.chain(url).replace(protocol, '').replace(host).split('/').slice(1).join('/').value()
+  if (protocol && host) {
+    pathname = _.chain(url)
+      .replace(protocol, '')
+      .replace(host)
+      .split('/')
+      .slice(1)
+      .join('/')
+      .value()
+  }
+
   return { protocol, host, pathname, href: url, auth }
 }
 
