@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <!-- <div class="feature-item">
+      <div class="feature-item">
         <div class="feature-desc">
           <div>Chat Embed Snippet</div>
           <div class="pane">
@@ -80,7 +80,7 @@
                         @click="clipboardCopy(chatEmbedIframeSnippet)">Copy</button>
           </div>
         </div>
-      </div> -->
+      </div>
 
       <div class="feature-item">
         <!-- <div class="feature-control">
