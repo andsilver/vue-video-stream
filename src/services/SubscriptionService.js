@@ -14,10 +14,11 @@ export default {
   getUserSubscriptions,
   getUserBillingHistory,
   getSubscriptionPackages,
-  orderSubscription
+  orderSubscription,
+  requestTrial
 }
 
-function getUserSubscriptions(getPackageDetails) {
+async function getUserSubscriptions(getPackageDetails) {
   const config = {
     path: '/subscriptions/user'
   }
@@ -26,7 +27,21 @@ function getUserSubscriptions(getPackageDetails) {
     config.params = { explicit: 1 }
   }
 
-  return makeRequest(config)
+  let response = await makeRequest(config)
+
+  try {
+    let basePack = response.subscription
+    let restreamExpiry = new Date(basePack.cend)
+    let subPayload = {restreamExpiry: restreamExpiry}
+
+    _.each(response.addonSubscriptions, (sub) => {
+      subPayload[`${sub.category}Expiry`] = new Date(sub.end)
+    })
+
+    window.Intercom('update', subPayload)
+  } catch (e) {}
+
+  return response
 }
 
 function getUserBillingHistory() {
@@ -49,6 +64,18 @@ function orderSubscription(packageId, quantity, paymentSourceToken) {
     data: {
       subscription: { package: packageId, quantity, paymentSourceToken }
     }
+  })
+}
+
+/**
+ * @param {string} packageId
+ * @param {number} quantity
+ * @param {string} paymentSourceToken
+ */
+function requestTrial(packCategory) {
+  return makeRequest({
+    path: `/subscriptions/trials/${packCategory}`,
+    method: 'post'
   })
 }
 

@@ -52,6 +52,24 @@
       <div class="feature-item">
         <div class="feature-control">
           <span class="toggle-control"
+                :class="{ enabled: features.ull.enabled }"
+                @click="toggleFeature('ull')">
+            <i class="fa"
+               :class="{
+                 'fa-toggle-on enabled': features.ull.enabled,
+                 'fa-toggle-off': !features.ull.enabled,
+                 'status-processing': featureProcessing.ull
+               }"></i>
+          </span>
+        </div>
+        <div class="feature-desc">
+          Enable Ultra Low Latency Embeds
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-control">
+          <span class="toggle-control"
                 :class="{ enabled: features.abr.enabled }"
                 @click="toggleFeature('abr')">
             <i class="fa"
@@ -226,6 +244,10 @@ export default {
           enabled: false,
           valueType: 'bool' 
         },
+        ull: { 
+          enabled: false,
+          valueType: 'bool' 
+        },
         abr: { 
           enabled: false,
           valueType: 'bool' 
@@ -303,7 +325,7 @@ export default {
       const feature = this.features[featureName]
       if (!feature) return
 
-      if (featureName === 'abr') {
+      if (featureName === 'abr' || featureName === 'ull') {
         if (window.Intercom)
           window.Intercom('show')
         return

@@ -17,7 +17,8 @@
       </template>
       <div>
         <!-- error placeholder -->
-        <b-alert v-if="error" show variant="danger">
+        <div v-if="error && !error.role" 
+             class="alert alert-danger">
           <div v-show="error.message">{{error.message}}</div>
           <div v-if="error.subscription"
                class="text-center" style="margin-top:10px">
@@ -25,19 +26,36 @@
               <button class="btn btn-sm btn-link" style="text-transform:uppercase;color: gold;"><strong>upgrade now</strong></button>
             </router-link>
           </div>
-
-          <div v-else-if="error.role"
-               class="" style="margin-top:10px">
-            <p>You do not have an active Live Streaming subscription. Please subscribe if you wish to use this feature.</p>
+        </div>
+        
+        <div v-if="error">
+          <div v-if="error.role"
+               style="margin-top:10px;font-size:14px;">
+            <p style="min-height:80px;">
+              You do not have an active Live Streaming subscription. Would you like to activate our 14 days trial ?</p>
             <br>
-            <button class="modal-button" @click="dismiss">cancel</button>
-            <router-link to="/subscribe?category=live&action=upgrade">
-              <button class="modal-button highlight">subscribe</button>
-            </router-link>
+            <div v-if="trialError" 
+                 class="alert alert-danger">{{trialError.message}}</div>
+            <div class="text-right">
+              <div v-if="trialProcessing" 
+                   style="display:flex;justify-content:center;">
+                <b-progress :value="100" 
+                            :max="100" 
+                            animated
+                            class="w-75"></b-progress>
+              </div>
+              <div v-else>
+                <button class="modal-button" @click="dismiss">cancel</button>
+                <button class="modal-button highlight" @click="forceActivateTrial">Activate Trial</button>
+                <div style="font-size:13px;margin:12px;">
+                  <router-link to="/subscribe?category=live&action=upgrade">Get more options</router-link>
+                </div>
+              </div>
+            </div>
             <br>
             <br>
           </div>
-        </b-alert>
+        </div>
 
         <div v-show="operational">
           <!-- form -->
@@ -123,8 +141,10 @@ export default {
   data() {
     return {
       processing: false,
-      operational: true,
+      trialProcessing: false,
       error: null,
+      trialError: null,
+      operational: true,
       channel: {
         name: null,
         region: null
@@ -141,7 +161,9 @@ export default {
     async onInit() {
       this.operational = true
       this.error = null
+      this.trialError = null
       this.processing = true
+      this.trialProcessing = false
 
       const sub = await SubscriptionService.getUserSubscriptions()
       this.processing = false
@@ -161,6 +183,32 @@ export default {
     getCountryFlag(region) {
       return `https://countryflags.io/${region.identifier}/flat/24.png`;
     },
+    async forceActivateTrial () {
+      this.trialError = null
+      this.trialProcessing = true
+      
+      try {
+        await SubscriptionService.requestTrial('live')
+      } catch(e) {
+        this.trialError = e
+        return
+      } finally {
+        this.trialProcessing = false
+      }
+
+      this.error = null
+      this.operational = true
+
+      // on trial activated
+      this.$notify({ group: 'success', text: 'Livestream Trial activated successfully' })
+
+      // update intercom config
+      window.Intercom('update', { 
+        livestreamTrial: true,
+        livestreamTrialExpiry: new Date(Date.now()+(14*24*3600*1000))
+      });
+
+    },
     async onSaveChannel() {
       this.error = null;
 
@@ -173,7 +221,12 @@ export default {
           this.channel.name,
           this.channel.region
         );
+        
         this.$emit("new-channel", stream, this.selectedRegion);
+        
+        // update intercom config
+        window.Intercom('update', { "livestreamCreated": true });
+
         this.dismiss();
       } catch (err) {
         this.error = err;

@@ -150,11 +150,18 @@ export default {
       return;
     }
 
+    let streamsCount = _.size(this.streams)
     // event tracking
     window.trackEvent("Dashboard", {
-      totalStreams: _.size(this.streams),
+      totalStreams: streamsCount,
       enabledStreams: _.size(_.filter(this.streams, { enabled: true }))
     });
+
+    window.Intercom('update', { 
+      totalStreams: streamsCount,
+      totalLiveStreams: _.filter(this.streams, { type: 'live' }).length
+    });
+
   },
   data() {
     return {
