@@ -120,7 +120,8 @@ export default {
       } catch (e) {}
     },
     getEpisodeIframeSnippet (episode) {
-      return `<iframe src="${episode.playbackUrl}" width="590" height="430" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+      let iframeSrc = 'https://player.castr.io/embed?src='+episode.playbackUrl
+      return `<iframe src="${iframeSrc}" width="590" height="430" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
     }
   }
 };
