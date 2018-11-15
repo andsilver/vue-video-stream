@@ -96,6 +96,12 @@
                 &nbsp;
                 <button class="modal-button modal-button-sm highlight badge-button"
                         @click="clipboardCopy(chatEmbedIframeSnippet)">Copy</button>
+                <!-- &nbsp; -->
+                <button class="modal-button modal-button-sm badge-button bordered"
+                        @click="clearChat">
+                        <!-- <i v-show="!chatFlushProcessing" class="fa fa-trash"></i>  -->
+                        {{  chatFlushProcessing ? 'Clearing ..' : 'Clear Messages' }}
+                </button>
           </div>
         </div>
       </div>
@@ -227,6 +233,7 @@ export default {
     return {
       processing: true,
       processingMessage: null,
+      chatFlushProcessing: null,
       streamId: null,
       userSubscription: null,
       streamMeta: {},
@@ -318,6 +325,18 @@ export default {
       // /manage/billing?category=live
       this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
       // this.$root.$emit('bv::show::modal', 'feature-upgrade')
+    },
+    async clearChat () {
+      if (this.chatFlushProcessing) return
+      
+      this.chatFlushProcessing = true
+
+      try {
+        await IntegrationService.flushStreamChat(this.streamId)
+      } catch (e) {}
+
+      this.chatFlushProcessing = false
+      this.$notify({ group: 'success', text: 'chat messages have been cleared' })
     },
     async toggleFeature(featureName) {
       if (this.featureProcessing[featureName]) return
