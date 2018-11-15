@@ -90,6 +90,12 @@ async function activateIntercom() {
     created_at: Math.round(new Date(user.joinDate).getTime() / 1000)
   }
 
+  // check for saved payment vendors
+  const paymentVendors = _.map(user.paymentMeta, 'vendor')
+  if (_.size(paymentVendors)) {
+    intercomConfig.paymentVendors = _.uniq(paymentVendors)
+  }
+
   if (userSub) {
     const userPacks = []
     // push restream pack
