@@ -54,6 +54,7 @@ const VaughnSoftServers = [
   { text: 'EU: Amsterdam, NL', value: 'rtmp://live-ams.vaughnsoft.net/live' }
 ]
 const facebookServers = ['rtmp://rtmp-api.facebook.com:80/rtmp']
+const dliveServers = ['rtmp://stream.dlive.tv/live']
 const DJliveServers = ['rtmp://live.djlive.pl/live']
 const BoomstreamServers = ['rtmp://live.boomstream.com/live']
 const streamLiveServers = ['rtmp://media.stream.live:1935/live']
@@ -173,16 +174,11 @@ const platforms = [{
   },
   { name: 'smashcast', servers: smashcastServers, icon: '/static/images/platforms/smashcast.svg' },
   { name: 'mobcrush', servers: mobcrushServers, icon: '/static/images/platforms/mobcrush.svg' },
-  {
-    name: 'dlive',
-    icon: '/static/images/platforms/dlive.png',
-    serverKeySegments: [
-      { text: 'rtmp://stream.', hidden: true },
-      'dlive.tv/live?key=',
-      { input: true, placeholder: ' xxx_xxxxxxxxxx==', width: 200 }
-    ],
-    serverKeySegmentValues: [],
-    canLinkService: false
+  { 
+    name: 'dlive', 
+    servers: dliveServers, 
+    streamKeyPlaceholder: 'aq6U8I3Osok9d05ExWeCZ12AGy7nsjl_password',
+    icon: '/static/images/platforms/dlive.png' 
   },
   {
     name: 'USTREAM',
