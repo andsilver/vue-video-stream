@@ -53,7 +53,7 @@
                   <code>{{ episode.endTimeDate | date('hh:mm DD MMM') }}</code> -->
                 </b-col>
                 <b-col style="padding-top:3px;font-size:14.5px;">
-                  <span v-if="duration<60">{{episode.duration}} secs</span>
+                  <span v-if="episode.duration<60">{{episode.duration}} secs</span>
                   <span v-else>{{episode.duration/60|number}} mins</span>
                 </b-col>
                 <b-col>

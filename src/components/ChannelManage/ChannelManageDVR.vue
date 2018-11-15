@@ -40,7 +40,7 @@ export default {
   mounted () {
     setTimeout(() => {
     this.processing = false
-    }, 5000)
+    }, 3000)
   },
   data () {
     return {
