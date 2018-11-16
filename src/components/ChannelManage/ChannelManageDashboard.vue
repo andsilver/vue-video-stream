@@ -187,6 +187,12 @@
                              class="video-thumb" />
 
               <!-- <div v-if="!isAlive()" class="video-thumb placeholder"> -->
+              <div v-else-if="!stream.enabled" class="video-thumb placeholder">
+                <p class="text-center">
+                  Disabled Stream<br>
+                  <span style="font-size:13px;opacity:0.7;">( Please enable )</span>
+                </p>
+              </div>
               <div v-else-if="!streamAlive" class="video-thumb placeholder">
                 <p>Waiting for stream</p>
               </div>

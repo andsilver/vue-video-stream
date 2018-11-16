@@ -1,10 +1,13 @@
 <template>
   <div class="card"
-       :class="{ restream: true, 'opacity-75 no-pointer': stream.removing }"
+       :class="{ restream: true, 
+                 disabled: !streamStatus,
+                 'opacity-75 no-pointer': stream.removing
+              }"
        @click="navigateManage">
     <div v-if="stream.type==='live'" class="type-badge"><code>LIVESTREAM</code></div>
     <div class="thumb">
-      <stream-thumb :stream="stream" class="video-thumb" />
+      <stream-thumb :stream="stream" :mediaPulse="mediaPulse" class="video-thumb" />
     </div>
     <div class="row">
       <div class="col-md-12">
@@ -36,18 +39,41 @@
     </div>    
     <div class="row card-controls">
       <div class="col-md-6">
-        <span class="control" 
+        <button class="btn-status danger outlined"
+                @click="requestDelete($event)">delete</button>
+        <!-- <span class="control" 
               @click="requestDelete($event)" 
               style="margin-left: 15px;">
           <i class="far fa-trash-alt"></i>
-        </span>
+        </span> -->
       </div>
-      <div class="col-md-6 p-0">
-        <span class="fas toggle-control"
+      <div class="col-md-6 p-0 text-right">
+        <!-- <span class="fas toggle-control"
               :class="{ 'fa-toggle-on enabled': streamStatus, 
                               'fa-toggle-off': !streamStatus,
                               'status-processing': statusProcessing }"
-              @click="toggleStatus($event)"></span>
+              @click="toggleStatus($event)"></span> -->
+        <div v-if="statusProcessing"><i class="fas fa-spinner fa-spin"></i></div>
+        <div v-else>
+          <!-- <button v-if="stream.enabled"  -->
+          <button v-if="streamStatus" 
+                  class="btn-status outlined"
+                  style="color:#f7f7f7 !important;"
+                  @click="toggleStatus($event)"
+                  v-b-tooltip.hover
+                  title="Stop streaming, publishing">disable</button>
+          <button v-else 
+                  class="btn-status no-dimm"
+                  @click="toggleStatus($event)">enable</button>
+          
+          <!-- <span class="tooltip-control">?</span> -->
+        </div>
+
+        <!-- <span class="fas toggle-control"
+              :class="{ 'fa-toggle-on enabled': streamStatus, 
+                              'fa-toggle-off': !streamStatus,
+                              'status-processing': statusProcessing }"
+              @click="toggleStatus($event)"></span> -->
       </div>
     </div>
 
@@ -95,8 +121,8 @@ export default {
     };
   },
   methods: {
-    navigateToBilling () {
-      this.$router.push({ path: '/manage/billing' });
+    navigateToBilling() {
+      this.$router.push({ path: "/manage/billing" });
     },
     requestDelete(ev) {
       ev.preventDefault();
@@ -105,9 +131,8 @@ export default {
       this.$emit("delete-stream", this.stream);
     },
     navigateManage() {
-      let viewName = 'ChannelManage'
-      if (this.stream.type === 'live')
-        viewName = 'LiveChannelManage'
+      let viewName = "ChannelManage";
+      if (this.stream.type === "live") viewName = "LiveChannelManage";
 
       this.$router.push({
         name: viewName,
@@ -120,18 +145,19 @@ export default {
     isStreamAlive() {
       return this.streamStatus && this.mediaPulse && this.mediaPulse.alive;
     },
-    async toggleStatus(ev) {
+    async toggleStatus(ev, newStatus) {
       ev.preventDefault();
       ev.stopPropagation();
 
       const oldStatus = this.streamStatus;
-      const newStatus = !oldStatus;
+      newStatus = newStatus === undefined ? !oldStatus : newStatus;
 
       this.statusProcessing = true;
 
       try {
         await StreamService.toggleStream(this.stream._id);
         this.streamStatus = newStatus;
+        this.stream.enabled = newStatus;
 
         window.trackEvent(
           `${newStatus ? "Enabled" : "Disabled"} stream: ${this.stream.name}`,
@@ -145,10 +171,9 @@ export default {
           text: err.message
         });
 
-        if (err.message && err.message.indexOf('upgrade') > -1) {
+        if (err.message && err.message.indexOf("upgrade") > -1) {
           this.$root.$emit("bv::show::modal", "billing-prompt");
         }
-
       }
 
       this.statusProcessing = false;
@@ -167,7 +192,7 @@ export default {
       return "stream was last edited on " + this.stream.last_edit;
     }
   },
-  components: { 
+  components: {
     StreamThumb,
     ConfirmModal
   }
@@ -231,6 +256,10 @@ export default {
   font-weight: 400;
   float: left;
   width: 97%;
+}
+
+.card.disabled .caption {
+  opacity: 0.5;
 }
 
 .card .action {
@@ -330,9 +359,10 @@ export default {
   opacity: 0.5;
 }
 .card-controls {
-  width: 100%;
-  bottom: 10px;
+  width: 98%;
+  bottom: 12px;
   position: absolute;
+  left: 12px;
 }
 .card-controls .control {
   display: inline-block;
@@ -377,5 +407,67 @@ export default {
 }
 .type-badge * {
   color: inherit;
+}
+
+.card.disabled .type-badge {
+  opacity: 0.5;
+}
+.card.disabled:hover .type-badge,
+.card.disabled:hover .caption,
+.card.disabled:hover .btn-status {
+  opacity: 1 !important;
+}
+
+.btn-status {
+  background-color: blue;
+  color: white;
+  border: none;
+  font-size: 12.5px;
+  cursor: pointer;
+  padding: 1.75px 9px;
+  border-radius: 2px;
+  transition: all 0.2s linear;
+}
+
+.btn-status.outlined {
+  color: blue;
+  border: 1px solid;
+  background-color: transparent !important;
+}
+
+.btn-status.outlined:hover {
+  color: #ffffff !important;
+  background-color: blue !important;
+  border-color: blue;
+}
+
+.btn-status.danger {
+  color: #ffffff;
+  background-color: #f00;
+}
+.btn-status.outlined.danger {
+  color: #f00;
+}
+.btn-status.outlined.danger:hover {
+  color: #ffffff;
+  background-color: #f00 !important;
+  border-color: #f00 !important;
+}
+.btn-status:hover {
+  background-color: #2647a3;
+}
+.card.card.disabled .btn-status {
+  opacity: 0.5;
+}
+.card.card.disabled .btn-status.no-dimm {
+  opacity: 1;
+}
+.tooltip-control {
+  display: inline-block;
+  padding: 1px 6px;
+  cursor: pointer;
+  border-radius: 50px;
+  background-color: black;
+
 }
 </style>

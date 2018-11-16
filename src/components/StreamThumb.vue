@@ -1,10 +1,20 @@
 <template>
   <div class="thumb" 
-         :style="{'background-image': streamThumb && `url(${streamThumb})` || ''}">
+         :style="{
+           'background-image': streamThumb && `url(${streamThumb})` || ''
+         }">
        <div v-show="!streamThumb"
             class="placeholder">
-         <span v-if="stream.enabled" class="message">Waiting for frames</span>
-         <span v-else class="message">Disabled stream</span>
+         <div v-if="stream.enabled">
+           <span v-if="mediaPulse && mediaPulse.alive" 
+                 class="message">Waiting for frames</span>
+           <span v-else class="message">Waiting for stream</span>
+         </div>
+         <span v-else 
+               class="message">
+               Disabled Stream<br>
+               <span style="font-size:13px;opacity:0.7;">( Please enable )</span>
+          </span>
        </div>
   </div>
 </template>
@@ -15,7 +25,15 @@ import StreamService from "../services/StreamService";
 let thumbsTempContainer
 export default {
   name: "StreamThumb",
-  props: ["stream"],
+  props: ["stream", "mediaPulse"],
+  watch: {
+    ['stream.enabled'] (newStatus) {
+      if (newStatus === false)
+        setTimeout(() => {
+          this.streamThumb = null
+        }, 100)
+    }
+  },
   mounted() {
     const slug = this.stream.key;
     const blockId = this.stream._id;
@@ -25,8 +43,7 @@ export default {
       this.$socket.emit("stream.thumb", slug, regionId);
 
     this.$socket.on("stream.thumb", (res) => {
-      if (res.id !== slug || 
-      !this.scopeAlive) return;
+      if (res.id !== slug || !this.scopeAlive || !this.stream.enabled) return;
 
       this.onThumb(res.data, () => {
         this.$socket.emit("stream.thumb", slug, regionId);

@@ -61,12 +61,30 @@
 
               </div>
             </b-col>
-            <b-col cols="1" class="text-right">
+            <b-col cols="1" class="text-right" style="padding-left:0;">
               
-              <button class="head-button"
+              <!-- <button class="head-button"
                       @click="requestStreamDelete">
                 <span class="icon far fa-trash-alt"></span>
-              </button>
+              </button> -->
+
+              <div>
+                <div v-if="statusProcessing"><i class="fas fa-spinner fa-spin"></i></div>
+                <div v-else>
+                  <button v-if="stream.enabled" 
+                    class="btn-status outlined"
+                    @click="toggleStatus($event)">disable</button>
+                  <button v-else 
+                        class="btn-status no-dimm"
+                        @click="toggleStatus($event)">enable</button>
+                  </div>
+                </div>
+
+              <div style="margin-top:8px;">
+                <button class="btn-status danger outlined"
+                        @click="requestStreamDelete">delete</button>
+              </div>
+
             </b-col>
           </b-row>
 
@@ -190,6 +208,7 @@ export default {
   data() {
     return {
       SourceTypes,
+      statusProcessing: false,
       nameEdit: false,
       userSubscription: null,
       processing: true,
@@ -332,6 +351,37 @@ export default {
         event: "stream.summary",
         value: haxrBlockId
       });
+    },
+    async toggleStatus(ev, newStatus) {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const oldStatus = this.stream.enabled;
+      newStatus = newStatus === undefined ? !oldStatus : newStatus;
+
+      this.statusProcessing = true;
+
+      try {
+        await StreamService.toggleStream(this.stream._id);
+        this.stream.enabled = newStatus;
+
+        window.trackEvent(
+          `${newStatus ? "Enabled" : "Disabled"} stream: ${this.stream.name}`,
+          this.stream
+        );
+      } catch (err) {
+        this.$notify({
+          group: "error",
+          title: "Couldn't toggle stream status",
+          text: err.message
+        });
+
+        if (err.message && err.message.indexOf("upgrade") > -1) {
+          this.$root.$emit("bv::show::modal", "billing-prompt");
+        }
+      }
+
+      this.statusProcessing = false;
     },
     requestStreamDelete() {
       this.$root.$emit("bv::show::modal", "modal-confirm");
@@ -551,5 +601,44 @@ function isValidUrl (url) {
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);
+}
+
+.btn-status {
+  background-color: blue;
+  color: white;
+  border: none;
+  font-size: 12.5px;
+  cursor: pointer;
+  padding: 1.75px 9px;
+  border-radius: 2px;
+  transition: all 0.2s linear;
+}
+
+.btn-status.outlined {
+  color: blue;
+  border: 1px solid;
+  background-color: transparent !important;
+}
+
+.btn-status.outlined:hover {
+  color: #ffffff !important;
+  background-color: blue !important;
+  border-color: blue;
+}
+
+.btn-status.danger {
+  color: #ffffff;
+  background-color: #f00;
+}
+.btn-status.outlined.danger {
+  color: #f00;
+}
+.btn-status.outlined.danger:hover {
+  color: #ffffff;
+  background-color: #f00 !important;
+  border-color: #f00 !important;
+}
+.btn-status:hover {
+  background-color: #2647a3;
 }
 </style>

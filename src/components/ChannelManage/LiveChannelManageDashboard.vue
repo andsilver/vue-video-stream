@@ -5,7 +5,13 @@
           <b-col class="preveiw-container">
             <div class="video-wrapper">
               <!-- <div v-if="!isAlive()" class="video-thumb placeholder"> -->
-              <div v-if="!streamAlive" class="video-thumb placeholder">
+              <div v-if="!stream.enabled" class="video-thumb placeholder">
+                <p class="text-center">
+                  Disabled Stream<br>
+                  <span style="font-size:13px;opacity:0.7;">( Please enable )</span>
+                </p>
+              </div>
+              <div v-else-if="!streamAlive" class="video-thumb placeholder">
                 <p>Waiting for stream</p>
               </div>
               <stream-player v-else :stream="stream" class="video-thumb" />
