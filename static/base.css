@@ -417,6 +417,10 @@ body {
   opacity: 1;
   font-weight: 600;
 }
+.nav-menu-inline li.disabled {
+  opacity: 0.6 !important;
+  /* cursor: not-allowed; */
+}
 .no-pointer {
   pointer-events: none;
 }

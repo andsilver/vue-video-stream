@@ -117,7 +117,7 @@
                        :to="{name: 'ChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
                        
-          <router-link v-if="stream.dvrReady"
+          <router-link v-if="stream.enabled && stream.dvrReady"
                        :to="{name: 'ChannelManageDVR'}"
                        tag="li" 
                        active-class="active">
@@ -125,6 +125,14 @@
             <!-- &nbsp; -->
             recording
           </router-link>
+          <li v-else-if="!stream.enabled && stream.dvrReady"
+              v-b-tooltip.hover
+              title="please enable stream to access recording"
+              class="li-disabled">
+            <!-- <i class="fa fa-video" style="color:rgb(234,24,44);"></i> -->
+            <!-- &nbsp; -->
+            recording
+          </li>
 
           <router-link tag="li"
                        :to="{name: 'ChannelManageChat'}"

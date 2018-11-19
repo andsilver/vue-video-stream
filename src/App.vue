@@ -479,6 +479,10 @@ body {
   opacity: 1;
   font-weight: 600;
 }
+.nav-menu-inline li.li-disabled {
+  color: #b0b0b0;
+  /* cursor: not-allowed; */
+}
 .no-pointer {
   pointer-events: none;
 }

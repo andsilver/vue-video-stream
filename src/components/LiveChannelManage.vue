@@ -135,13 +135,23 @@
                        :to="{name: 'LiveChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
           <!-- <router-link v-if="stream.dvrHours" -->
-          <router-link tag="li" 
+          <router-link v-if="stream.enabled && stream.dvrReady"
+                       tag="li" 
                        :to="{name: 'LiveChannelManageDVR'}"
                        active-class="active">recording</router-link>
+          <li v-else-if="!stream.enabled && stream.dvrReady"
+              v-b-tooltip.hover
+              title="please enable stream to access recording"
+              class="li-disabled">recording</li>
           <!-- <router-link v-if="stream.dvrHours" -->
-          <router-link tag="li" 
+          <router-link v-if="stream.enabled && stream.dvrReady"
+                       tag="li" 
                        :to="{name: 'LiveChannelManageVodEpisodes'}"
                        active-class="active">vod episodes</router-link>
+          <li v-else-if="!stream.enabled && stream.dvrReady"
+              v-b-tooltip.hover
+              title="please enable stream to access recorded episodes"
+              class="li-disabled">vod episodes</li>
           <!-- <router-link v-if="stream.dvrHours" -->
           <router-link tag="li" 
                        :to="{name: 'LiveChannelManageSettings'}"
