@@ -1,11 +1,23 @@
 <template>
-    <div v-if="!stream.dvrHours" class="container" style="padding:0">
+    <div v-if="!stream.dvrReady" class="container" style="padding:0">
       <p class="text-danger" style="font-size:14px;">
         Video Recording is not included in your current subscription. Kindly upgrade your subscription plan to access this feature.
       </p>
       <router-link to="/subscribe?category=live&action=upgrade">
         <button class="btn btn-danger">Upgrade Now</button>
       </router-link>
+    </div>
+    <div v-else-if="stream.dvrReady && !stream.dvrHours" class="container text-center" style="padding:40px 0;">
+      <p class="text-warning" style="font-size:14px;">
+        Video Recording is included in your subscription. Please contact us to get this feature enabled.
+      </p>
+      <button type="submit"
+              class="modal-button highlight"
+              style="margin-left:5px;"
+              onclick="Intercom('show')">
+        <i class="fa fa-unlock-alt"></i>&nbsp;
+        Activate Cloud Recording
+      </button>
     </div>
     <div v-else class="container view-wrapper dvr-widget-wrapper" style="padding:0">
       <div v-if="processing">
@@ -32,7 +44,7 @@
               <!-- :style="{ height: (processing?0:560)+'px'  }"></iframe> -->
   </div>
 </template>
-// <script src="./ChannelManageRecording/ChannelManageRecording.js"></script>
+
 <script>
 export default {
   name: "ChannelManageDVR",
