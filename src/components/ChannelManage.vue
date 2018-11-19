@@ -116,12 +116,19 @@
           <router-link tag="li" 
                        :to="{name: 'ChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
-                       
-          <!-- <router-link v-if="stream.enabled && stream.dvrReady"
+
+          <!-- <router-link v-if="stream.enabled && stream.dvrReady" -->
+          <router-link v-if="stream.dvrHours"
                        :to="{name: 'ChannelManageDVR'}"
                        tag="li" 
                        active-class="active">recording</router-link>
-          <li v-else-if="!stream.enabled && stream.dvrReady"
+          <router-link v-else
+                       :to="{name: 'ChannelManageDVRDemo'}"
+                       tag="li" 
+                       active-class="active">
+            recording <code style="font-size:12px;">(demo)</code>
+          </router-link>
+          <!-- <li v-else-if="!stream.enabled && stream.dvrReady"
               v-b-tooltip.hover
               title="please enable stream to access recording"
               class="li-disabled">recording</li> -->

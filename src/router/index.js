@@ -11,6 +11,7 @@ import ChannelManage from '@/components/ChannelManage'
 import ChannelManageDashboard from '@/components/ChannelManage/ChannelManageDashboard'
 import ChannelManageChat from '@/components/ChannelManage/ChannelManageChat'
 import ChannelManageDVR from '@/components/ChannelManage/ChannelManageDVR'
+import ChannelManageDVRDemo from '@/components/ChannelManage/ChannelManageDVRDemo'
 import ChannelManageVodEpisodes from '@/components/ChannelManage/ChannelManageVodEpisodes'
 
 import LiveChannelManage from '@/components/LiveChannelManage'
@@ -85,6 +86,12 @@ const router = new Router({
           path: 'recording',
           name: 'ChannelManageDVR',
           component: ChannelManageDVR,
+          props: true
+        },
+        {
+          path: 'recordingDemo',
+          name: 'ChannelManageDVRDemo',
+          component: ChannelManageDVRDemo,
           props: true
         }
       ]
