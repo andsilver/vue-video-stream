@@ -232,7 +232,7 @@
                        :value="getStreamHlsUrl()"
                        readonly/>
               </div> -->
-              <div class="field-container">
+              <div class="field-container" style="padding-bottom:0;">
                 <div class="label">Deployment Region</div>
                 <div class="input">
                   <div style="font-size:15.5px;">
@@ -242,7 +242,14 @@
                     &nbsp;<span>{{stream.region.name}}</span>
                   </div>
                   <!-- <div v-show="!hasPullSource()"  -->
-                  <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div>
+                  <!-- <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div> -->
+                </div>
+              </div>
+               <div class="field-container field-container-sm" style="padding-top:0;">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamPushUrl)">Copy</button>
+                <div class="input">
+                  <div style="">{{getStreamPushUrl()}}</div>
                 </div>
               </div>
               <div v-if="hasPullSource()" class="field-container">
@@ -496,6 +503,15 @@ export default {
     };
   },
   methods: {
+    clipboardCopy (text) {
+      try {
+        if (text instanceof Function) 
+          text = text()
+
+        this.$copyText(text);
+        this.$notify({ group: "info", text: "Copied to clipboard" });
+      } catch (e) {}
+    },
     onMediaPulseChanged () {
       const platforms = []
       _.each(this.streamPlatforms, (platform, index) => {
@@ -1217,6 +1233,7 @@ function isRTSPSource(pullUrl) {
   /* width: 235px; */
   width: 100%;
   padding: 10px 0;
+  position: relative;
 }
 .field-container:last-of-type {
   border-bottom: none;
@@ -1426,5 +1443,23 @@ function isRTSPSource(pullUrl) {
   justify-content: center;
   font-size: 18px;
   position: absolute;
+}
+
+.field-container .badge-button {
+  opacity: 0;
+  font-size:11px;
+  padding: 4px 9px;
+  position: absolute;
+  right: 10px;
+  top: 46px;
+  pointer-events: none;
+  transition: all 0.15s linear;
+}
+.field-container:hover .badge-button {
+  opacity:1;
+  pointer-events: inherit;
+}
+.field-container-sm .badge-button {
+  top: 8px;
 }
 </style>
