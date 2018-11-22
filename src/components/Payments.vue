@@ -331,7 +331,10 @@ export default {
     isCurrentSubscription (pack) {
       pack = pack || this.subscriptionPackage
       // return pack && this.userBaseSubscription.package._id
-      return pack && _.get(this, 'userBaseSubscription.package._id') === pack._id
+      let userSubNode = this.userBaseSubscription
+      if (!userSubNode || !pack) return
+
+      return userSubNode.enabled && userSubNode.package._id === pack._id
       // return pack && _.get(this, 'userSubscription.subscription.package') === pack._id
     },
     selectSubscriptionPackage (pack) {
