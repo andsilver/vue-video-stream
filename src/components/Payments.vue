@@ -227,13 +227,17 @@ export default {
       // fetch user subscriptions
       const userSubscription = await SubscriptionService.getUserSubscriptions(true)
       this.userSubscription = userSubscription
+      
+      this.updateUserBaseSubscription()
+      let baseSub = this.userBaseSubscription
+      // let baseSub = userSubscription.subscription
+      // const packCategoryType = this.packCategory.value
+      // if (packCategoryType !== 'restream') {
+      //   baseSub = _.find(userSubscription.addonSubscriptions, { category: packCategoryType })
+      //   baseSub = baseSub || { package: { baseCharge: 0 } }
+      // }
 
-      let baseSub = userSubscription.subscription
-      const packCategoryType = this.packCategory.value
-      if (packCategoryType !== 'restream') {
-        baseSub = _.find(userSubscription.addonSubscriptions, { category: packCategoryType })
-        baseSub = baseSub || { package: { baseCharge: 0 } }
-      }
+      // this.userBaseSubscription = baseSub
 
       const action = this.$route.query && this.$route.query.action
       const baseCharge = parseFloat(this.$route.query.bycharge)
@@ -274,6 +278,7 @@ export default {
       cardValidated: false,
       packages: [],
       userSubscription: null,
+      userBaseSubscription: null,
       packCategory: null,
       subscriptionPackage: null,
       subscriptionPackages: [],
@@ -325,7 +330,9 @@ export default {
     },
     isCurrentSubscription (pack) {
       pack = pack || this.subscriptionPackage
-      return pack && _.get(this, 'userSubscription.subscription.package') === pack._id
+      // return pack && this.userBaseSubscription.package._id
+      return pack && _.get(this, 'userBaseSubscription.package._id') === pack._id
+      // return pack && _.get(this, 'userSubscription.subscription.package') === pack._id
     },
     selectSubscriptionPackage (pack) {
       this.subscriptionPackage = pack
@@ -337,6 +344,21 @@ export default {
 
       if (oldPackCat && oldPackCat !== packCat)
         this.selectSubscriptionPackage(null)
+
+      this.updateUserBaseSubscription()
+    },
+    updateUserBaseSubscription () {
+      const packCategoryType = this.packCategory.value
+      const userSub = this.userSubscription
+      if (!userSub) return
+
+      let baseSub = userSub.subscription
+      if (packCategoryType !== 'restream') {
+        baseSub = _.find(userSub.addonSubscriptions, { category: packCategoryType })
+        baseSub = baseSub || { package: { baseCharge: 0 } }
+      }
+
+      this.userBaseSubscription = baseSub
     },
     filterSubscriptionPacks () {
       const packCat = this.packCategory
