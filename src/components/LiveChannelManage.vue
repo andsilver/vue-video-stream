@@ -586,9 +586,10 @@ function isValidUrl (url) {
   padding: 10px 14px;
   color: #ffffff;
   /* background-color: #010329; */
-  background-color: #17193e;
-  border: none;
+  background-color: #202940;
+  border: 1px solid #151c31;
   border-radius: 2px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);
