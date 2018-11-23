@@ -111,7 +111,7 @@
 
         <li v-for="stream in streams"
             v-bind:key="stream._id"
-            class="col-md-6"
+            class="col-md-4"
             style="padding-left:0;">
           <div class="card-wrapper">
             <stream-card-view :stream="stream"

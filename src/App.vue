@@ -69,7 +69,8 @@ body {
   padding: 0;
   font-family: comfortaa !important;
   color: #f7f7f7;
-  background-color: #010329 !important;
+  /* background-color: #010329 !important; */
+  background-color: #192035 !important;
 }
 
 .absolute {

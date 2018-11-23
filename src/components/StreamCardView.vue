@@ -206,7 +206,8 @@ export default {
   margin: 0;
   padding: 0;
   color: #f7f7f7;
-  background-color: rgb(23, 25, 72);
+  /* background-color: rgb(23, 25, 72); */
+  background-color: #202940;
   overflow: visible;
   width: 100%;
   min-height: 360px;
