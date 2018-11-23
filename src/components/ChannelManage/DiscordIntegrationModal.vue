@@ -242,7 +242,8 @@ export default {
   display: inline-block;
   vertical-align: middle;
   margin-right: 8px;
-  background-color: #334ed2;
+  /* background-color: #141d31; */
+  background-color: transparent;
   padding: 4px 11px;
   text-align: center;
   line-height: 19px;
@@ -258,7 +259,7 @@ export default {
   vertical-align: middle;
 }
 .steps-container .step-item.active .step-count {
-  background-color: #1223b3;
+  background-color: #141d31;
 }
 .view-title {
   font-size: 20px;

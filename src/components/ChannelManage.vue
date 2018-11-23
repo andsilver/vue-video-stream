@@ -459,14 +459,17 @@ function isValidUrl (url) {
   width: auto;
   display: inline-block;
   transition: all 0.2s ease-in-out;
-  border-radius: 2px;
+  border-radius: 4px;
+  outline-color: #0074fc;
+  width: 100%;
+  box-sizing: border-box !important;
 }
 .title input:hover {
-  background-color: #17193e;
+  background-color: rgba(18, 23, 37, 0.67);
 }
 .title input:focus {
   /* background-color: #17193e; */
-  outline-color: #ffffff;
+  background-color: rgba(18, 23, 37, 0.67);
 }
 .subtitle {
   padding: 5px 0;

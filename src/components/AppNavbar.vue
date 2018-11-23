@@ -113,7 +113,8 @@ export default {
   color: white;
   display: inline-block;
   text-align: center;
-  background-color: rgb(40, 44, 131);
+  background-color: rgb(57, 65, 89);
+  border: 1px solid #171a25;
   margin-top: -5px;
   padding: 12px 10px;
   box-sizing: border-box;

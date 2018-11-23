@@ -598,16 +598,17 @@ function isRTSPSource(pullUrl) {
   margin: 10px 0 10px 0;
   padding: 10px 14px;
   color: #ffffff;
-  /* background-color: #010329; */
-  background-color: #17193e;
+  background-color: rgba(18, 23, 37, 0.67);
   border: none;
   border-radius: 2px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  outline-color: #0074fc;
 }
 .input:focus {
-  background-color: rgba(1, 3, 41, 0.47);
+  background-color: rgba(18, 23, 37, 0.67);
 }
 .input:read-only:focus {
-  background-color: #17193e;
+  background-color: rgba(18, 23, 37, 0.67);
 }
 .field-container-sm .input {
   margin-top: 0;
@@ -823,9 +824,10 @@ function isRTSPSource(pullUrl) {
 }
 .feature-item {
   padding: 24px 20px;
-  background-color: #040634;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: #202940;
+  border: 1px solid rgba(23, 28, 41, 0.83);
   margin-bottom: 10px;
+  border-radius: 4px;
 }
 .feature-item > div {
   display: inline-block;

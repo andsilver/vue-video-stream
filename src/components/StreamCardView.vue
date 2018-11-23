@@ -402,9 +402,9 @@ export default {
   right: -1px;
   z-index: 1;
   color: #ffffff;
-  background-color: #282c83;
+  background-color: #4747f3;
   padding: 3px 12px;
-  border-radius: 0 0 0 10px;
+  border-radius: 0 4px 0 10px;
 }
 .type-badge * {
   color: inherit;
@@ -420,7 +420,7 @@ export default {
 }
 
 .btn-status {
-  background-color: blue;
+  background-color: #4747f3;
   color: white;
   border: none;
   font-size: 12.5px;
@@ -431,28 +431,28 @@ export default {
 }
 
 .btn-status.outlined {
-  color: blue;
+  color: #4747f3;
   border: 1px solid;
   background-color: transparent !important;
 }
 
 .btn-status.outlined:hover {
   color: #ffffff !important;
-  background-color: blue !important;
-  border-color: blue;
+  background-color: #4747f3 !important;
+  border-color: #4747f3;
 }
 
 .btn-status.danger {
   color: #ffffff;
-  background-color: #f00;
+  background-color: #ff5b6f;
 }
 .btn-status.outlined.danger {
-  color: #f00;
+  color: #ff5b6f;
 }
 .btn-status.outlined.danger:hover {
   color: #ffffff;
-  background-color: #f00 !important;
-  border-color: #f00 !important;
+  background-color: #ff5b6f !important;
+  border-color: #ff5b6f !important;
 }
 .btn-status:hover {
   background-color: #2647a3;

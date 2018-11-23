@@ -1202,8 +1202,8 @@ function isRTSPSource(pullUrl) {
   color: #ffffff;
   /* background-color: #010329; */
   background-color: #202940;
-  border: 1px solid #151c31;
-  border-radius: 2px;
+  border: none;
+  border-radius: 4px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
   outline-color: #0074fc;
 }
@@ -1211,7 +1211,7 @@ function isRTSPSource(pullUrl) {
   background-color: rgba(18, 23, 37, 0.67);
 }
 .input:read-only:focus {
-  background-color: rgba(18, 23, 37, 0.67);
+  background-color: rgb(42, 49, 68);
 }
 .field-container-sm .input {
   margin-top:0;
