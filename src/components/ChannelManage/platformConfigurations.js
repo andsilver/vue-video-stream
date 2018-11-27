@@ -79,7 +79,7 @@ const cavetubeServers = ['rtmp://cavestream.net/live']
 const younowServers = ['rtmp://stream.younow.com/liveapp']
 const livehouseServers = ['rtmp://live-ea.livehouse.in/app/']
 const fc2Servers = ['rtmp://media.live.fc2.com/live']
-const lahzenegarServers = ['rtmp://live.lahzenegar.com:80/pro']
+const lahzenegarServers = ['rtmp://rtmp.lahzecdn.com:443/pro']
 const aparatServers = ['rtmp://rtmp.cdn.asset.aparat.com:443/event']
 
 const platforms = [{
