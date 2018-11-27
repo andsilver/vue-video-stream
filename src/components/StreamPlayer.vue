@@ -21,7 +21,7 @@
           </button>
         </div>
       </div>
-      <video id="player"/>
+      <video id="player" :class="{'ipcam': stream.type === 'ipcam' }"/>
     </div>
   </div>
 </template>
@@ -171,7 +171,8 @@ export default {
 .player-controls {
   height: 40px;
   width: 100%;
-  background-color: rgba(1, 3, 41, 0.55);
+  /* background-color: rgba(1, 3, 41, 0.55); */
+  background-color: rgb(32, 41, 64);
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -179,7 +180,8 @@ export default {
   transition: all 0.2s ease-in-out;
 }
 .player-controls-wrapper:hover .player-controls {
-  background-color: rgba(1, 3, 41, 0.95);
+  /* background-color: rgba(1, 3, 41, 0.95); */
+  background-color: rgb(31, 41, 66);
 }
 .player-control {
   border: none;
@@ -231,6 +233,10 @@ export default {
   width: 100%;
   max-width: 350px;
   max-height: 220px;
+}
+#player.ipcam {
+  max-width: unset;
+  max-height: 100%;
 }
 .mbr-controls {
   display: none;

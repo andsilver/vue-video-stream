@@ -115,7 +115,7 @@
          </div>
          <div class="reciept-row">
            <b-row class="reciept-row">
-             <b-col class="key">basic charge</b-col>
+             <b-col class="key">base charge</b-col>
              <b-col class="value currency sm">
                <div v-if="subscriptionPackage">
                  <span>${{getSubscriptionFee()}}</span>
@@ -285,6 +285,7 @@ export default {
       packCategories: [
         { label: 'restreaming', value: 'restream' },
         { label: 'live streaming', value: 'live' },
+        { label: 'ip camera', value: 'ipcam' },
       ],
       quantity: 1,
       getEndingDate() {

@@ -18,6 +18,7 @@ export default {
   getStreamViewership,
   addStream,
   addLiveStream,
+  addCamStream,
   setStreamName,
   toggleStream,
   setStreamPullUrl,
@@ -98,6 +99,20 @@ function addLiveStream(name, regionId) {
     method: 'post',
     data: {
       stream: { name, region: regionId, type: 'live' }
+    }
+  })
+}
+
+/**
+ * @param {string} name
+ * @param {string} regionId
+ */
+function addCamStream(name, regionId) {
+  return makeRequest({
+    path: '/streams/deploy',
+    method: 'post',
+    data: {
+      stream: { name, region: regionId, type: 'ipcam' }
     }
   })
 }

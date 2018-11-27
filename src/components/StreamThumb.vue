@@ -8,7 +8,9 @@
          <div v-if="stream.enabled">
            <span v-if="mediaPulse && mediaPulse.alive" 
                  class="message">Waiting for frames</span>
-           <span v-else class="message">Waiting for stream</span>
+           <span v-else class="message">
+             {{ stream.type === 'ipcam' ? 'No camera source ' :  'Waiting for stream' }}
+           </span>
          </div>
          <span v-else 
                class="message">

@@ -5,7 +5,10 @@
                  'opacity-75 no-pointer': stream.removing
               }"
        @click="navigateManage">
+    
     <div v-if="stream.type==='live'" class="type-badge"><code>LIVESTREAM</code></div>
+    <div v-else-if="stream.type==='ipcam'" class="type-badge ipcam"><code>IPCAM</code></div>
+
     <div class="thumb">
       <stream-thumb :stream="stream" :mediaPulse="mediaPulse" class="video-thumb" />
     </div>
@@ -132,7 +135,10 @@ export default {
     },
     navigateManage() {
       let viewName = "ChannelManage";
-      if (this.stream.type === "live") viewName = "LiveChannelManage";
+      if (this.stream.type === "live") 
+        viewName = "LiveChannelManage";
+      else if (this.stream.type === "ipcam") 
+        viewName = "CamChannelManage";
 
       this.$router.push({
         name: viewName,
@@ -408,6 +414,9 @@ export default {
 }
 .type-badge * {
   color: inherit;
+}
+.type-badge.ipcam {
+  background-color: #ff5b6f;
 }
 
 .card.disabled .type-badge {

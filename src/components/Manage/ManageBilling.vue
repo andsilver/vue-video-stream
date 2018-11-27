@@ -49,7 +49,8 @@
             <div v-if="hasAddonSubscripitons()">
               <hr>
               <div v-for="sub in userSubscription.addonSubscriptions"
-                   :key="sub._id">
+                   :key="sub._id"
+                   style="margin-bottom:20px;">
                 <div :class="{expired: !sub.enabled}">
 
                   <div v-if="!sub.enabled" 

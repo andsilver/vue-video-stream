@@ -18,6 +18,10 @@ import LiveChannelManage from '@/components/LiveChannelManage'
 import LiveChannelManageDashboard from '@/components/ChannelManage/LiveChannelManageDashboard'
 import LiveChannelManageSettings from '@/components/ChannelManage/LiveChannelManageSettings'
 
+import CamChannelManage from '@/components/CamChannelManage'
+import CamChannelManageDashboard from '@/components/ChannelManage/CamChannelManageDashboard'
+import CamChannelManageSettings from '@/components/ChannelManage/CamChannelManageSettings'
+
 import AppManage from '@/components/Manage'
 import AdminStats from '@/components/AdminStats'
 import ManageAccount from '@/components/Manage/ManageAccount'
@@ -125,6 +129,39 @@ const router = new Router({
           path: 'settings',
           name: 'LiveChannelManageSettings',
           component: LiveChannelManageSettings,
+          props: true
+        }
+      ]
+    },
+    {
+      path: '/ipcams/:streamId',
+      name: 'CamChannelManage',
+      component: CamChannelManage,
+      redirect: {
+        name: 'CamChannelManageDashboard'
+      },
+      children: [{
+          path: 'dashboard',
+          name: 'CamChannelManageDashboard',
+          component: CamChannelManageDashboard,
+          props: true
+        },
+        {
+          path: 'recording',
+          name: 'CamChannelManageDVR',
+          component: ChannelManageDVR,
+          props: true
+        },
+        // {
+        //   path: 'vodepisodes',
+        //   name: 'CamChannelManageVodEpisodes',
+        //   component: ChannelManageVodEpisodes,
+        //   props: true
+        // },
+        {
+          path: 'settings',
+          name: 'CamChannelManageSettings',
+          component: CamChannelManageSettings,
           props: true
         }
       ]

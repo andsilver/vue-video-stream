@@ -46,6 +46,17 @@
               <div class="desc">Live Stream Using Your Own Player</div>
             </div>
           </b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <!-- <b-dropdown-item v-b-modal.add-cam-channel-modal> -->
+          <b-dropdown-item @click="openCamModal">
+                <div class="dropdown-icon">
+                  <img src="../assets/cctv.png" style="width:25px;margin-left:-3px;" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New IPCam</div>
+                  <div class="desc">You IPCam on the cloud</div>
+                </div>
+              </b-dropdown-item>
         </b-dropdown>
       </div>
     </div>
@@ -106,6 +117,15 @@
                   <div class="desc">Live Stream Using Your Own Player</div>
                 </div>
               </b-dropdown-item>
+              <b-dropdown-item v-b-modal.add-cam-channel-modal>
+                <div class="dropdown-icon">
+                  <img src="../assets/live-streaming.svg" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New IPCam</div>
+                  <div class="desc">You IPCam on the cloud</div>
+                </div>
+              </b-dropdown-item>
           </b-dropdown>
         </div>
 
@@ -123,6 +143,7 @@
     
     <add-channel-modal @new-channel="onNewStream"></add-channel-modal>
     <add-live-channel-modal @new-channel="onNewStream"></add-live-channel-modal>
+    <add-cam-channel-modal @new-channel="onNewStream"></add-cam-channel-modal>
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
   </div>
@@ -130,6 +151,7 @@
 
 <script>
 import StreamCardView from "./StreamCardView.vue";
+import AddCamChannelModal from "./AddCamChannelModal.vue";
 import AddChannelModal from "./AddChannelModal.vue";
 import AddLiveChannelModal from "./AddLiveChannelModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
@@ -172,6 +194,9 @@ export default {
     };
   },
   methods: {
+    openCamModal() {
+      this.$root.$emit("bv::show::modal", "modal-add-cam-channel");
+    },
     onStreamCreateToggle(state) {
       this.streamCreateDropdownActive = state;
     },
@@ -227,6 +252,7 @@ export default {
   },
   components: {
     StreamCardView,
+    AddCamChannelModal,
     AddChannelModal,
     AddLiveChannelModal,
     ConfirmModal
