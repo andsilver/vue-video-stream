@@ -208,6 +208,8 @@ export default {
       let redirectPath = "/streams/";
       if (stream.type === "live") {
         redirectPath = "/livestreams/";
+      } else if (stream.type === "ipcam") {
+        redirectPath = "/ipcams/";
       }
 
       redirectPath += stream._id;
