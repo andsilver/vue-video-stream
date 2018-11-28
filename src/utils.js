@@ -84,8 +84,8 @@ function resolveURL(url, trimLeadingSlash) {
   }
 
   // trim leading slashes if specified
-  if (trimLeadingSlash)
-    updatedUrl = _.replace(updatedUrl, /\/$/, '')
+  // if (trimLeadingSlash)
+  //   updatedUrl = _.replace(updatedUrl, /\/$/, '')
 
   return encodeURI(updatedUrl)
 }

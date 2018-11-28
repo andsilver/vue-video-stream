@@ -187,7 +187,8 @@ const platforms = [{
       { input: true, placeholder: '----', width: 60 },
       { text: '...ustream.tv/ustreamVideo/', exclude: true },
       { text: '.fme.ustream.tv/ustreamVideo/', hidden: true },
-      { input: true, placeholder: '----', width: 60 }
+      { input: true, placeholder: '----', width: 60 },
+      { text: '/', hidden: true }
     ],
     serverKeySegmentValues: [],
     icon: '/static/images/platforms/ustream.svg'
