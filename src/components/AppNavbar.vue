@@ -2,7 +2,14 @@
   <div class="navbar container">
       <div class="row">
         <div class="col-md-4">
-          <a href="/app/dashboard"><img class="logo-icon" src="../assets/castr.png" alt="castr"></a>
+          <div class="castr-logo-wrapper">
+          <div class="logo-icon-dot"></div>
+            <a href="/app/dashboard">
+              <img class="logo-icon" 
+                  src="../assets/castr.png"
+                    alt="Streaming Dashboard - Castr" />
+            </a>
+          </div>
           <!-- <h3 class="logo">Castr</h3> -->
         </div>
         <div class="col-md-4"></div>
@@ -93,8 +100,23 @@ export default {
   box-sizing: border-box;
   display: block;
 }
+.castr-logo-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.castr-logo-wrapper .logo-icon-dot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  right: 1px;
+  top: 16px;
+  background-color: #ec0104;
+  -webkit-animation: blink 2s ease-in-out infinite;
+  animation: blink 2s ease-in-out infinite;
+}
 .logo-icon {
-  width: 122px;
+  width: 130px;
   height: auto;
   display: inline-block;
   vertical-align: top;
