@@ -2,11 +2,14 @@
   <div class="view-wrapper" :style="{ 'min-height': minWindowHeight || 'auto' }">
     <div class="form">
       <div class="text-center">
-        <h3 class="title">
-          <!-- <img class="logo-icon" src="../assets/logo.png" alt="castr logo"> -->
-          <img class="logo-icon" src="/static/images/castr_lg.png" alt="castr logo">
-          <!-- <span>Castr</span> -->
-        </h3>
+        <div class="castr-logo-wrapper">
+            <div class="logo-icon-dot dot-lg"></div>
+            <h3 class="title">
+              <a href="/">
+              <img class="logo-icon" src="/static/images/castr_lg.png" alt="castr logo">
+              </a>
+            </h3>
+        </div>
         <p style="font-size:15px;">Single Ingest, Unlimited Platforms</p>
       </div>
       <br>
@@ -256,6 +259,25 @@ function checkRedirect() {
   color: #f7f7f7;
   font-weight: 600;
   text-align: center;
+}
+.castr-logo-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.castr-logo-wrapper .logo-icon-dot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  right: 1px;
+  top: 16px;
+  background-color: #ec0104;
+  -webkit-animation: blink 2s ease-in-out infinite;
+  animation: blink 2s ease-in-out infinite;
+}
+.castr-logo-wrapper .logo-icon-dot.dot-lg {
+  top: 20px;
+  right: 3px;
 }
 .logo-icon {
   width: 165px;

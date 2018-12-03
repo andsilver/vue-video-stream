@@ -1,7 +1,19 @@
 <template>
   <div class="view-wrapper" :style="{ 'min-height': minWindowHeight || 'auto' }">
     <div class="container">
-      <a href="/"><img class="logo-icon" src="/static/images/castr_lg.png" alt="castr logo"></a>
+      <div class="castr-logo-wrapper">
+            <div class="logo-icon-dot"></div>
+            <a href="/">
+              <img class="logo-icon" 
+                  src="../assets/castr.png"
+                    alt="Streaming Dashboard - Castr" />
+            </a>
+          </div>
+      <!-- <a href="/">
+      <img class="logo-icon" 
+      src="/static/images/castr_lg.png" 
+      alt="castr logo"
+      ></a> -->
       <div class="form">
         <div class="subtitle">Forgot Password</div>
         <p>
@@ -128,8 +140,23 @@ export default {
   font-weight: 600;
   margin-bottom: 10px;
 }
+.castr-logo-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.castr-logo-wrapper .logo-icon-dot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  right: 1px;
+  top: 16px;
+  background-color: #ec0104;
+  -webkit-animation: blink 2s ease-in-out infinite;
+  animation: blink 2s ease-in-out infinite;
+}
 .logo-icon {
-  width: 96px;
+  width: 132px;
   margin-left: -5px;
 }
 .form {
