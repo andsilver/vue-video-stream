@@ -79,7 +79,7 @@ const cavetubeServers = ['rtmp://cavestream.net/live']
 const younowServers = ['rtmp://stream.younow.com/liveapp']
 const livehouseServers = ['rtmp://live-ea.livehouse.in/app/']
 const fc2Servers = ['rtmp://media.live.fc2.com/live']
-const lahzenegarServers = ['rtmp://live.lahzenegar.com:80/pro']
+const lahzenegarServers = ['rtmp://rtmp.lahzecdn.com:443/pro']
 const aparatServers = ['rtmp://rtmp.cdn.asset.aparat.com:443/event']
 
 const platforms = [{
@@ -187,7 +187,8 @@ const platforms = [{
       { input: true, placeholder: '----', width: 60 },
       { text: '...ustream.tv/ustreamVideo/', exclude: true },
       { text: '.fme.ustream.tv/ustreamVideo/', hidden: true },
-      { input: true, placeholder: '----', width: 60 }
+      { input: true, placeholder: '----', width: 60 },
+      { text: '/', hidden: true }
     ],
     serverKeySegmentValues: [],
     icon: '/static/images/platforms/ustream.svg'

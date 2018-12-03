@@ -3,7 +3,15 @@
     <div class="container">
       <b-row>
         <b-col cols="3">
-          <a href="/app/dashboard"><img class="logo-icon" src="../assets/castr.png" alt="castr"></a>
+          <div class="castr-logo-wrapper">
+            <div class="logo-icon-dot"></div>
+            <a href="/app/dashboard">
+              <img class="logo-icon" 
+                  src="../assets/castr.png"
+                    alt="Streaming Dashboard - Castr" />
+            </a>
+          </div>
+          <!-- <a href="/app/dashboard"><img class="logo-icon" src="../assets/castr.png" alt="castr"></a> -->
           <!-- <h3 class="logo-text"><a href="/">Castr</a></h3> -->
         </b-col>
         <b-col>
@@ -51,6 +59,21 @@ export default {
   color: #f7f7f7;
   box-sizing: border-box;
   display: block;
+}
+.castr-logo-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.castr-logo-wrapper .logo-icon-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  right: 1px;
+  top: 13px;
+  background-color: #ec0104;
+  -webkit-animation: blink 2s ease-in-out infinite;
+  animation: blink 2s ease-in-out infinite;
 }
 .logo-icon {
   width: 112px;
