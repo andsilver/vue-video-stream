@@ -1268,7 +1268,8 @@ function isRTSPSource(pullUrl) {
   padding: 18px 6px;
   /* border-bottom: 1px solid rgb(17, 19, 64); */
   margin-bottom: 8px;
-  background: #040634;
+  /* background: #040634; */
+  background: #202940;
   border-radius: 2px;
   border: none;
   padding-left: 20px;
