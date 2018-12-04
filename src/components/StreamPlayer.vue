@@ -52,7 +52,7 @@ export default {
       playback: false,
       buffered: true,
       controls: {
-        volume: true,
+        volume: false,
         fullscreen: false
       },
       scopeAlive: true,
@@ -66,6 +66,10 @@ export default {
       const element = document.getElementById("player");
       const mbrControls = document.querySelector(".mbr-controls");
       this.videoDOM = element;
+
+      // make `muted` by default
+
+      this.videoDOM.volume = 0
 
       let mediaProgressCount = 0;
       const playerConfig = {
