@@ -65,8 +65,8 @@
                 </template>
                 <b-dropdown-item v-for="(pack, index) in packages || []"
                                  :key="index"
-                                 @click="selectSubscriptionPackage(pack)"
-                                 :disabled="isCurrentSubscription(pack)">
+                                 @click="selectSubscriptionPackage(pack)">
+                                 <!-- :disabled="isCurrentSubscription(pack)"> -->
                   <div class="a package-dropdown-item" 
                        :class="{ selected: subscriptionPackage === pack }">
                     <span class="package-name">{{pack.name}}</span>
@@ -145,8 +145,8 @@
          <div v-if="checkoutStep==0 && subscriptionPackage">
            <b-button size="lg"
                      variant="success"
-                     @click="requestCheckout"
-                     :disabled="isCurrentSubscription()">
+                     @click="requestCheckout">
+                     <!-- :disabled="isCurrentSubscription()"> -->
               &nbsp; 
               <i v-if="hasFee()" class="far fa-check-circle"></i>
               <span>{{ hasFee() ? 'Pay Now' : 'Change Package' }}</span>
