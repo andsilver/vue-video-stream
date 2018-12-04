@@ -236,9 +236,11 @@ export default {
       getStreamStatus() {
         return this.streamAlive ? "active" : "inactive";
       },
-      getStreamQuality(height) {
+      getStreamQuality() {
         const sizes = [480, 720, 1080, 1440, 2160];
         const sizesFmt = ["sd", "hd", "fhd", "qhd", "uhd"];
+
+        const { height } = this.mediaPulse || {};
 
         let quality = "sd";
         for (let i = 0; i < sizes.length; i++) {
