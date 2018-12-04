@@ -28,7 +28,7 @@
                 <div class="label">status</div>
               </div>
             </b-col>
-            <b-col cols="3">
+            <b-col cols="6" sm="3">
               <div class="stat-container">
                 <div v-if="streamAlive">
                   <span class="value">
@@ -41,7 +41,7 @@
                 <div class="label">incoming</div>
               </div>
             </b-col>
-            <b-col>
+            <b-col cols="6" sm="auto" class="d-none d-sm-block">
               <div class="stat-container" style="padding-left:50px;">
                 <div v-if="streamAlive">
                   <span v-if="streamFps" class="value" style="margin-right:10px;">
@@ -97,7 +97,7 @@
                 </div>
                 <div v-else class="value">..</div>
               </b-col>
-              <b-col cols="4" class="stat-container xs">
+              <b-col cols="8" lg="4" class="stat-container xs">
                 <div class="label">in</div>
                 <div class="value">{{ mediaPulse.bytesInTotal | bytes }}</div>
                 &nbsp;

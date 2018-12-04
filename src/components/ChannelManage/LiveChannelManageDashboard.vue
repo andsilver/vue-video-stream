@@ -56,7 +56,7 @@
               </div> -->
             </div>
           </b-col>
-          <b-col cols="8">
+          <b-col cols="12" lg="8">
 
             <div class="ingest-wrapper">
               <div class="field-container" style="padding:0;">

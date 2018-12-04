@@ -10,7 +10,7 @@
       <stream-thumb :stream="stream" :mediaPulse="mediaPulse" class="video-thumb" />
     </div>
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-12">
         <div class="caption">
           <div class="title">
             <div>
@@ -38,7 +38,7 @@
       </div>
     </div>    
     <div class="row card-controls">
-      <div class="col-md-6">
+      <div class="col-6">
         <button class="btn-status danger outlined"
                 @click="requestDelete($event)">delete</button>
         <!-- <span class="control" 
@@ -47,7 +47,7 @@
           <i class="far fa-trash-alt"></i>
         </span> -->
       </div>
-      <div class="col-md-6 p-0 text-right">
+      <div class="col-6 p-0 text-right">
         <!-- <span class="fas toggle-control"
               :class="{ 'fa-toggle-on enabled': streamStatus, 
                               'fa-toggle-off': !streamStatus,

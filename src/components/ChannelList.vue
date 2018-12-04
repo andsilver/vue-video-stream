@@ -1,10 +1,10 @@
 <template>
   <div class="container view-wrapper">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-6">
         <div class="title">My Streams</div>
       </div>
-      <div v-if="streams.length" class="col-md-6 text-right">
+      <div v-if="streams.length" class="col-6 text-right">
         <!-- <button class="addChannel"
                 v-b-modal.modal-add-channel>
           <i class="fa fa-video"></i>&nbsp; Create New

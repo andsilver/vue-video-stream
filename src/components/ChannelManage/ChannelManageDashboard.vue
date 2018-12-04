@@ -2,7 +2,7 @@
   <div>
     <div class="content-container">
         <b-row>
-          <b-col cols="8">
+          <b-col cols="12" lg="8">
             <div v-if="!streamPlatforms.length" 
                  class="placeholder">
                  Ready, Set ... &nbsp;Go!

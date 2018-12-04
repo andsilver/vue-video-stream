@@ -2,7 +2,7 @@
   <div class="footer">
     <div class="container">
       <b-row>
-        <b-col cols="3">
+        <b-col cols="6" lg="3">
           <div class="castr-logo-wrapper">
             <div class="logo-icon-dot"></div>
             <a href="/app/dashboard">
@@ -14,7 +14,7 @@
           <!-- <a href="/app/dashboard"><img class="logo-icon" src="../assets/castr.png" alt="castr"></a> -->
           <!-- <h3 class="logo-text"><a href="/">Castr</a></h3> -->
         </b-col>
-        <b-col>
+        <b-col class="d-none d-sm-block">
           <div class="nav-links">
             <!-- <div class="nav-link"><a href="/">company</a></div>
             <div class="nav-link"><a href="/#pricing">pricing</a></div>
@@ -24,7 +24,8 @@
             <div class="nav-link"><router-link to="/manage/billing">Billing</router-link></div>
           </div>
         </b-col>
-        <b-col cols="3">
+        <!-- <b-col cols="3" xs="6"> -->
+        <b-col cols="6" lg="3">
           <div class="nav-links nav-links-socials">
             <div class="nav-link"><a href="https://facebook.com/castrlive" target="_blank"><i class="fab fa-facebook"></i></a></div>
             <div class="nav-link"><a href="https://twitter.com/castrHQ" target="_blank"><i class="fab fa-twitter"></i></a></div>

@@ -1,7 +1,7 @@
 <template>
   <div class="navbar container">
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 col-6">
           <div class="castr-logo-wrapper">
           <div class="logo-icon-dot"></div>
             <a href="/app/dashboard">
@@ -12,8 +12,8 @@
           </div>
           <!-- <h3 class="logo">Castr</h3> -->
         </div>
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
+        <div class="col-md-4 d-none d-sm-block"></div>
+        <div class="col-md-4 col-6">
           <b-dropdown right
                       no-caret
                       id="navdd" 
@@ -45,7 +45,8 @@
                 <a href="#" @click="forceLogout">Logout</a>
               </b-dropdown-item>
           </b-dropdown>
-          <router-link to="/subscribe">
+          
+          <router-link to="/subscribe" class="d-none d-sm-inline">
             <button class="btn btn-danger float-right"
                    style="margin-top:5px;margin-right:5px;letter-spacing:1px;">UPGRADE</button>
           </router-link>
