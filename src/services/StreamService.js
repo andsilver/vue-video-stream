@@ -19,6 +19,7 @@ export default {
   addStream,
   addLiveStream,
   addCamStream,
+  addScheduledStream,
   setStreamName,
   toggleStream,
   setStreamPullUrl,
@@ -32,7 +33,14 @@ export default {
   getAvailableRegions,
   getStreamMetadata,
   saveStreamMetadata,
-  uploadStreamPoster
+  uploadStreamPoster,
+  uploadStreamPlaylistVideo,
+
+  getStreamPlaylist,
+  saveStreamPlaylistVideo,
+  moveStreamPlaylistVideo,
+  togleStreamPlaylistVideoStatus,
+  removeStreamPlaylistVideo
 }
 
 function getUserStreams() {
@@ -64,7 +72,9 @@ function getStreamDvrRanges(streamId, startTime, endTime) {
  */
 function getStreamDvrEpisodes(streamId) {
   return makeRequest(`/streams/${streamId}/dvrEpisodes`)
-  // return makeRequest(`http://api-staging.castr.io:22776/streams/5be297af95f06137e7081b3e/dvrEpisodes`)
+  // return
+  // makeRequest(`http://api-staging.castr.io:22776/streams/5be297af95f06137e7081b
+  // 3 e/dvrEpisodes`)
 }
 
 /**
@@ -84,7 +94,11 @@ function addStream(name, regionId) {
     path: '/streams/deploy',
     method: 'post',
     data: {
-      stream: { name, region: regionId, type: 'restream' }
+      stream: {
+        name,
+        region: regionId,
+        type: 'restream'
+      }
     }
   })
 }
@@ -98,7 +112,11 @@ function addLiveStream(name, regionId) {
     path: '/streams/deploy',
     method: 'post',
     data: {
-      stream: { name, region: regionId, type: 'live' }
+      stream: {
+        name,
+        region: regionId,
+        type: 'live'
+      }
     }
   })
 }
@@ -112,7 +130,29 @@ function addCamStream(name, regionId) {
     path: '/streams/deploy',
     method: 'post',
     data: {
-      stream: { name, region: regionId, type: 'ipcam' }
+      stream: {
+        name,
+        region: regionId,
+        type: 'ipcam'
+      }
+    }
+  })
+}
+
+/**
+ * @param {string} name
+ * @param {string} regionId
+ */
+function addScheduledStream(name, regionId) {
+  return makeRequest({
+    path: '/streams/deploy',
+    method: 'post',
+    data: {
+      stream: {
+        name,
+        region: regionId,
+        type: 'scheduled'
+      }
     }
   })
 }
@@ -125,7 +165,9 @@ function setStreamName(streamId, name) {
   return makeRequest({
     path: `/streams/${streamId}/name`,
     method: 'put',
-    data: { name }
+    data: {
+      name
+    }
   })
 }
 
@@ -133,10 +175,7 @@ function setStreamName(streamId, name) {
  * @param {string} streamId
  */
 function toggleStream(streamId) {
-  return makeRequest({
-    path: `/streams/${streamId}/toggle`,
-    method: 'put'
-  })
+  return makeRequest({ path: `/streams/${streamId}/toggle`, method: 'put' })
 }
 
 /**
@@ -147,7 +186,9 @@ function setStreamPullUrl(streamId, pullUrl) {
   return makeRequest({
     path: `/streams/${streamId}/pullurl/set`,
     method: 'put',
-    data: { url: pullUrl }
+    data: {
+      url: pullUrl
+    }
   })
 }
 
@@ -155,20 +196,14 @@ function setStreamPullUrl(streamId, pullUrl) {
  * @param {string} streamId
  */
 function unsetStreamPullUrl(streamId) {
-  return makeRequest({
-    path: `/streams/${streamId}/pullurl/unset`,
-    method: 'put'
-  })
+  return makeRequest({ path: `/streams/${streamId}/pullurl/unset`, method: 'put' })
 }
 
 /**
  * @param {string} streamId
  */
 function deleteStream(streamId) {
-  return makeRequest({
-    path: `/streams/${streamId}`,
-    method: 'delete'
-  })
+  return makeRequest({ path: `/streams/${streamId}`, method: 'delete' })
 }
 
 /**
@@ -215,7 +250,9 @@ function toggleStreamPlatform(streamId, platformId, forceState) {
   }
 
   if (forceState !== undefined) {
-    config.data = { enabled: forceState }
+    config.data = {
+      enabled: forceState
+    }
   }
 
   return makeRequest(config)
@@ -230,7 +267,9 @@ function setStreamPlatformName(streamId, platformId, name) {
   return makeRequest({
     path: `/streams/${streamId}/platforms/${platformId}/name`,
     method: 'put',
-    data: { name }
+    data: {
+      name
+    }
   })
 }
 
@@ -259,10 +298,7 @@ function setStreamPlatformAddress(streamId, platformId, addressUpdates) {
  * @param {string} platformId
  */
 function deleteStreamPlatform(streamId, platformId) {
-  return makeRequest({
-    path: `/streams/${streamId}/platforms/${platformId}`,
-    method: 'delete'
-  })
+  return makeRequest({ path: `/streams/${streamId}/platforms/${platformId}`, method: 'delete' })
 }
 
 /**
@@ -281,7 +317,12 @@ function saveStreamMetadata(streamId, key, value) {
   return makeRequest({
     path: `/streams/${streamId}/metadata/save`,
     method: 'put',
-    data: { updates: { key, value } }
+    data: {
+      updates: {
+        key,
+        value
+      }
+    }
   })
 }
 
@@ -297,6 +338,89 @@ function uploadStreamPoster(streamId, fdata) {
     headers: {
       'content-type': 'multipart/form-data'
     }
+  })
+}
+
+/**
+ * @param {string} streamId
+ * @param {File} file
+ */
+function uploadStreamPlaylistVideo(streamId, file, onBytesUploaded) {
+  let apiUri = `https://fr-vod.castr.io:1335/video/upload/${streamId}`
+
+  const fdata = new FormData()
+  fdata.append('file', file)
+
+  return makeRequest({
+    path: apiUri,
+    method: 'post',
+    data: fdata,
+    headers: {
+      'content-type': 'multipart/form-data'
+    },
+    onUploadProgress(progressEvent) {
+      // let percentCompleted = Math.round((progressEvent.loaded * 100) /
+      // progressEvent.total)
+      let percentCompleted = (progressEvent.loaded * 100) / progressEvent.total
+      if (onBytesUploaded) {
+        onBytesUploaded(percentCompleted)
+      }
+    }
+  })
+}
+
+/**
+ * @param {string} streamId
+ * @param {object} videoMeta
+ */
+async function getStreamPlaylist(streamId) {
+  return await makeRequest(`/streams/${streamId}/schedular/playlist`)
+}
+
+/**
+ * @param {string} streamId
+ * @param {object} videoMeta
+ */
+function saveStreamPlaylistVideo(streamId, videoMeta) {
+  return makeRequest({
+    path: `/streams/${streamId}/schedular/playlist`,
+    method: 'post',
+    data: { videoMeta }
+  })
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} videoId
+ */
+function moveStreamPlaylistVideo(streamId, videoId, precedence) {
+  return makeRequest({
+    path: `/streams/${streamId}/schedular/playlist/${videoId}`,
+    method: 'put',
+    data: { updates: { precedence } }
+  })
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} videoId
+ * @param {boolean} enabled
+ */
+function togleStreamPlaylistVideoStatus(streamId, videoId, enabled) {
+  return makeRequest({
+    path: `/streams/${streamId}/schedular/playlist/${videoId}`,
+    method: 'put',
+    data: { updates: { enabled } }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function removeStreamPlaylistVideo(streamId, videoId) {
+  return makeRequest({
+    path: `/streams/${streamId}/schedular/playlist/${videoId}`,
+    method: 'delete'
   })
 }
 
@@ -322,17 +446,21 @@ async function getAvailableRegions(category) {
  */
 async function makeRequest(reqConfig) {
   if (typeof reqConfig === 'string') {
-    reqConfig = { path: reqConfig }
+    reqConfig = {
+      path: reqConfig
+    }
   }
 
   reqConfig.url = reqConfig.path
 
   let res
   try {
-    res = await Vue.axios.request(reqConfig)
+    res = await Vue
+      .axios
+      .request(reqConfig)
   } catch (err) {
     throw new RequestError(err.response.data)
   }
 
-  return res.data
+  return res && res.data
 }

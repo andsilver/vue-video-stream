@@ -21,7 +21,7 @@
           </button>
         </div>
       </div>
-      <video id="player" :class="{'ipcam': stream.type === 'ipcam' }"/>
+      <video id="player" :class="{'container-size': stream.type === 'ipcam' || stream.type === 'scheduled' }"/>
     </div>
   </div>
 </template>
@@ -234,7 +234,7 @@ export default {
   max-width: 350px;
   max-height: 220px;
 }
-#player.ipcam {
+#player.container-size {
   max-width: unset;
   max-height: 100%;
 }

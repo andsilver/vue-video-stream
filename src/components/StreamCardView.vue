@@ -1,13 +1,14 @@
 <template>
   <div class="card"
-       :class="{ restream: true, 
-                 disabled: !streamStatus,
-                 'opacity-75 no-pointer': stream.removing
+       :class="{ disabled: !streamStatus,
+                 'opacity-75 no-pointer': stream.removing,
+                 [stream.type]: true
               }"
        @click="navigateManage">
     
     <div v-if="stream.type==='live'" class="type-badge"><code>LIVESTREAM</code></div>
     <div v-else-if="stream.type==='ipcam'" class="type-badge ipcam"><code>IPCAM</code></div>
+    <div v-else-if="stream.type==='scheduled'" class="type-badge scheduled"><code>SCHEDULER STREAM</code></div>
 
     <div class="thumb">
       <stream-thumb :stream="stream" :mediaPulse="mediaPulse" class="video-thumb" />
@@ -139,6 +140,8 @@ export default {
         viewName = "LiveChannelManage";
       else if (this.stream.type === "ipcam") 
         viewName = "CamChannelManage";
+      else if (this.stream.type === "scheduled") 
+        viewName = "ScheduledChannelManage";
 
       this.$router.push({
         name: viewName,
@@ -229,6 +232,10 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.2);
   /* transform: scale(1.025, 1.025); */
   /* box-shadow: 0 0 6px rgba(0, 0, 0, .3); */
+}
+
+.card.scheduled {
+  background-color: rgba(16,138,166, 0.15);
 }
 
 .card .thumb {
@@ -417,6 +424,9 @@ export default {
 }
 .type-badge.ipcam {
   background-color: #ff5b6f;
+}
+.scheduled .type-badge {
+  background-color: #108aa6;
 }
 
 .card.disabled .type-badge {

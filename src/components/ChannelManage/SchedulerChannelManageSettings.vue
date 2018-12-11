@@ -117,12 +117,12 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import utils from "@/utils";
 
 export default {
-  name: "CamChannelManageSettings",
+  name: "ScheduledChannelManageSettings",
   props: ["stream", "streamAlive", "mediaPulse"],
   async mounted() {
     // event tracking
     window.trackEvent(
-      this.stream.name + " - IPCam Stream Settings Page",
+      this.stream.name + " - Scheduled Stream Settings Page",
       this.stream
     );
   },

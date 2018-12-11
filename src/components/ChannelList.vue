@@ -57,6 +57,16 @@
                   <div class="desc">You IPCam on the cloud</div>
                 </div>
               </b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item @click="openScheduledStreamModal">
+                <div class="dropdown-icon">
+                  <img src="../assets/scheduled.png" style="width:22px;margin-left:-1px;" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New Scheduled Stream</div>
+                  <div class="desc">Schedule your live presence</div>
+                </div>
+              </b-dropdown-item>
         </b-dropdown>
       </div>
     </div>
@@ -144,6 +154,7 @@
     <add-channel-modal @new-channel="onNewStream"></add-channel-modal>
     <add-live-channel-modal @new-channel="onNewStream"></add-live-channel-modal>
     <add-cam-channel-modal @new-channel="onNewStream"></add-cam-channel-modal>
+    <add-scheduled-channel-modal @new-channel="onNewStream"></add-scheduled-channel-modal>
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
   </div>
@@ -154,6 +165,7 @@ import StreamCardView from "./StreamCardView.vue";
 import AddCamChannelModal from "./AddCamChannelModal.vue";
 import AddChannelModal from "./AddChannelModal.vue";
 import AddLiveChannelModal from "./AddLiveChannelModal.vue";
+import AddScheduledChannelModal from "./AddSchedulerChannelModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import StreamService from "../services/StreamService";
 
@@ -197,6 +209,9 @@ export default {
     openCamModal() {
       this.$root.$emit("bv::show::modal", "modal-add-cam-channel");
     },
+    openScheduledStreamModal() {
+      this.$root.$emit("bv::show::modal", "modal-add-scheduled-channel");
+    },
     onStreamCreateToggle(state) {
       this.streamCreateDropdownActive = state;
     },
@@ -210,6 +225,8 @@ export default {
         redirectPath = "/livestreams/";
       } else if (stream.type === "ipcam") {
         redirectPath = "/ipcams/";
+      } else if (stream.type === "scheduled") {
+        redirectPath = "/scheduled/";
       }
 
       redirectPath += stream._id;
@@ -257,6 +274,7 @@ export default {
     AddCamChannelModal,
     AddChannelModal,
     AddLiveChannelModal,
+    AddScheduledChannelModal,
     ConfirmModal
   }
 };
