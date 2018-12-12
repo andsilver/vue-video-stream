@@ -44,6 +44,7 @@ export default {
   },
   destroyed() {
     this.scopeAlive = false;
+    this.stopPlayback()
     this.videoPlayer.stop();
   },
   data() {
@@ -87,7 +88,8 @@ export default {
           // setTimeout(this.stopPlayback.bind(this), 0);
           this.stopPlayback(() => {
             window.player.play();
-            window.player.setBufferMode("segments");
+            if(window.player.setBufferMode)
+              window.player.setBufferMode("segments");
           });
         }
       };
@@ -233,7 +235,7 @@ export default {
 #player {
   position: relative;
   width: 100%;
-  max-width: 350px;
+  /* max-width: 350px; */
   max-height: 220px;
 }
 .mbr-controls {
