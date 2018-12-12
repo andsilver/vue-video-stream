@@ -134,7 +134,7 @@ export default {
         player.stopPromise.then(() => {
           if (cb) cb();
         });
-      } else cb();
+      } else if (cb) cb();
     },
     getStreamURL() {
       const { region, key } = this.stream;
