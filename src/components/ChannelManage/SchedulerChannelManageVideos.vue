@@ -313,7 +313,7 @@ export default {
     },
     async toggleVideoStatus (videoId) {
       const video = _.find(this.videoFiles, { id: videoId })
-      if (!video) return
+      if (!video || video.file) return
 
       video.statusProcessing = true
 
