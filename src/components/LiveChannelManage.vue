@@ -393,7 +393,9 @@ export default {
 
       _.each(codecs, codec => {
         if (!/^v/gi.test(codec.id) || _.isNil(codec.fps)) return;
-        this.streamFps = Math.round(codec.fps);
+        let fps = Math.round(codec.fps)
+        if (fps <= 144)
+          this.streamFps = fps;
       });
     },
     unsubscribeMediaPulse() {
