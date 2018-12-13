@@ -341,7 +341,8 @@ export default {
 }
 #stream-deploy-dropdown .dropdown-menu {
   min-width: 275px;
-  background-color: rgb(61, 70, 115) !important;
+  /* background-color: rgb(61, 70, 115) !important; */
+  background-color: rgb(47, 55, 80) !important;
   color: #ffffff;
   left: 1px !important;
   top: 16px !important;
@@ -352,7 +353,8 @@ export default {
   content: '.';
   display: inline-block;
   position: absolute;
-  background: #3f4672;
+  /* background: #3f4672; */
+  background-color: rgb(47, 55, 80);
   width: 20px;
   height: 20px;
   color: transparent;
@@ -371,7 +373,7 @@ export default {
 }
 #stream-deploy-dropdown .dropdown-item {
   color: inherit;
-  padding: 7px 14px !important;
+  padding: 12px 20px !important;
   background-color: transparent;
   position:relative;
   z-index: 1;
@@ -399,5 +401,7 @@ export default {
 }
 .dropdown-divider {
   border-color: rgba(1, 3, 41, 0.14);
+  margin-top: 0;
+  margin-bottom: 0;
 }
 </style>

@@ -30,42 +30,6 @@
           </div>
         </div>
       </div>
-      
-      <div class="feature-item">
-        <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.embedRewind.enabled }"
-                @click="toggleFeature('embedRewind')">
-            <i class="fa"
-               :class="{
-                 'fa-toggle-on': features.embedRewind.enabled,
-                 'fa-toggle-off': !features.embedRewind.enabled,
-                 'status-processing': featureProcessing.embedRewind,
-               }"></i>
-          </span>
-        </div>
-        <div class="feature-desc">
-          Enable Embed Player Rewind
-        </div>
-      </div>
-
-      <div class="feature-item">
-        <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.ull.enabled }"
-                @click="toggleFeature('ull')">
-            <i class="fa"
-               :class="{
-                 'fa-toggle-on enabled': features.ull.enabled,
-                 'fa-toggle-off': !features.ull.enabled,
-                 'status-processing': featureProcessing.ull
-               }"></i>
-          </span>
-        </div>
-        <div class="feature-desc">
-          Enable Ultra Low Latency Embeds
-        </div>
-      </div>
 
       <div class="feature-item">
         <div class="feature-control">

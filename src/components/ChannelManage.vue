@@ -48,7 +48,6 @@
                     {{streamFps}}
                     <span style="font-size:16px;">fps</span>
                   </span>
-                  
                   <span class="value">
                     <span v-for="(track, index) in mediaPulse.tracks" 
                           :key="index" 

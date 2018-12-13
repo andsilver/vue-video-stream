@@ -177,8 +177,7 @@
 
           </b-col>
           <b-col class="preveiw-container">
-            <div class="video-wrapper"
->
+            <div class="video-wrapper">
               <div v-if="!stream.enabled" class="video-thumb placeholder">
                 <p class="text-center">
                   Disabled Stream<br>
@@ -214,6 +213,27 @@
                   <div style="">{{getStreamPushUrl()}}</div>
                 </div>
               </div>
+
+              <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamIframeCode)">Copy</button>
+                <b-row>
+                  <b-col><div class="label">Iframe Snippet</div></b-col>
+                </b-row>
+                <!-- <div class="label">Iframe Snippet</div> -->
+                <input class="input"
+                       :value="getStreamIframeCode()"
+                       readonly/>
+              </div>
+              <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamEmbedUrl)">Copy</button>
+                <div class="label">Embed Url</div>
+                <input class="input"
+                       :value="getStreamEmbedUrl()"
+                       readonly/>
+              </div>
+
             </div>
           </b-col>
         </b-row>
@@ -396,6 +416,22 @@ export default {
         this.$copyText(text);
         this.$notify({ group: "info", text: "Copied to clipboard" });
       } catch (e) {}
+    },
+    getStreamIframeCode() {
+      let embedUrl = this.getStreamEmbedUrl();
+      let htmlCode = `<iframe src="${embedUrl}" width="590" height="431" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+      return htmlCode;
+    },
+    getStreamEmbedUrl() {
+      // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
+      let embedUrl = `https://player.castr.io/${this.stream.key}?`;
+      const {hostnameCDN} = this.stream.region || {}
+      if (hostnameCDN) {
+        let cdnPop = _.replace(hostnameCDN, /\D/g, '')
+        embedUrl += `cdnsrc=${cdnPop}&`
+      }
+
+      return embedUrl;
     },
     onMediaPulseChanged () {
       const platforms = []

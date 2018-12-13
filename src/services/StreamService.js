@@ -35,6 +35,7 @@ export default {
   saveStreamMetadata,
   uploadStreamPoster,
   uploadStreamPlaylistVideo,
+  deleteStreamPlaylistVideoFile,
 
   getStreamPlaylist,
   saveStreamPlaylistVideo,
@@ -345,8 +346,8 @@ function uploadStreamPoster(streamId, fdata) {
  * @param {string} streamId
  * @param {File} file
  */
-function uploadStreamPlaylistVideo(streamId, file, onBytesUploaded) {
-  let apiUri = `https://fr-vod.castr.io:1335/video/upload/${streamId}`
+function uploadStreamPlaylistVideo(streamId, file, onBytesUploaded, cancelToken) {
+  let apiUri = `https://fr-vod.castr.io:1335/playlist/${streamId}/videos/add`
 
   const fdata = new FormData()
   fdata.append('file', file)
@@ -365,7 +366,21 @@ function uploadStreamPlaylistVideo(streamId, file, onBytesUploaded) {
       if (onBytesUploaded) {
         onBytesUploaded(percentCompleted)
       }
-    }
+    },
+    cancelToken
+  })
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} videoId
+ */
+function deleteStreamPlaylistVideoFile(streamId, videoId) {
+  let apiUri = `https://fr-vod.castr.io:1335/playlist/${streamId}/videos/${videoId}`
+
+  return makeRequest({
+    path: apiUri,
+    method: 'delete'
   })
 }
 
@@ -373,8 +388,8 @@ function uploadStreamPlaylistVideo(streamId, file, onBytesUploaded) {
  * @param {string} streamId
  * @param {object} videoMeta
  */
-async function getStreamPlaylist(streamId) {
-  return await makeRequest(`/streams/${streamId}/schedular/playlist`)
+function getStreamPlaylist(streamId) {
+  return makeRequest(`/streams/${streamId}/schedular/playlist`)
 }
 
 /**
@@ -393,11 +408,11 @@ function saveStreamPlaylistVideo(streamId, videoMeta) {
  * @param {string} streamId
  * @param {string} videoId
  */
-function moveStreamPlaylistVideo(streamId, videoId, precedence) {
+function moveStreamPlaylistVideo(streamId, videoId1, videoId2) {
   return makeRequest({
-    path: `/streams/${streamId}/schedular/playlist/${videoId}`,
+    path: `/streams/${streamId}/schedular/playlist/shift`,
     method: 'put',
-    data: { updates: { precedence } }
+    data: { updates: [videoId1, videoId2] }
   })
 }
 
@@ -459,7 +474,8 @@ async function makeRequest(reqConfig) {
       .axios
       .request(reqConfig)
   } catch (err) {
-    throw new RequestError(err.response.data)
+    let edata = _.get(err, 'response.data')
+    throw new RequestError(edata)
   }
 
   return res && res.data

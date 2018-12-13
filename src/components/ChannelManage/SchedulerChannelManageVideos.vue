@@ -30,7 +30,7 @@
             <b-col>
               <button class="btn btn-primary"
                       @click="triggerFileUpload">Upload Video</button>              
-              <button class="btn btn-link">Clear All</button>
+              <!-- <button class="btn btn-link">Clear All</button> -->
             </b-col>
 
           </b-row>
@@ -53,7 +53,7 @@
               </b-row>
             </div>
             <!-- <div v-for="(video, index) in videoFiles" -->
-            <div v-for="(video, index) in sortedVideoFiles"
+            <div v-for="video in sortedVideoFiles"
                  :key="video.id"
                  class="video-item"
                  :class="{ uploadable: video.uploadable }">
@@ -93,11 +93,20 @@
                     &nbsp;
                   </span>
 
-                  <div v-if="video.uploadable" class="inline-block" style="padding-left:20px;">
-                    <button v-if="video.uploading" class="badge">UPLOADING ..</button>
-                    <button v-else class="video-action-btn">Pending</button>
+                  <div v-if="video.uploadable" 
+                       class="inline-block upload-wrapper">
+
+                    <div v-if="video.uploading">
+                      <b-progress :value="video.uploadProgress || 0"
+                                  :max="100" 
+                                  show-progress 
+                                  animated></b-progress>
+                      <!-- <button class="badge">UPLOADING ..</button> -->
+                    </div>
+                    <button v-else class="video-action-btn">awaiting upload</button>
 
                   </div>
+
                   <div v-else class="inline-block">
                     <span v-if="video.mediaInfo">{{video.mediaInfo.width}} x {{video.mediaInfo.height}}</span>
                     &nbsp;
@@ -123,16 +132,26 @@
                     <button v-if="!video.uploading" 
                             class="btn btn-primary btn-sm" 
                             @click="uploadVideoFile(video.id)">Upload</button>
-                    <button class="btn btn-link btn-sm" 
-                            @click="removeVideoFile(video.id)">{{ video.uploading ? 'Cancel' : 'Remove' }}</button>
+                    <button v-show="video.uploading"
+                            class="btn btn-link btn-sm" 
+                            @click="cancelVideoUpload(video.id)">Cancel</button>
+                    <button v-show="!video.uploading"
+                            class="btn btn-link btn-sm" 
+                            @click="removeVideoFile(video.id)">Remove</button>
                   </div>
                   <div v-else>
                     <div v-if="video.removing">
                       <code>removing ..</code>
                     </div>
                     <div v-else>
-                      <button class="video-action-btn ">Up</button>
-                      <button class="video-action-btn ">Down</button>
+                      <button v-if="canMoveVideo(video.id, -1)"
+                              class="video-action-btn"
+                              @click="moveVideoFile(video.id, -1)">Up</button>
+                      
+                      <button v-if="canMoveVideo(video.id, 1)"
+                              class="video-action-btn"
+                              @click="moveVideoFile(video.id, 1)">Down</button>
+                      
                       <button class="video-action-btn delete" 
                               @click="requestVideoRemoval(video.id)">Delete</button>
                     </div>
@@ -147,6 +166,10 @@
         </div>
       </div>
 
+      <alert-modal modal-id="alert-video-encoding" 
+                     message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
+                     okText="Got it, thanks"></alert-modal>
+      
       <confirm-modal modal-id="confirm-video-removal" 
                      :message="'You are about to delete video named `' + (focusedVideo && focusedVideo.fileName || '') + '`'"
                      okText="Delete"
@@ -156,7 +179,9 @@
   </div>
 </template>
 <script>
+import Vue from 'vue'
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import AlertModal from "@/components/AlertModal.vue";
 import StreamService from '@/services/StreamService'
 import utils from '@/utils'
 
@@ -214,23 +239,32 @@ export default {
 
       const vm = this
       el.onchange = function (e) {
-        console.log('this.files', this.files)
+        // console.log('this.files', this.files)
 
         let file = _.head(this.files)
+
         if (!file) return
+        
+        if (file.type !== 'video/mp4') {
+          vm.$root.$emit("bv::show::modal", "alert-video-encoding")
+          el.value = null
+          return
+        }
 
         let newVideo = {
-          file,
           id: 'unnamed_' + Date.now(),
           fileName: file.name,
           bytes: file.size,
           mediaInfo: {},
           precedence: vm.computeVideoPrecedence(),
-          uploadable: true,
-          uploading: false,
+          enabled: true,
           removing: false,
           statusProcessing: false,
-          enabled: true
+
+          file,
+          uploadable: true,
+          uploading: false,
+          uploadProgress: 0
           // precedence: -1
         }
 
@@ -248,15 +282,23 @@ export default {
       video.uploading = true
       // video.precedence = this.computeVideoPrecedence(video)
       const onBytes = (uploaded) => {
-        console.log('blob uploaded', uploaded)
+        // console.log('blob uploaded', uploaded)
+        video.uploadProgress = uploaded
       }
 
-      let uploadHandle = StreamService.uploadStreamPlaylistVideo(this.stream._id, video.file, onBytes)
-      video.uploadHandle = uploadHandle
+      const cancelSource = Vue.axios.CancelToken.source();
+      video.cancelSource = cancelSource
+
+      const uploadHandle = StreamService.uploadStreamPlaylistVideo(
+        this.stream._id, 
+        video.file, 
+        onBytes, 
+        cancelSource.token)
 
       uploadHandle
         .then((res) => void this.onVideoUploaded(video, res))
         .catch((e) => {
+          video.uploadProgress = 0
           video.uploadError = true
           console.log('upload error', e)
         })
@@ -279,8 +321,13 @@ export default {
 
       video.uploadable = false
       video.file = null
+      // console.log('video', video)
 
-      console.log('video', video)
+      const videoIndex = this.videoFiles.indexOf(video)
+      let newVideoArray = utils.removeArrayItem(this.videoFiles, videoIndex)
+
+      this.videoFiles = [...newVideoArray, video]
+
     },
     async saveVideoMeta (video) {
       const videoMeta = _.pick(video, ['id', 'fileName', 'bytes', 'mediaInfo', 'precedence'])
@@ -298,14 +345,64 @@ export default {
       this.focusedVideo = video
       this.$root.$emit("bv::show::modal", "confirm-video-removal");
     },
+    async moveVideoFile (videoId, moveDir) {
+      if (!moveDir) return 
+
+      const videoIndex = _.findIndex(this.videoFiles, { id: videoId })
+      const videoIndex2 = videoIndex + moveDir
+
+      const vid1 = this.videoFiles[videoIndex]
+      const vid2 = this.videoFiles[videoIndex2]
+      if (!vid2) return
+
+      this.swapVideos(videoIndex, videoIndex2)
+      
+      try {
+        await StreamService.moveStreamPlaylistVideo(this.stream._id, videoId, vid2.id)
+      } catch(e) {
+        this.$notify({ group: 'error', text: 'Could not change playlist order' })
+        this.swapVideos(videoIndex, videoIndex2)
+        console.log('video-move-error', e)
+      }
+
+    },
+    swapVideos (videoIndex, videoIndex2) {
+      let oprecedence = this.videoFiles[videoIndex].precedence
+      let nprecedence = this.videoFiles[videoIndex2].precedence
+
+      this.videoFiles[videoIndex].precedence = nprecedence
+      this.videoFiles[videoIndex2].precedence = oprecedence
+
+      this.videoFiles = utils.swapArray(this.videoFiles, videoIndex, videoIndex2)
+    },
+    cancelVideoUpload (videoId) {
+      videoId = videoId || this.focusedVideo.id
+      const video = _.find(this.videoFiles, { id: videoId })
+
+      if (!video || !video.cancelSource) return
+
+      video.cancelSource.cancel()
+      video.uploading = false
+    },
     async removeVideoFile (videoId) {
-      videoId = this.focusedVideo.id
+      videoId = videoId || this.focusedVideo.id
       const video = _.find(this.videoFiles, { id: videoId })
       video.removing = true
 
       if (!video.uploadable) {
         // removal api request
         await StreamService.removeStreamPlaylistVideo(this.stream._id, videoId)
+        
+        StreamService
+          .deleteStreamPlaylistVideoFile(this.stream._id, videoId)
+          .catch((e) => {
+            console.log('playlist video removal error', e)
+          })
+      }
+
+      if (video.file || video.uploading) {
+        video.cancelSource.cancel()
+        console.log('uploading cancelled with success')
       }
 
       let index = this.videoFiles.indexOf(video)
@@ -357,9 +454,29 @@ export default {
     getVideoIframeSnippet (video) {
       let iframeSrc = 'https://player.castr.io/embed?src='+video.playbackUrl
       return `<iframe src="${iframeSrc}" width="590" height="430" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+    },
+    canMoveVideo (videoId, moveDir) {
+      if (!moveDir) return 
+
+      const videoIndex = _.findIndex(this.videoFiles, { id: videoId })
+      if (videoIndex === -1) return
+
+      let siblingVideoIndex = videoIndex + moveDir
+      if (siblingVideoIndex === videoIndex) return
+
+      // console.log(
+      //   moveDir == 1 ? 'down': 'up', 
+      //   this.videoFiles[videoIndex].fileName,
+      //   videoIndex, 
+      //   siblingVideoIndex)
+
+      let siblingVideo = this.videoFiles[siblingVideoIndex]
+
+      return !!siblingVideo
     }
   },
   components: {
+    AlertModal,
     ConfirmModal
   }
 };
@@ -459,7 +576,7 @@ function imageReader(file, cb) {
   background-color: #f33483;
 }
 .video-action-btn {
-  font-size: 11px;
+  font-size: 12px;
   border: none;
   border-radius: 2px;
   padding: 3px 6px 2px 6px;
@@ -503,5 +620,12 @@ function imageReader(file, cb) {
   cursor: not-allowed;
   opacity: 0.65;
   color: #ffffff;
+}
+.upload-wrapper {
+  padding-left: 15px;
+  width: 220px;
+}
+.progress {
+  height: 18px;
 }
 </style>

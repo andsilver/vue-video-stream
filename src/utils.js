@@ -1,6 +1,15 @@
 import _ from 'lodash'
 
-export default { toArray, updateArrayItem, validateURL, resolveURL, resolveStreamKey, binarySearch }
+export default {
+  toArray,
+  swapArray,
+  updateArrayItem,
+  validateURL,
+  resolveURL,
+  resolveStreamKey,
+  removeArrayItem,
+  binarySearch
+}
 
 /**
  * @param {string} url
@@ -111,7 +120,7 @@ function extractUrlSegments(url) {
         auth = { user, pass }
       }
 
-      _host = host.substr(authSegmentIndex+1)
+      _host = host.substr(authSegmentIndex + 1)
     }
 
     host = _host
@@ -146,6 +155,21 @@ function updateArrayItem(array, newValue, atIndex) {
     [newValue],
     array.slice(atIndex + 1)
   )
+}
+
+function removeArrayItem(array, atIndex) {
+  return _.concat(
+    array.slice(0, atIndex),
+    array.slice(atIndex + 1)
+  )
+}
+
+function swapArray(array, nodeIndex1, nodeIndex2) {
+  let arr = array.slice()
+  let tempNode1 = arr[nodeIndex1]
+  arr[nodeIndex1] = arr[nodeIndex2]
+  arr[nodeIndex2] = tempNode1
+  return arr
 }
 
 function toArray(param) {
