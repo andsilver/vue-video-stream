@@ -193,6 +193,13 @@ const platforms = [{
     serverKeySegmentValues: [],
     icon: '/static/images/platforms/ustream.svg'
   },
+  { 
+    name: 'VK Live', 
+    customServer: true,
+    serverInputPlaceholder: 'rtmp://stream.vk.me:443/livesrv=7753&s=aWQ9dFA0M0o3NVjeS==',
+    streamKeyPlaceholder: 'tP43J7523M_zp',
+    icon: '/static/images/platforms/vk.png'
+  },
   { name: 'GoodGame', servers: goodgameServers, icon: '/static/images/platforms/gg.svg', streamKeyPlaceholder: '30549?pwd=000a0000b00000b0' },
   { name: 'cybergame', servers: cybergameServers, icon: '/static/images/platforms/cybergame.svg', streamKeyPlaceholder: 'example?key=tJz0m0XRsZZktYOuv' },
   { name: 'StreamMe', servers: StreamMeServers, icon: '/static/images/platforms/streamme.svg' },
