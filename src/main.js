@@ -36,6 +36,7 @@ const options = {
 
   image: 'https://castr.io/streamtomultiplesites.png',
   locale: 'auto',
+  zipCode: true,
   // currency: 'PHP',
   // billingAddress: true,
   panelLabel: 'Subscribe {{amount}}'
