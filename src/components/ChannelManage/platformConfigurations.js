@@ -45,7 +45,13 @@ const PricartoServers = [
 ]
 const bilibiliServers = ['rtmp://txy.live-send.acg.tv/live-txy/?']
 const webTvServers = ['rtmp://live3.origins.web.tv/liveext']
-const gamePlankServers = ['rtmp://live.gameplank.tv/app']
+// const gamePlankServers = ['rtmp://live.gameplank.tv/app']
+const gamePlankServers = [
+  { text: 'Default', value: 'rtmp://live.gameplank.tv/app' },
+  { text: 'US: Oregon', value: 'rtmp://live-or.gameplank.tv/app' },
+  { text: 'US: Virginia', value: 'rtmp://live-va.gameplank.tv/app' },
+  { text: 'UK: London', value: 'rtmp://live-ldn.gameplank.tv/app' }
+]
 const VaughnSoftServers = [
   { text: 'US: Primary', value: 'rtmp://live.vaughnsoft.net/live' },
   { text: 'US: Chicago, IL', value: 'rtmp://live-ord.vaughnsoft.net/live' },
@@ -206,7 +212,14 @@ const platforms = [{
   { name: 'bilibili', servers: bilibiliServers, icon: '/static/images/platforms/bilibili.svg', streamKeyPlaceholder: 'streamname=live_..&key=...' },
   { name: 'picarto TV', servers: PricartoServers, icon: '/static/images/platforms/picartotv.svg', streamKeyPlaceholder: 'ptv_125095_01115ae8b3cd' },
   { name: 'web TV', servers: webTvServers, icon: '/static/images/platforms/webtv.png' },
-  { name: 'GamePlank', servers: gamePlankServers, icon: '/static/images/platforms/gameplank.png' },
+  { 
+    name: 'GamePlank',
+    servers: gamePlankServers,
+    // customServer: true,
+    // serverInputPlaceholder: 'rtmp://gameplank.tv/live',
+    streamKeyPlaceholder: 'GamePlank_xxxxxxxxxxxxxxxxxxxxxxx',
+    icon: '/static/images/platforms/gameplank.png' 
+  },
   { name: 'vaughn live', servers: VaughnSoftServers, icon: '/static/images/platforms/vaughnlivelogotype.svg' },
   { name: 'breakers TV', servers: VaughnSoftServers, icon: '/static/images/platforms/breakerstv.svg' },
   { name: 'instagib', servers: VaughnSoftServers, icon: '/static/images/platforms/instagib.svg' },

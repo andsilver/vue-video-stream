@@ -853,3 +853,9 @@ textarea.input {
   background-color: rgba(1, 3, 41, 0.47);
 }
 </style>
+
+<style>
+.field-container select.form-control option{
+  background-color: #212458 !important;
+}
+</style>
