@@ -61,6 +61,11 @@ const VaughnSoftServers = [
 ]
 const facebookServers = ['rtmp://rtmp-api.facebook.com:80/rtmp']
 const dliveServers = ['rtmp://stream.dlive.tv/live']
+const nimoServers = [
+  { text: 'Push Line 1', value: 'rtmp://wspush.rtmp.nimo.tv/live/' },
+  { text: 'Push Line 2', value: 'rtmp://txpush.rtmp.nimo.tv/live/' }
+  // { text: 'Push Line 3', value: 'rtmp://stream.dlive.tv/live' }
+]
 const DJliveServers = ['rtmp://live.djlive.pl/live']
 const BoomstreamServers = ['rtmp://live.boomstream.com/live']
 const streamLiveServers = ['rtmp://media.stream.live:1935/live']
@@ -185,6 +190,12 @@ const platforms = [{
     servers: dliveServers, 
     streamKeyPlaceholder: 'aq6U8I3Osok9d05ExWeCZ12AGy7nsjl_password',
     icon: '/static/images/platforms/dlive.png' 
+  },
+  { 
+    name: 'Nimo TV',
+    servers: nimoServers,
+    streamKeyPlaceholder: 'zu9759512055689r26ec0fbb2ed70800aad9c8e316783pm29j78fosd==&ws2al=1&ws2tx=1',
+    icon: '/static/images/platforms/nimotv.png'
   },
   {
     name: 'USTREAM',
