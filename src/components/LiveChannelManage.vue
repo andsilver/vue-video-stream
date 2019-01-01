@@ -259,7 +259,7 @@ export default {
         return _.sum([bytesOutTotal, pushStatsTotal]);
       },
       getStreamStatus() {
-        return this.streamAlive ? "active" : "inactive";
+        return this.streamAlive ? "active" : "offline";
       },
       getStreamQuality() {
         const sizes = [480, 720, 1080, 1440, 2160];
