@@ -14,7 +14,7 @@
           <span v-else>Not available</span>
         </b-col>
       </b-row>
-    </div> -->
+    </div>-->
     <div class="row-container">
       <b-row>
         <b-col>
@@ -23,52 +23,78 @@
         <b-col class="text-right text-dimm">
           <div v-if="processing">Please wait ..</div>
           <div v-else>
-            <div>
+            <div :class="{expired: !isSubEnabled()}">
               <div>
+                <div
+                    v-if="!isSubEnabled()"
+                    class="inline-block"
+                  >Expired&nbsp;&nbsp;</div>
 
                 <div class="subscription-badge package-category-badge sm">restream</div>
                 <span class="subscription-badge">{{getSubscriptionName()}}</span>&nbsp;
-                <a href="/#pricing" target="_blank"><b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge></a>
+                <a href="/#pricing" target="_blank">
+                  <b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge>
+                </a>
 
                 <router-link :to="subscriptionManagePage(null, 'restream')">
-                  <b-button variant="link" size="sm">{{isPaidSubscription() ? 'CHANGE' : 'UPGRADE'}}</b-button>
+                  <!-- <b-button variant="link" size="sm">{{ sub.enabled ? 'CHANGE' : 'PAY NOW' }}</b-button> -->
+                  <b-button variant="link" size="sm">
+                      <span v-if="isSubEnabled()">
+                        {{isPaidSubscription() ? 'CHANGE' : 'Upgrade'}}
+                      </span>
+                      <span v-else>PAY NOW</span>
+                  </b-button>
                 </router-link>
                 <!-- <router-link v-if="isPaidSubscription()"
                             :to="subscriptionManagePage('cancel')">
                   <b-button variant="link" size="sm">CANCEL</b-button>
-                </router-link> -->
-                <b-button variant="link" size="sm" onclick="Intercom('show')">CANCEL</b-button>
+                </router-link>-->
+                <b-button v-show="isSubEnabled()"
+                          variant="link" 
+                          size="sm" 
+                          onclick="Intercom('show')">CANCEL</b-button>
               </div>
-              <div style="margin-top:7px;">
+              <div v-show="isSubEnabled()" style="margin-top:7px;">
                 <code style="font-size:12.5px;">USD ${{getSubscriptionFee()}}/month</code>&nbsp;
                 <span v-if="isPaidSubscription()">
-                  valid through <strong>{{ getSubscriptionAge() | date('DD MMM, YYYY') }}</strong>
+                  valid through
+                  <strong>{{ getSubscriptionAge() | date('DD MMM, YYYY') }}</strong>
                 </span>
               </div>
             </div>
             <div v-if="hasAddonSubscripitons()">
               <hr>
-              <div v-for="sub in userSubscription.addonSubscriptions"
-                   :key="sub._id">
+              <div v-for="sub in userSubscription.addonSubscriptions" :key="sub._id">
                 <div :class="{expired: !sub.enabled}">
-
-                  <div v-if="!sub.enabled" 
-                       class="inline-block" 
-                       style="color:red;">Expired&nbsp;&nbsp;</div>
+                  <div
+                    v-if="!sub.enabled"
+                    class="inline-block"
+                    style="color:red;"
+                  >Expired&nbsp;&nbsp;</div>
                   <div class="subscription-badge package-category-badge sm">{{sub.category}}</div>
                   <span class="subscription-badge">{{getSubscriptionName(sub)}}</span>&nbsp;
-                  <a href="/#pricing" target="_blank"><b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge></a>
+                  <a href="/#pricing" target="_blank">
+                    <b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge>
+                  </a>
 
                   <!-- <router-link :to="subscriptionManagePage(null, sub.category'live')"> -->
-                  <router-link :to="subscriptionManagePage(sub.enabled ? null : 'resubscribe', sub.category)">
+                  <router-link
+                    :to="subscriptionManagePage(sub.enabled ? null : 'resubscribe', sub.category)"
+                  >
                     <b-button variant="link" size="sm">{{ sub.enabled ? 'CHANGE' : 'PAY NOW'}}</b-button>
                   </router-link>
-                  <b-button v-if="sub.enabled" variant="link" size="sm" onclick="Intercom('show')">CANCEL</b-button>
+                  <b-button
+                    v-if="sub.enabled"
+                    variant="link"
+                    size="sm"
+                    onclick="Intercom('show')"
+                  >CANCEL</b-button>
                 </div>
                 <div v-show="sub.enabled" style="margin-top:7px;">
                   <code style="font-size:12.5px;">USD ${{getSubscriptionFee(sub)}}/month</code>&nbsp;
                   <span>
-                    valid through <strong>{{ getSubscriptionAge(sub) | date('DD MMM, YYYY') }}</strong>
+                    valid through
+                    <strong>{{ getSubscriptionAge(sub) | date('DD MMM, YYYY') }}</strong>
                   </span>
                 </div>
               </div>
@@ -78,22 +104,20 @@
       </b-row>
     </div>
     <br>
-    <div class="row-container"
-         style="border:none;">
+    <div class="row-container" style="border:none;">
       <div class="para-title">Transactions</div>
       <div class="text-dimm">Below are the billing transactions debited through Castr</div>
     </div>
     <br>
-    <p v-if="transactionsProcessing"
-       class="text-center">retreiving billing history</p>
-    <b-table v-if="!transactionsProcessing" 
-             :fields="transactionsTableFields" 
-             :items="paymentHistory"
-             :hover="true"
-             class="">
-      <template slot="time" slot-scope="data">
-        {{data.value | date('DD/MM/YYYY')}}
-      </template>
+    <p v-if="transactionsProcessing" class="text-center">retreiving billing history</p>
+    <b-table
+      v-if="!transactionsProcessing"
+      :fields="transactionsTableFields"
+      :items="paymentHistory"
+      :hover="true"
+      class
+    >
+      <template slot="time" slot-scope="data">{{data.value | date('DD/MM/YYYY')}}</template>
       <template slot="package" slot-scope="data">
         <code class="subscription-badge sm">{{data.value.name}}</code>
       </template>
@@ -103,54 +127,59 @@
         <span>{{getCycleEnd(data.item.time) | date('DD/MM/YYYY')}}</span>
       </template>
       <template slot="amount" slot-scope="data">
-        <span style="font-size:12px;">USD</span> ${{data.value}}
+        <span style="font-size:12px;">USD</span>
+        ${{data.value}}
       </template>
       <template slot="actions" slot-scope="data">
-        <b-button variant="link" 
-                  size="sm"
-                  disabled>--</b-button>
+        <b-button variant="link" size="sm" disabled>--</b-button>
       </template>
     </b-table>
-    <p v-if="!transactionsProcessing && !paymentHistory.length" 
-       class="text-center">no transactions to display</p>
-
+    <p
+      v-if="!transactionsProcessing && !paymentHistory.length"
+      class="text-center"
+    >no transactions to display</p>
   </div>
 </template>
 
 <script>
-import SubscriptionService from '../../services/SubscriptionService'
+import SubscriptionService from "../../services/SubscriptionService";
 
 export default {
   name: "ManageBilling",
-  async mounted () {
+  async mounted() {
     try {
       // get user subscription
-      this.userSubscription = await SubscriptionService.getUserSubscriptions(true)
-      this.processing = false
+      this.userSubscription = await SubscriptionService.getUserSubscriptions(
+        true
+      );
+      this.processing = false;
 
-      const isPaid = this.isPaidSubscription()
+      const isPaid = this.isPaidSubscription();
       const packages = await SubscriptionService.getSubscriptionPackages();
-      
+
       if (!isPaid) {
-        const starterPack = _.chain(packages).filter(p => p.baseCharge > 0).sortBy(p => p.baseCharge).head().value()
-        if (starterPack) this.superiorPackage = starterPack
+        const starterPack = _.chain(packages)
+          .filter(p => p.baseCharge > 0)
+          .sortBy(p => p.baseCharge)
+          .head()
+          .value();
+        if (starterPack) this.superiorPackage = starterPack;
       } else {
-        const basicPack = _.find(packages, { baseCharge: 0 })
-        if (basicPack) this.basicPackage = basicPack
+        const basicPack = _.find(packages, { baseCharge: 0 });
+        if (basicPack) this.basicPackage = basicPack;
       }
 
       // get user billing transactions
-      this.paymentHistory = await SubscriptionService.getUserBillingHistory()
-      this.transactionsProcessing = false
+      this.paymentHistory = await SubscriptionService.getUserBillingHistory();
+      this.transactionsProcessing = false;
 
       // track event
-
     } catch (e) {
-      window.alert('error: ' + e.message)
-      console.log('error', e)
+      window.alert("error: " + e.message);
+      console.log("error", e);
     }
 
-    window.trackEvent(`Billing Details`)
+    window.trackEvent(`Billing Details`);
   },
   data() {
     return {
@@ -162,75 +191,78 @@ export default {
       superiorPackage: null,
       userSubscription: null,
       paymentHistory: [
-        // { 
-        //   id: 'm87jdhcw0e8r7', 
+        // {
+        //   id: 'm87jdhcw0e8r7',
         //   cycle: { start: new Date(Date.now()-(30*24*3600000)), end: new Date() },
         //   bill: { net: 19.99 },
         //   time: new Date()
         // },
-        // { 
-        //   id: 'cimosyndnfy', 
+        // {
+        //   id: 'cimosyndnfy',
         //   cycle: { start: new Date(Date.now()-(2*30*24*3600000)), end: new Date(Date.now()-(30*24*3600000)) },
         //   bill: { net: 19.99 },
         //   time: new Date(Date.now()-(30*24*3600000))
         // }
       ],
       transactionsTableFields: [
-        { key: 'time', label: 'Date'},
-        { key: 'package', label: 'subscription' },
-        { key: 'cycle', label: 'cycle' },
-        { key: 'amount', label: 'Billed' },
-        { key: 'actions', label: ' ' },
+        { key: "time", label: "Date" },
+        { key: "package", label: "subscription" },
+        { key: "cycle", label: "cycle" },
+        { key: "amount", label: "Billed" },
+        { key: "actions", label: " " }
       ],
       getCycleEnd(cstart) {
-        const cend = new Date(cstart)
-        cend.setMonth(cend.getMonth()+1)
+        const cend = new Date(cstart);
+        cend.setMonth(cend.getMonth() + 1);
 
-        return cend.toString()
+        return cend.toString();
       },
-      subscriptionManagePage (action, category) {
-        let suffix = '?'
-        if (action === 'cancel') {
-          const freePack = this.basicPackage
-          suffix += freePack && `package=${freePack._id}&` || ''
-
-        } else if (action === 'upgrade') {
-          if (category === 'restream') {
-            const supPack = this.superiorPackage
-            suffix += supPack && `package=${supPack._id}&` || ''
+      subscriptionManagePage(action, category) {
+        let suffix = "?";
+        if (action === "cancel") {
+          const freePack = this.basicPackage;
+          suffix += (freePack && `package=${freePack._id}&`) || "";
+        } else if (action === "upgrade") {
+          if (category === "restream") {
+            const supPack = this.superiorPackage;
+            suffix += (supPack && `package=${supPack._id}&`) || "";
           } else {
-              suffix += 'action=upgrade&'
+            suffix += "action=upgrade&";
           }
         } else if (action) {
-          suffix += `action=${action}&`
+          suffix += `action=${action}&`;
         }
 
         if (category) {
-          suffix += `category=${category}`
+          suffix += `category=${category}`;
         }
 
-        return '/subscribe' + suffix
-    },
+        return "/subscribe" + suffix;
+      }
     };
   },
   methods: {
+    isSubEnabled(sub) {
+      sub = sub || this.userSubscription.subscription;
+      return sub.enabled;
+    },
     getSubscriptionName(sub) {
-      sub = sub || this.userSubscription.subscription
-      return sub.package.name
+      sub = sub || this.userSubscription.subscription;
+      return sub.package.name;
     },
     getSubscriptionAge(sub) {
-      sub = sub || this.userSubscription.subscription
-      return sub.cend
+      sub = sub || this.userSubscription.subscription;
+      return sub.cend;
     },
     isPaidSubscription() {
-      return this.getSubscriptionFee() > 0
+      return this.getSubscriptionFee() > 0;
     },
     getSubscriptionFee(sub) {
-      sub = sub || this.userSubscription.subscription
-      return sub.package.baseCharge
+      sub = sub || this.userSubscription.subscription;
+      return sub.package.baseCharge;
     },
     hasAddonSubscripitons() {
-      return _.size(this.userSubscription.addonSubscriptions) > 0
+      return _.size(this.userSubscription.addonSubscriptions) > 0;
     }
   }
 };
@@ -294,7 +326,7 @@ export default {
   text-transform: uppercase;
 }
 .subscription-badge.sm {
-  font-size:12px;
+  font-size: 12px;
   padding: 2px 6px;
 }
 
@@ -306,6 +338,6 @@ export default {
 }
 .expired {
   padding: 10px;
-  background-color: rgba(220, 220, 220, 0.09)
+  background-color: rgba(220, 220, 220, 0.09);
 }
 </style>
