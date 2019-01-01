@@ -36,7 +36,7 @@
       </b-row>
       <!-- <hr/> -->
       <div class="text-center text-muted" 
-           style="margin: 5px 0;">© 2018 Castr. All rights reserved</div>
+           style="margin: 5px 0;">© 2019 Castr. All rights reserved</div>
     </div>
   </div>
 </template>
