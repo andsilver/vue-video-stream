@@ -344,7 +344,13 @@ export default {
       const feature = this.features[featureName]
       if (!feature) return
 
-      if (featureName === 'abr' || featureName === 'ull') {
+      if (featureName === 'abr') {
+        this.toggleABR()
+        return
+      }
+
+      // if (featureName === 'abr' || featureName === 'ull') {
+      if (featureName === 'ull') {
         if (window.Intercom)
           window.Intercom('show')
         return
@@ -367,6 +373,19 @@ export default {
       
       if (feature.valueType === 'bool' || !nstate) {
         await this.saveSetting(featureName, nstate)
+      }
+
+    },
+    async toggleABR () {
+      let nstate = !this.features.abr.enabled
+      let methodName = nstate === true ? 'enableStreamABR' : 'disableStreamABR'
+
+      try {
+        await StreamService[methodName](this.stream._id)
+        this.features.abr.enabled = nstate
+      } catch(e) {
+        console.log('error', e)
+        this.$notify({group: 'error', text: 'could not toggle stream ABR'})
       }
 
     },

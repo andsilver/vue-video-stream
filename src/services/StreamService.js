@@ -33,6 +33,8 @@ export default {
   getAvailableRegions,
   getStreamMetadata,
   saveStreamMetadata,
+  enableStreamABR,
+  disableStreamABR,
   uploadStreamPoster,
   uploadStreamPlaylistVideo,
   deleteStreamPlaylistVideoFile,
@@ -324,6 +326,28 @@ function saveStreamMetadata(streamId, key, value) {
         value
       }
     }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function enableStreamABR(streamId) {
+  return makeRequest({
+    path: `/streams/${streamId}/abr/toggle`,
+    method: 'put',
+    data: { enabled: true }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function disableStreamABR(streamId) {
+  return makeRequest({
+    path: `/streams/${streamId}/abr/toggle`,
+    method: 'put',
+    data: { enabled: false }
   })
 }
 
