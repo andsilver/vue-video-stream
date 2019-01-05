@@ -384,7 +384,12 @@ export default {
         await StreamService[methodName](this.stream._id)
         this.features.abr.enabled = nstate
       } catch(e) {
-        console.log('error', e)
+        if (_.includes(_.get(e, 'message')), 'upgrade') {
+          this.$root.$emit('bv::show::modal', 'feature-upgrade')
+        } else {
+          console.log('api-error', e)
+        }
+
         this.$notify({group: 'error', text: 'could not toggle stream ABR'})
       }
 
