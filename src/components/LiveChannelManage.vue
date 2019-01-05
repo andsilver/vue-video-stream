@@ -50,7 +50,7 @@
                 </div>
                 <div v-else><span class="value">..</span></div>
 
-                <div class="label">incoming</div>
+                <div class="label">bitrate</div>
               </div>
             </b-col>
             <b-col>
@@ -110,11 +110,11 @@
                 <div v-else class="value">..</div>
               </b-col>
               <b-col cols="4" class="stat-container xs">
-                <div class="label">in</div>
+                <!-- <div class="label">in</div>
                 <div class="value">{{ mediaPulse.bytesInTotal | bytes }}</div>
                 &nbsp;
                 <div class="label">out</div>
-                <div class="value">{{ countPushedBytes() | bytes }}</div>
+                <div class="value">{{ countPushedBytes() | bytes }}</div> -->
               </b-col>
               <b-col class="stat-container xs" style="padding-left:0px;">
                 <div class="value">
