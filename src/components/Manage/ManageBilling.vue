@@ -16,94 +16,105 @@
       </b-row>
     </div>-->
     <div class="row-container">
-      <b-row>
-        <b-col>
-          <div class="para-title">Subscriptions</div>
-        </b-col>
-        <b-col class="text-right text-dimm">
-          <div v-if="processing">Please wait ..</div>
-          <div v-else>
-            <div :class="{expired: !isSubEnabled()}">
-              <div>
-                <div
-                    v-if="!isSubEnabled()"
-                    class="inline-block"
-                  >Expired&nbsp;&nbsp;</div>
-
-                <div class="subscription-badge package-category-badge sm">restream</div>
-                <span class="subscription-badge">{{getSubscriptionName()}}</span>&nbsp;
-                <a href="/#pricing" target="_blank">
-                  <b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge>
-                </a>
-
-                <router-link :to="subscriptionManagePage(null, 'restream')">
-                  <!-- <b-button variant="link" size="sm">{{ sub.enabled ? 'CHANGE' : 'PAY NOW' }}</b-button> -->
-                  <b-button variant="link" size="sm">
-                      <span v-if="isSubEnabled()">
-                        {{isPaidSubscription() ? 'CHANGE' : 'Upgrade'}}
-                      </span>
-                      <span v-else>PAY NOW</span>
-                  </b-button>
-                </router-link>
-                <!-- <router-link v-if="isPaidSubscription()"
-                            :to="subscriptionManagePage('cancel')">
-                  <b-button variant="link" size="sm">CANCEL</b-button>
-                </router-link>-->
-                <b-button v-show="isSubEnabled()"
-                          variant="link" 
-                          size="sm" 
-                          onclick="Intercom('show')">CANCEL</b-button>
-              </div>
-              <div v-show="isSubEnabled()" style="margin-top:7px;">
-                <code style="font-size:12.5px;">USD ${{getSubscriptionFee()}}/month</code>&nbsp;
-                <span v-if="isPaidSubscription()">
-                  valid through
-                  <strong>{{ getSubscriptionAge() | date('DD MMM, YYYY') }}</strong>
-                </span>
-              </div>
-            </div>
-            <div v-if="hasAddonSubscripitons()">
-              <hr>
-              <div v-for="sub in userSubscription.addonSubscriptions"
-                   :key="sub._id"
-                   style="margin-bottom:20px;">
-                <div :class="{expired: !sub.enabled}">
-                  <div
-                    v-if="!sub.enabled"
-                    class="inline-block"
-                    style="color:red;"
-                  >Expired&nbsp;&nbsp;</div>
-                  <div class="subscription-badge package-category-badge sm">{{sub.category}}</div>
-                  <span class="subscription-badge">{{getSubscriptionName(sub)}}</span>&nbsp;
-                  <a href="/#pricing" target="_blank">
-                    <b-badge style="padding:5px 6px;border-radius:50px;">?</b-badge>
-                  </a>
-
-                  <!-- <router-link :to="subscriptionManagePage(null, sub.category'live')"> -->
-                  <router-link
-                    :to="subscriptionManagePage(sub.enabled ? null : 'resubscribe', sub.category)"
-                  >
-                    <b-button variant="link" size="sm">{{ sub.enabled ? 'CHANGE' : 'PAY NOW'}}</b-button>
-                  </router-link>
-                  <b-button
-                    v-if="sub.enabled"
-                    variant="link"
-                    size="sm"
-                    onclick="Intercom('show')"
-                  >CANCEL</b-button>
-                </div>
-                <div v-show="sub.enabled" style="margin-top:7px;">
-                  <code style="font-size:12.5px;">USD ${{getSubscriptionFee(sub)}}/month</code>&nbsp;
-                  <span>
-                    valid through
-                    <strong>{{ getSubscriptionAge(sub) | date('DD MMM, YYYY') }}</strong>
-                  </span>
-                </div>
-              </div>
-            </div>
+      <div class="para-title">Subscriptions</div>
+      <br>
+      <div v-if="!userSubscription">
+        <div class="page-placeholder" 
+             style="height: 200px">
+          <div class="page-placeholder-content">
+            Please wait ..
+            <br>
+            <b-progress :value="100" 
+                        :max="100" 
+                        animated
+                        class="w-100 mt-2"
+                        style="height: 7px;"></b-progress>
           </div>
-        </b-col>
-      </b-row>
+        </div>
+      </div>
+      <div v-else class="user-sub-list">
+        <div class="user-sub-item head">
+          <b-row>
+            <b-col cols="4">&nbsp;&nbsp;subscription</b-col>
+            <b-col cols="2">streaming type</b-col>
+            <b-col cols="4">subscription age</b-col>
+            <b-col></b-col>
+          </b-row>
+        </div>
+        <div class="user-sub-item">
+          <b-row>
+            <b-col cols="4">
+              <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
+              <div class="pack-name">{{getSubscriptionName()}}</div>
+              <div>
+                <code style="font-size:13px;">USD ${{getSubscriptionFee()}}/month</code>
+              </div>
+            </b-col>
+            <b-col cols="2">
+              <div class="subscription-badge package-category-badge sm">restream</div>
+            </b-col>
+            <b-col cols="4">
+              <div v-if="isPaidSubscription()">
+                Valid untill
+                <code style="font-size:inherit;margin: 10px;">{{ getSubscriptionAge() | date('DD MMM, YYYY') }}</code>
+                <span v-if="!isSubEnabled()" class="expired-badge">expired</span>
+              </div>
+            </b-col>
+            <b-col class="text-right">
+              <router-link :to="subscriptionManagePage(null, 'restream')">
+                <b-button variant="danger" size="sm">
+                  <span v-if="isSubEnabled()">{{isPaidSubscription() ? 'CHANGE' : 'Upgrade'}}</span>
+                  <span v-else>PAY NOW</span>
+                </b-button>
+              </router-link>
+              
+              <b-button v-if="isSubEnabled()"
+                        variant="link"
+                        size="sm"
+                        onclick="Intercom('show')">CANCEL</b-button>
+            </b-col>
+          </b-row>
+        </div>
+        <div v-if="hasAddonSubscripitons()">
+          <div v-for="sub in userSubscription.addonSubscriptions"
+               :key="sub._id"
+               class="user-sub-item">
+          <b-row>
+            <b-col cols="4">
+              <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
+              <div class="pack-name">{{getSubscriptionName(sub)}}</div>
+              <div>
+                <code style="font-size:13px;">USD ${{getSubscriptionFee(sub)}}/month</code>
+              </div>
+            </b-col>
+            <b-col cols="2">
+              <div class="subscription-badge package-category-badge sm">{{sub.category}}</div>
+            </b-col>
+            <b-col cols="4">
+              <div v-if="isPaidSubscription()">
+                Valid untill
+                <code style="font-size:inherit;margin: 10px;">{{ getSubscriptionAge(sub) | date('DD MMM, YYYY') }}</code>
+                <span v-if="!isSubEnabled(sub)" class="expired-badge">expired</span>
+              </div>
+            </b-col>
+            <b-col class="text-right">
+              <router-link :to="subscriptionManagePage(null, sub.category)">
+                <b-button :variant="isSubEnabled(sub) ? 'link' : 'danger'" size="sm">
+                  <span v-if="isSubEnabled(sub)">{{isPaidSubscription(sub) ? 'CHANGE' : 'UPGRADE'}}</span>
+                  <span v-else>PAY NOW</span>
+                </b-button>
+              </router-link>
+              
+              <b-button v-if="isSubEnabled(sub)"
+                        variant="link"
+                        size="sm"
+                        onclick="Intercom('show')">CANCEL</b-button>
+            </b-col>
+          </b-row>
+        </div>
+        </div>
+      </div>
+
     </div>
     <br>
     <div class="row-container" style="border:none;">
@@ -256,8 +267,8 @@ export default {
       sub = sub || this.userSubscription.subscription;
       return sub.cend;
     },
-    isPaidSubscription() {
-      return this.getSubscriptionFee() > 0;
+    isPaidSubscription(sub) {
+      return this.getSubscriptionFee(sub) > 0;
     },
     getSubscriptionFee(sub) {
       sub = sub || this.userSubscription.subscription;
@@ -322,7 +333,7 @@ export default {
   padding: 4px 7px;
   font-size: 13px;
   letter-spacing: -0.5px;
-  background: #dc3545;
+  /* background: #dc3545; */
   color: #ffffff;
   display: inline-block;
   text-transform: uppercase;
@@ -332,14 +343,42 @@ export default {
   padding: 2px 6px;
 }
 
+.expired-badge {
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 12px;
+  letter-spacing: -0.5px;
+  background-color: #dc3545;
+  color: #ffffff;
+  display: inline-block;
+}
 .package-category-badge {
-  background: #282c83;
-  margin-right: 5px;
+  /* background: #282c83; */
+  background: #2159d1;
+  /* background: #dc3545; */
+  /* margin-right: 5px; */
   letter-spacing: 0;
-  text-transform: lowercase;
+  text-transform: capitalize;
 }
 .expired {
   padding: 10px;
   background-color: rgba(220, 220, 220, 0.09);
+}
+.user-sub-list {
+
+}
+.user-sub-item.head {
+  font-size:13px;
+  color: #eeeeee;
+  background-color: #192035;
+}
+.user-sub-item {
+  padding: 12px 0;
+  /* border-bottom:1px dashed rgba(255,255,255,0.4); */
+  border-bottom: 1px solid #37395f;
+}
+.pack-name {
+  font-size: 15px;
+  text-transform: capitalize;
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="container view-wrapper">
     <div class="row">
       <div class="col-6">
-        <div class="title">My Streams</div>
+        <div class="title">Dashboard</div>
       </div>
       <div v-if="streams.length" class="col-6 text-right">
         <!-- <button class="addChannel"
@@ -46,27 +46,6 @@
               <div class="desc">Live Stream Using Your Own Player</div>
             </div>
           </b-dropdown-item>
-          <b-dropdown-divider></b-dropdown-divider>
-          <!-- <b-dropdown-item v-b-modal.add-cam-channel-modal> -->
-          <b-dropdown-item @click="openCamModal">
-                <div class="dropdown-icon">
-                  <img src="../assets/cctv.png" style="width:25px;margin-left:-3px;" />
-                </div>
-                <div class="dropdown-text">
-                  <div class="main">New IPCam</div>
-                  <div class="desc">You IPCam on the cloud</div>
-                </div>
-              </b-dropdown-item>
-          <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item @click="openScheduledStreamModal">
-                <div class="dropdown-icon">
-                  <img src="../assets/scheduled.png" style="width:22px;margin-left:-1px;" />
-                </div>
-                <div class="dropdown-text">
-                  <div class="main">New Scheduled Stream</div>
-                  <div class="desc">Schedule your live presence</div>
-                </div>
-              </b-dropdown-item>
         </b-dropdown>
       </div>
     </div>
@@ -118,6 +97,7 @@
                   <div class="desc">Restream To Multiple Sites</div>
                 </div>
               </b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item v-b-modal.modal-add-live-channel>
                 <div class="dropdown-icon">
                   <img src="../assets/live-streaming.svg" />
@@ -125,15 +105,6 @@
                 <div class="dropdown-text">
                   <div class="main">New Live Stream</div>
                   <div class="desc">Live Stream Using Your Own Player</div>
-                </div>
-              </b-dropdown-item>
-              <b-dropdown-item v-b-modal.add-cam-channel-modal>
-                <div class="dropdown-icon">
-                  <img src="../assets/live-streaming.svg" />
-                </div>
-                <div class="dropdown-text">
-                  <div class="main">New IPCam</div>
-                  <div class="desc">You IPCam on the cloud</div>
                 </div>
               </b-dropdown-item>
           </b-dropdown>
@@ -317,9 +288,9 @@ export default {
   clear: both;
 }
 .card-wrapper {
-  padding: 0 5px;
+  padding: 0;
   margin-bottom: 15px;
-  margin-right: 5px;
+  /* margin-right: 5px; */
 }
 .placeholder {
   font-size: 32px;

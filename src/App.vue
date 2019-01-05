@@ -4,9 +4,9 @@
     <div style="margin-bottom: 125px;" :style="{minHeight: winHeight || 'auto'}">
       <router-view/>
     </div>
-    <notifications group="error" classes="vue-notification error" position="bottom right"/>
-    <notifications group="success" classes="vue-notification success" position="bottom right"/>
-    <notifications group="info" classes="vue-notification info" position="bottom right"/>
+    <notifications group="error" classes="vue-notification error" style="top:10px;right:10px"/>
+    <notifications group="success" classes="vue-notification success" style="top:10px;right:10px"/>
+    <notifications group="info" classes="vue-notification info" style="top:10px;right:10px"/>
     <app-footer />
     <div id="thumb-temp-loader"></div>
   </div>
@@ -246,7 +246,7 @@ body {
   display: inline-block;
   padding: 10px;
   height: 200px;
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .vue-notification.info {

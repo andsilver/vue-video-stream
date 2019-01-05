@@ -383,7 +383,7 @@ export default {
 #webcam-player {
   position: relative;
   width: 100%;
-  max-width: 350px;
+  max-width: 100%;
   max-height: 220px;
 }
 .mbr-controls {

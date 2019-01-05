@@ -66,8 +66,9 @@ export default {
     initPlaybackSetup() {
       const element = document.getElementById("player");
       const mbrControls = document.querySelector(".mbr-controls");
+      if (!element) return
+      
       this.videoDOM = element;
-
       // make `muted` by default
 
       this.videoDOM.volume = 0

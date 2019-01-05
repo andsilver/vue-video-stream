@@ -54,13 +54,13 @@
               </div>
             </b-col>
             <b-col>
-              <div class="stat-container" style="padding-left:50px;">
+              <div class="stat-container">
                 <div v-if="streamAlive">
                   <div v-if="streamFps" class="value" style="margin-right:10px;">
                     {{streamFps}}
                     <span style="font-size:16px;">fps</span>
                   </div>
-                  
+                  <div class="label">codecs</div>
                   <!-- <span class="value">
                     <span v-for="(track, index) in mediaPulse.tracks" 
                           :key="index" 
@@ -109,14 +109,14 @@
                 </div>
                 <div v-else class="value">..</div>
               </b-col>
-              <b-col cols="4" class="stat-container xs">
+              <b-col cols="3" class="stat-container xs">
                 <!-- <div class="label">in</div>
                 <div class="value">{{ mediaPulse.bytesInTotal | bytes }}</div>
                 &nbsp;
                 <div class="label">out</div>
                 <div class="value">{{ countPushedBytes() | bytes }}</div> -->
               </b-col>
-              <b-col class="stat-container xs" style="padding-left:0px;">
+              <b-col class="stat-container xs" style="padding-left:15px;">
                 <div class="value">
                     <span v-for="(track, index) in mediaPulse.tracks" 
                           :key="index" 
@@ -182,7 +182,7 @@
                     :max="100" 
                     animated
                     class="w-100 mt-2"
-                    style="height: 10px;"></b-progress>
+                    style="height: 7px;"></b-progress>
       </div>
     </div>
 
@@ -252,7 +252,7 @@ export default {
       streamName: null,
       streamFps: null,
       mediaPulse: null,
-      clientsCount: null,
+      clientsCount: 0,
       windowHeight: 0,
       countPushedBytes() {
         const { bytesOutTotal = 0, pushStatsTotal = 0 } = this.mediaPulse;

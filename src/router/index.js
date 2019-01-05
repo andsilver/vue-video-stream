@@ -138,74 +138,7 @@ const router = new Router({
           props: true
         }
       ]
-    },
-    {
-      path: '/ipcams/:streamId',
-      name: 'CamChannelManage',
-      component: CamChannelManage,
-      redirect: {
-        name: 'CamChannelManageDashboard'
-      },
-      children: [{
-          path: 'dashboard',
-          name: 'CamChannelManageDashboard',
-          component: CamChannelManageDashboard,
-          props: true
-        },
-        {
-          path: 'recording',
-          name: 'CamChannelManageDVR',
-          component: ChannelManageDVR,
-          props: true
-        },
-        // {
-        //   path: 'vodepisodes',
-        //   name: 'CamChannelManageVodEpisodes',
-        //   component: ChannelManageVodEpisodes,
-        //   props: true
-        // },
-        {
-          path: 'settings',
-          name: 'CamChannelManageSettings',
-          component: CamChannelManageSettings,
-          props: true
-        }
-      ]
-    },
-    {
-      path: '/scheduled/:streamId',
-      name: 'ScheduledChannelManage',
-      component: ScheduledChannelManage,
-      redirect: {
-        name: 'ScheduledChannelManageDashboard'
-      },
-      children: [{
-          path: 'dashboard',
-          name: 'ScheduledChannelManageDashboard',
-          component: ScheduledChannelManageDashboard,
-          props: true
-        },
-        // {
-        //   path: 'timeline',
-        //   name: 'ScheduledChannelManageTimeline',
-        //   component: ScheduledChannelManageTimeline,
-        //   props: true
-        // },
-        {
-          path: 'videos',
-          name: 'ScheduledChannelManageVideos',
-          component: ScheduledChannelManageVideos,
-          props: true
-        },
-        {
-          path: 'settings',
-          name: 'ScheduledChannelManageSettings',
-          component: ScheduledChannelManageSettings,
-          props: true
-        }
-      ]
-    },
-    {
+    }, {
       path: '/manage',
       name: 'AppManage',
       redirect: '/manage/account',

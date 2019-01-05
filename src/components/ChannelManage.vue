@@ -28,7 +28,7 @@
                 <div class="label">status</div>
               </div>
             </b-col>
-            <b-col cols="6" sm="3">
+            <b-col cols="6" sm="2">
               <div class="stat-container">
                 <div v-if="streamAlive">
                   <span class="value">
@@ -38,29 +38,29 @@
                 </div>
                 <div v-else><span class="value">..</span></div>
 
-                <div class="label">incoming</div>
+                <div class="label">bitrate</div>
               </div>
             </b-col>
-            <b-col cols="6" sm="auto" class="d-none d-sm-block">
+            <b-col cols="6" sm="3" class="d-none d-sm-block">
               <div class="stat-container" style="padding-left:50px;">
                 <div v-if="streamAlive">
-                  <span v-if="streamFps" class="value" style="margin-right:10px;">
+                  <div v-if="streamFps" class="value" style="margin-right:10px;">
                     {{streamFps}}
                     <span style="font-size:16px;">fps</span>
-                  </span>
-                  <span class="value">
+                  </div>
+                  <div class="label">codecs</div>
+                  <!-- <span class="value">
                     <span v-for="(track, index) in mediaPulse.tracks" 
                           :key="index" 
                           class="media-codec"
                           :class="getTrackType(track)">{{track.codec}}</span>
-                  </span>
-                  
+                  </span> -->
                 </div>
                 <div v-else><span class="value">..</span></div>
 
               </div>
             </b-col>
-            <b-col cols="1" class="text-right" style="padding-left:0;">
+            <b-col cols="4" class="text-right" style="padding-left:0;">
               
               <!-- <button class="head-button"
                       @click="requestStreamDelete">
@@ -89,21 +89,27 @@
 
           <b-row v-if="streamAlive">
 
-              <b-col class="stat-container xs">
+              <b-col cols="3" class="stat-container xs">
                 <div v-if="mediaPulse.alive" class="value">
                   <strong class="text-uppercase">{{getStreamQuality()}}</strong>
                   <span style="margin-left:5px;font-size:14px;">{{mediaPulse.width}} x {{mediaPulse.height}}</span>
                 </div>
                 <div v-else class="value">..</div>
               </b-col>
-              <b-col cols="4" class="stat-container xs">
+              <b-col cols="3" class="stat-container xs">
                 <!-- <div class="label">in</div>
                 <div class="value">{{ mediaPulse.bytesInTotal | bytes }}</div>
                 &nbsp;
                 <div class="label">out</div>
                 <div class="value">{{ countPushedBytes() | bytes }}</div> -->
               </b-col>
-              <b-col cols="5" class="stat-container xs">
+              <b-col class="stat-container xs" style="padding-left:0px;">
+                <div class="value">
+                    <span v-for="(track, index) in mediaPulse.tracks" 
+                          :key="index" 
+                          class="media-codec"
+                          :class="getTrackType(track)">{{track.codec}}</span>
+                </div>
                 <!-- <div class="label">uptime</div>
                 <div class="value">{{ mediaPulse.lifetime | elapsed }}</div> -->
               </b-col>

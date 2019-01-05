@@ -1,17 +1,24 @@
 <template>
-  <div class="card"
-       :class="{ disabled: !streamStatus,
+  <div
+    class="card"
+    :class="{ disabled: !streamStatus,
                  'opacity-75 no-pointer': stream.removing,
                  [stream.type]: true
               }"
-       @click="navigateManage">
-    
-    <div v-if="stream.type==='live'" class="type-badge"><code>LIVESTREAM</code></div>
-    <div v-else-if="stream.type==='ipcam'" class="type-badge ipcam"><code>IPCAM</code></div>
-    <div v-else-if="stream.type==='scheduled'" class="type-badge scheduled"><code>SCHEDULER STREAM</code></div>
+    @click="navigateManage"
+  >
+    <div v-if="stream.type==='live'" class="type-badge">
+      <code><i class="fa fa-play"></i> LIVESTREAM</code>
+    </div>
+    <div v-else-if="stream.type==='ipcam'" class="type-badge ipcam">
+      <code>IPCAM</code>
+    </div>
+    <div v-else-if="stream.type==='scheduled'" class="type-badge scheduled">
+      <code>SCHEDULED</code>
+    </div>
 
     <div class="thumb">
-      <stream-thumb :stream="stream" :mediaPulse="mediaPulse" class="video-thumb" />
+      <stream-thumb :stream="stream" :mediaPulse="mediaPulse" class="video-thumb"/>
     </div>
     <div class="row">
       <div class="col-12">
@@ -20,13 +27,14 @@
             <div>
               <div class="set-padding-l-xs">
                 <span class="word-wrap">{{stream.name}}</span>
-                <span class="status"
-                      :class="{ 'none': !mediaPulse,
+                <span
+                  class="status"
+                  :class="{ 'none': !mediaPulse,
                                 'online blink': isStreamAlive(),
-                                'offline': mediaPulse && !mediaPulse.alive }"></span>
-                <span v-if="isStreamAlive() && mediaPulse.bitrate" 
-                      class="bitrate">
-                      <code>{{mediaPulse.bitrate | number}}</code> kbps
+                                'offline': mediaPulse && !mediaPulse.alive }"
+                ></span>
+                <span v-if="isStreamAlive() && mediaPulse.bitrate" class="bitrate">
+                  <code style="font-size:inherit;">{{mediaPulse.bitrate | number}}</code> kbps
                 </span>
               </div>
             </div>
@@ -34,42 +42,43 @@
 
           <div class="description">
             <div>
-              <img class="media-flag"  :src="getCountryFlag(stream)" />
+              <img class="media-flag" :src="getCountryFlag(stream)">
               <div class="media-region">{{stream.region.name}}</div>
             </div>
           </div>
         </div>
       </div>
-    </div>    
+    </div>
     <div class="row card-controls">
       <div class="col-6">
-        <button class="btn-status danger outlined"
-                @click="requestDelete($event)">delete</button>
+        <button class="btn-status danger outlined" @click="requestDelete($event)">delete</button>
         <!-- <span class="control" 
               @click="requestDelete($event)" 
               style="margin-left: 15px;">
           <i class="far fa-trash-alt"></i>
-        </span> -->
+        </span>-->
       </div>
       <div class="col-6 p-0 text-right">
         <!-- <span class="fas toggle-control"
               :class="{ 'fa-toggle-on enabled': streamStatus, 
                               'fa-toggle-off': !streamStatus,
                               'status-processing': statusProcessing }"
-              @click="toggleStatus($event)"></span> -->
-        <div v-if="statusProcessing"><i class="fas fa-spinner fa-spin"></i></div>
+        @click="toggleStatus($event)"></span>-->
+        <div v-if="statusProcessing">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
         <div v-else>
           <!-- <button v-if="stream.enabled"  -->
-          <button v-if="streamStatus" 
-                  class="btn-status outlined"
-                  style="color:#f7f7f7 !important;"
-                  @click="toggleStatus($event)"
-                  v-b-tooltip.hover
-                  title="Stop streaming, publishing">disable</button>
-          <button v-else 
-                  class="btn-status no-dimm"
-                  @click="toggleStatus($event)">enable</button>
-          
+          <button
+            v-if="streamStatus"
+            class="btn-status outlined"
+            style="color:#f7f7f7 !important;"
+            @click="toggleStatus($event)"
+            v-b-tooltip.hover
+            title="Stop streaming, publishing"
+          >disable</button>
+          <button v-else class="btn-status no-dimm" @click="toggleStatus($event)">enable</button>
+
           <!-- <span class="tooltip-control">?</span> -->
         </div>
 
@@ -77,15 +86,17 @@
               :class="{ 'fa-toggle-on enabled': streamStatus, 
                               'fa-toggle-off': !streamStatus,
                               'status-processing': statusProcessing }"
-              @click="toggleStatus($event)"></span> -->
+        @click="toggleStatus($event)"></span>-->
       </div>
     </div>
 
-    <confirm-modal modal-id="billing-prompt"
-                   message="Please settle pending subscription invoices before continue."
-                   okText="See Billing"
-                   cancelText="Close"
-                   @modal-confirm="navigateToBilling()"></confirm-modal>
+    <confirm-modal
+      modal-id="billing-prompt"
+      message="Please settle pending subscription invoices before continue."
+      okText="See Billing"
+      cancelText="Close"
+      @modal-confirm="navigateToBilling()"
+    ></confirm-modal>
   </div>
 </template>
 
@@ -136,11 +147,9 @@ export default {
     },
     navigateManage() {
       let viewName = "ChannelManage";
-      if (this.stream.type === "live") 
-        viewName = "LiveChannelManage";
-      else if (this.stream.type === "ipcam") 
-        viewName = "CamChannelManage";
-      else if (this.stream.type === "scheduled") 
+      if (this.stream.type === "live") viewName = "LiveChannelManage";
+      else if (this.stream.type === "ipcam") viewName = "CamChannelManage";
+      else if (this.stream.type === "scheduled")
         viewName = "ScheduledChannelManage";
 
       this.$router.push({
@@ -219,7 +228,7 @@ export default {
   background-color: #202940;
   overflow: visible;
   width: 100%;
-  min-height: 360px;
+  min-height: 345px;
   box-sizing: border-box;
   border-radius: 5px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
@@ -235,7 +244,7 @@ export default {
 }
 
 .card.scheduled {
-  background-color: rgba(16,138,166, 0.15);
+  background-color: rgba(16, 138, 166, 0.15);
 }
 
 .card .thumb {
@@ -289,8 +298,8 @@ export default {
 }
 
 .card .caption .title {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 22px;
+  /* font-weight: 700; */
   color: #f7f7f7;
   letter-spacing: -0.5px;
 }
@@ -338,7 +347,7 @@ export default {
   opacity: 1;
 }
 .card .description {
-  margin-top: 5px;
+  /* margin-top: 5px; */
 }
 .card .media-region {
   color: white;
@@ -346,12 +355,12 @@ export default {
   /* background: #09af90; */
   display: inline-block;
   /* border-radius: 2px; */
-  font-size: 14px;
-  letter-spacing: -0.5px;
+  font-size: 13px;
+  letter-spacing: -0.3px;
 }
 .card .media-flag {
   display: inline-block;
-  max-width: 20px;
+  max-width: 16px;
   margin-right: 3px;
 }
 
@@ -411,13 +420,13 @@ export default {
 .type-badge {
   display: inline-block;
   position: absolute;
-  top: -1px;
-  right: -1px;
+  top: 10px;
+  right: 10px;
   z-index: 1;
   color: #ffffff;
-  background-color: #4747f3;
-  padding: 3px 12px;
-  border-radius: 0 4px 0 10px;
+  background-color: #ff3838eb;
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 .type-badge * {
   color: inherit;
@@ -488,6 +497,5 @@ export default {
   cursor: pointer;
   border-radius: 50px;
   background-color: black;
-
 }
 </style>

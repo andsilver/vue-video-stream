@@ -8,10 +8,12 @@
              centered
              no-close-on-backdrop>
       <template slot="modal-header">
-        <div style="width: 100%">
+        <div style="width: 100%"
+             class="text-center"
+             :class="stage===0?'container':''">
           <b-row>
             <b-col>
-              <span v-html="modalTitle()"></span>
+              <span style="font-size:18px;" v-html="modalTitle()"></span>
               &nbsp;
               <b-button v-if="stage > 0"
                         variant="link" 
@@ -25,7 +27,7 @@
         </div>
       </template>
       <div>
-        <section v-if="stage==0">
+        <section v-if="stage==0" class="container">
           <div class="platforms-template-list">
             <div class="platform-item"
                  @click="onPlatformSelect()">
@@ -270,7 +272,8 @@ import IntegrationService from "../../services/IntegrationService";
 import utils from '@/utils'
 
 const Platforms = platformConfigurations.platforms;
-const ModalTitles = ["Select Streaming Platform", ""];
+// const ModalTitles = ["Select Streaming Platform", ""];
+const ModalTitles = ["Select Publish Platform", ""];
 _.each(Platforms, plat => {
   plat.id = _.replace(plat, /\s/gi, "_");
   plat.iconUrl = true;
@@ -307,9 +310,12 @@ export default {
         if (this.stage === 1) {
           if (this.customPlatform) title = "Custom Platform";
           else
+            // title +=
+            //   `<i class="fab fa-${this.platform.name}"></i> &nbsp;` +
+            //   _.capitalize(this.platform.name);
             title +=
-              `<i class="fab fa-${this.platform.name}"></i> &nbsp;` +
-              _.capitalize(this.platform.name);
+              `<img src="${this.platform.icon}" class="picon"/> &nbsp;` +
+              `<span style="font-size:14px;vertical-align:bottom;">${_.capitalize(this.platform.name)}</span>`;
         }
 
         return title;
@@ -750,15 +756,16 @@ function getApiBase() {
 <style scoped>
 .platforms-template-list {
   padding-top: 30px;
-  padding-right: 50px;
   padding-bottom: 30px;
-  padding-left: 50px;
+  /* padding-right: 50px;
+  padding-left: 50px; */
 }
 
 .platform-item {
   display: inline-block;
   padding: 7px;
-  width: 185px;
+  /* width: 185px; */
+  width: 174px;
   height: 105px;
   box-sizing: border-box;
   text-align: center;
@@ -858,5 +865,9 @@ textarea.input {
 <style>
 .field-container select.form-control option{
   background-color: #212458 !important;
+}
+.picon {
+  max-width: 100px;
+  max-height: 24px;
 }
 </style>

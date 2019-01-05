@@ -285,7 +285,7 @@ export default {
       packCategories: [
         { label: 'restreaming', value: 'restream' },
         { label: 'live streaming', value: 'live' },
-        { label: 'ip camera', value: 'ipcam' },
+        // { label: 'ip camera', value: 'ipcam' },
       ],
       quantity: 1,
       getEndingDate() {
