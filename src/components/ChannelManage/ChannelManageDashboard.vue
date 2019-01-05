@@ -1251,12 +1251,14 @@ function isRTSPSource(pullUrl) {
   padding: 10px 14px;
   color: #ffffff;
   /* background-color: #010329; */
-  background-color: #17193e;
+  background-color: #202940;
   border: none;
-  border-radius: 2px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  outline-color: #0074fc;
 }
 .input:focus {
-  background-color: rgba(1, 3, 41, 0.47);
+  background-color: rgba(18, 23, 37, 0.67);
 }
 .platform-list {
   margin: 15px 0;
@@ -1266,7 +1268,8 @@ function isRTSPSource(pullUrl) {
   padding: 18px 6px;
   /* border-bottom: 1px solid rgb(17, 19, 64); */
   margin-bottom: 8px;
-  background: #040634;
+  /* background: #040634; */
+  background: #202940;
   border-radius: 2px;
   border: none;
   padding-left: 20px;

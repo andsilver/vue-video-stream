@@ -18,6 +18,16 @@ import LiveChannelManage from '@/components/LiveChannelManage'
 import LiveChannelManageDashboard from '@/components/ChannelManage/LiveChannelManageDashboard'
 import LiveChannelManageSettings from '@/components/ChannelManage/LiveChannelManageSettings'
 
+import CamChannelManage from '@/components/CamChannelManage'
+import CamChannelManageDashboard from '@/components/ChannelManage/CamChannelManageDashboard'
+import CamChannelManageSettings from '@/components/ChannelManage/CamChannelManageSettings'
+
+import ScheduledChannelManage from '@/components//SchedulerChannelManage'
+import ScheduledChannelManageDashboard from '@/components/ChannelManage/SchedulerChannelManageDashboard'
+import ScheduledChannelManageTimeline from '@/components/ChannelManage/SchedulerChannelManageTimeline'
+import ScheduledChannelManageVideos from '@/components/ChannelManage/SchedulerChannelManageVideos'
+import ScheduledChannelManageSettings from '@/components/ChannelManage/SchedulerChannelManageSettings'
+
 import AppManage from '@/components/Manage'
 import AdminStats from '@/components/AdminStats'
 import ManageAccount from '@/components/Manage/ManageAccount'
@@ -125,6 +135,72 @@ const router = new Router({
           path: 'settings',
           name: 'LiveChannelManageSettings',
           component: LiveChannelManageSettings,
+          props: true
+        }
+      ]
+    },
+    {
+      path: '/ipcams/:streamId',
+      name: 'CamChannelManage',
+      component: CamChannelManage,
+      redirect: {
+        name: 'CamChannelManageDashboard'
+      },
+      children: [{
+          path: 'dashboard',
+          name: 'CamChannelManageDashboard',
+          component: CamChannelManageDashboard,
+          props: true
+        },
+        {
+          path: 'recording',
+          name: 'CamChannelManageDVR',
+          component: ChannelManageDVR,
+          props: true
+        },
+        // {
+        //   path: 'vodepisodes',
+        //   name: 'CamChannelManageVodEpisodes',
+        //   component: ChannelManageVodEpisodes,
+        //   props: true
+        // },
+        {
+          path: 'settings',
+          name: 'CamChannelManageSettings',
+          component: CamChannelManageSettings,
+          props: true
+        }
+      ]
+    },
+    {
+      path: '/scheduled/:streamId',
+      name: 'ScheduledChannelManage',
+      component: ScheduledChannelManage,
+      redirect: {
+        name: 'ScheduledChannelManageDashboard'
+      },
+      children: [{
+          path: 'dashboard',
+          name: 'ScheduledChannelManageDashboard',
+          component: ScheduledChannelManageDashboard,
+          props: true
+        },
+        // {
+        //   path: 'timeline',
+        //   name: 'ScheduledChannelManageTimeline',
+        //   component: ScheduledChannelManageTimeline,
+        //   props: true
+        // },
+        {
+          path: 'videos',
+          name: 'ScheduledChannelManageVideos',
+          component: ScheduledChannelManageVideos,
+          props: true
+        },
+        {
+          path: 'settings',
+          name: 'ScheduledChannelManageSettings',
+          component: ScheduledChannelManageSettings,
           props: true
         }
       ]

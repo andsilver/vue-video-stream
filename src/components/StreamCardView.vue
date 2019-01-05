@@ -1,11 +1,15 @@
 <template>
   <div class="card"
-       :class="{ restream: true, 
-                 disabled: !streamStatus,
-                 'opacity-75 no-pointer': stream.removing
+       :class="{ disabled: !streamStatus,
+                 'opacity-75 no-pointer': stream.removing,
+                 [stream.type]: true
               }"
        @click="navigateManage">
+    
     <div v-if="stream.type==='live'" class="type-badge"><code>LIVESTREAM</code></div>
+    <div v-else-if="stream.type==='ipcam'" class="type-badge ipcam"><code>IPCAM</code></div>
+    <div v-else-if="stream.type==='scheduled'" class="type-badge scheduled"><code>SCHEDULER STREAM</code></div>
+
     <div class="thumb">
       <stream-thumb :stream="stream" :mediaPulse="mediaPulse" class="video-thumb" />
     </div>
@@ -132,7 +136,12 @@ export default {
     },
     navigateManage() {
       let viewName = "ChannelManage";
-      if (this.stream.type === "live") viewName = "LiveChannelManage";
+      if (this.stream.type === "live") 
+        viewName = "LiveChannelManage";
+      else if (this.stream.type === "ipcam") 
+        viewName = "CamChannelManage";
+      else if (this.stream.type === "scheduled") 
+        viewName = "ScheduledChannelManage";
 
       this.$router.push({
         name: viewName,
@@ -206,7 +215,8 @@ export default {
   margin: 0;
   padding: 0;
   color: #f7f7f7;
-  background-color: rgb(23, 25, 72);
+  /* background-color: rgb(23, 25, 72); */
+  background-color: #202940;
   overflow: visible;
   width: 100%;
   min-height: 360px;
@@ -222,6 +232,10 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.2);
   /* transform: scale(1.025, 1.025); */
   /* box-shadow: 0 0 6px rgba(0, 0, 0, .3); */
+}
+
+.card.scheduled {
+  background-color: rgba(16,138,166, 0.15);
 }
 
 .card .thumb {
@@ -401,12 +415,18 @@ export default {
   right: -1px;
   z-index: 1;
   color: #ffffff;
-  background-color: #282c83;
+  background-color: #4747f3;
   padding: 3px 12px;
-  border-radius: 0 0 0 10px;
+  border-radius: 0 4px 0 10px;
 }
 .type-badge * {
   color: inherit;
+}
+.type-badge.ipcam {
+  background-color: #ff5b6f;
+}
+.scheduled .type-badge {
+  background-color: #108aa6;
 }
 
 .card.disabled .type-badge {
@@ -419,7 +439,7 @@ export default {
 }
 
 .btn-status {
-  background-color: blue;
+  background-color: #4747f3;
   color: white;
   border: none;
   font-size: 12.5px;
@@ -430,28 +450,28 @@ export default {
 }
 
 .btn-status.outlined {
-  color: blue;
+  color: #4747f3;
   border: 1px solid;
   background-color: transparent !important;
 }
 
 .btn-status.outlined:hover {
   color: #ffffff !important;
-  background-color: blue !important;
-  border-color: blue;
+  background-color: #4747f3 !important;
+  border-color: #4747f3;
 }
 
 .btn-status.danger {
   color: #ffffff;
-  background-color: #f00;
+  background-color: #ff5b6f;
 }
 .btn-status.outlined.danger {
-  color: #f00;
+  color: #ff5b6f;
 }
 .btn-status.outlined.danger:hover {
   color: #ffffff;
-  background-color: #f00 !important;
-  border-color: #f00 !important;
+  background-color: #ff5b6f !important;
+  border-color: #ff5b6f !important;
 }
 .btn-status:hover {
   background-color: #2647a3;

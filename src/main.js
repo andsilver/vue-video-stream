@@ -31,8 +31,8 @@ const options = {
   // key: 'pk_live_yIPV9HjJOfT5DiSifUT5ZKIi',
 
   // newkeys
-  // key: 'pk_test_3CqyR5dPd6by5H8IQNT6r8Uq',
-  key: 'pk_live_SoqbLrowwD39LEtIamsw8OOC',
+  key: 'pk_test_3CqyR5dPd6by5H8IQNT6r8Uq',
+  // key: 'pk_live_SoqbLrowwD39LEtIamsw8OOC',
 
   image: 'https://castr.io/streamtomultiplesites.png',
   locale: 'auto',

@@ -69,7 +69,8 @@ body {
   padding: 0;
   font-family: comfortaa !important;
   color: #f7f7f7;
-  background-color: #010329 !important;
+  /* background-color: #010329 !important; */
+  background-color: #192035 !important;
 }
 
 .absolute {
@@ -101,7 +102,7 @@ body {
 }
 
 .modal-content {
-  background-color: rgb(20, 22, 66) !important;
+  background-color: #202940 !important;
   color: #f7f7f7;
   padding: 10px;
 }
@@ -195,7 +196,7 @@ body {
 }
 
 .table thead th {
-  background-color: #010329 !important;
+  background-color: #192035 !important;
   border: none;
 }
 

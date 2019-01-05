@@ -2,7 +2,7 @@
   <div class="container view-wrapper">
     <div v-if="!processing">
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <div class="title">
             <!-- <a class="title-change-placeholder">change</a> -->
             <input v-model="streamName"
@@ -18,7 +18,7 @@
             <i class="fa fa-caret-left"></i>&nbsp; Go back
           </router-link>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-9">
           <b-row>
             <b-col cols="3">
               <div class="stat-container">
@@ -28,7 +28,19 @@
                 <div class="label">status</div>
               </div>
             </b-col>
-            <b-col cols="6" sm="3">
+            <b-col cols="2">
+              <div class="stat-container">
+                <div v-if="streamAlive">
+                  <span class="value">
+                    <!-- {{mediaPulse.clients | number}} -->
+                    {{clientsCount | number}}
+                  </span>
+                </div>
+                <div v-else><span class="value">..</span></div>
+                <div class="label">viewers</div>
+              </div>
+            </b-col>
+            <b-col cols="3">
               <div class="stat-container">
                 <div v-if="streamAlive">
                   <span class="value">
@@ -41,19 +53,20 @@
                 <div class="label">incoming</div>
               </div>
             </b-col>
-            <b-col cols="6" sm="auto" class="d-none d-sm-block">
+            <b-col>
               <div class="stat-container" style="padding-left:50px;">
                 <div v-if="streamAlive">
-                  <span v-if="streamFps" class="value" style="margin-right:10px;">
+                  <div v-if="streamFps" class="value" style="margin-right:10px;">
                     {{streamFps}}
                     <span style="font-size:16px;">fps</span>
-                  </span>
-                  <span class="value">
+                  </div>
+                  
+                  <!-- <span class="value">
                     <span v-for="(track, index) in mediaPulse.tracks" 
                           :key="index" 
                           class="media-codec"
                           :class="getTrackType(track)">{{track.codec}}</span>
-                  </span>
+                  </span> -->
                   
                 </div>
                 <div v-else><span class="value">..</span></div>
@@ -83,13 +96,13 @@
                 <button class="btn-status danger outlined"
                         @click="requestStreamDelete">delete</button>
               </div>
-
+              
+              
             </b-col>
           </b-row>
 
           <b-row v-if="streamAlive">
-
-              <b-col class="stat-container xs">
+              <b-col cols="5" class="stat-container xs">
                 <div v-if="mediaPulse.alive" class="value">
                   <strong class="text-uppercase">{{getStreamQuality()}}</strong>
                   <span style="margin-left:5px;font-size:14px;">{{mediaPulse.width}} x {{mediaPulse.height}}</span>
@@ -97,13 +110,19 @@
                 <div v-else class="value">..</div>
               </b-col>
               <b-col cols="4" class="stat-container xs">
-                <!-- <div class="label">in</div>
+                <div class="label">in</div>
                 <div class="value">{{ mediaPulse.bytesInTotal | bytes }}</div>
                 &nbsp;
                 <div class="label">out</div>
-                <div class="value">{{ countPushedBytes() | bytes }}</div> -->
+                <div class="value">{{ countPushedBytes() | bytes }}</div>
               </b-col>
-              <b-col cols="5" class="stat-container xs">
+              <b-col class="stat-container xs" style="padding-left:0px;">
+                <div class="value">
+                    <span v-for="(track, index) in mediaPulse.tracks" 
+                          :key="index" 
+                          class="media-codec"
+                          :class="getTrackType(track)">{{track.codec}}</span>
+                </div>
                 <!-- <div class="label">uptime</div>
                 <div class="value">{{ mediaPulse.lifetime | elapsed }}</div> -->
               </b-col>
@@ -113,36 +132,30 @@
       <div class="content-container">
         <ul class="nav-menu-inline page-menu">
           <router-link tag="li" 
-                       :to="{name: 'ChannelManageDashboard'}"
+                       :to="{name: 'CamChannelManageDashboard'}"
                        active-class="active">dashboard</router-link>
-
-          <!-- <router-link v-if="stream.enabled && stream.dvrReady" -->
-          <router-link v-if="stream.dvrHours"
-                       :to="{name: 'ChannelManageDVR'}"
+          <!-- <router-link v-if="stream.dvrHours" -->
+          <router-link v-if="stream.enabled && stream.dvrReady"
                        tag="li" 
+                       :to="{name: 'CamChannelManageDVR'}"
                        active-class="active">recording</router-link>
-          <router-link v-else
-                       :to="{name: 'ChannelManageDVRDemo'}"
-                       tag="li" 
-                       active-class="active">
-            recording <code style="font-size:12px;">(demo)</code>
-          </router-link>
-          <!-- <li v-else-if="!stream.enabled && stream.dvrReady"
+          <li v-else-if="!stream.enabled && stream.dvrReady"
               v-b-tooltip.hover
               title="please enable stream to access recording"
-              class="li-disabled">recording</li> -->
+              class="li-disabled">recording</li>
 
-          <router-link tag="li"
-                       :to="{name: 'ChannelManageChat'}"
-                       active-class="active">
-            <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
-            &nbsp;chat overlay
-          <!-- <li @click="requestChatStatus">
-            <i class="fa fa-comment-alt" style="color:rgb(32,133,240);"></i>
-            &nbsp;chat overlay
-          </li> -->
-          </router-link>
+          <!-- <router-link v-if="stream.dvrHours" -->
+          <router-link tag="li" 
+                       :to="{name: 'CamChannelManageSettings'}"
+                       active-class="active">cam settings</router-link>
         </ul>
+
+        <div v-if="trialSubscription && !isRecording()" 
+             class="text-danger" 
+             style="font-size:14px;">
+          You are using a Trial plan with limited playback and recording caps.
+          Please <router-link to="/subscribe?category=ipcam&action=upgrade">upgrade</router-link> to remove this cap.
+        </div>
 
         <router-view :stream="stream" 
                      :streamAlive="streamAlive"
@@ -167,11 +180,6 @@
 
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
-
-    <alert-modal modal-id="alert-chat-down"
-                 message="We have encountered unusual behaviour in our chat app and would appreciate your patience while our team get things back online."
-                 okText="I Understand"
-                 class="text-center"></alert-modal>
   </div>
 </template>
 
@@ -188,7 +196,7 @@ const SourceTypes = {
 };
 
 export default {
-  name: "ChannelManage",
+  name: "CamChannelManage",
   async mounted() {
     this.windowHeight = window.innerHeight - 200;
     this.streamId = this.$route.params.streamId;
@@ -198,6 +206,12 @@ export default {
     this.processing = false;
 
     if (!this.stream) return;
+    
+    const userSub = await SubscriptionService.getUserSubscriptions(true)
+    const baseSub = _.find(userSub.addonSubscriptions, { category: 'ipcam' })
+    if (baseSub) {
+      this.trialSubscription = /trial/gi.test(baseSub.package.name)
+    }
 
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Page", this.stream);
@@ -212,43 +226,44 @@ export default {
   destroyed() {
     if (!this.stream) return;
     this.unsubscribeMediaPulse();
+    this.scopeAlive = false
   },
   data() {
     return {
-      SourceTypes,
       statusProcessing: false,
+      scopeAlive: true,
+      SourceTypes,
       nameEdit: false,
       userSubscription: null,
       processing: true,
       processingMessage: null,
       stream: null,
       streamAlive: false,
+      trialSubscription: false,
       streamId: null,
       streamName: null,
       streamFps: null,
       mediaPulse: null,
+      clientsCount: null,
       windowHeight: 0,
       countPushedBytes() {
         const { bytesOutTotal = 0, pushStatsTotal = 0 } = this.mediaPulse;
         return _.sum([bytesOutTotal, pushStatsTotal]);
       },
       getStreamStatus() {
-        return this.streamAlive ? "active" : "offline";
+        return this.streamAlive ? "active" : "inactive";
       },
       getStreamQuality() {
         const sizes = [480, 720, 1080, 1440, 2160];
         const sizesFmt = ["sd", "hd", "fhd", "qhd", "uhd"];
 
-        const { height } = this.mediaPulse || {};
+        const { height } = this.mediaPulse;
 
         let quality = "sd";
         for (let i = 0; i < sizes.length; i++) {
-          let nsize = sizes[i + 1]
-          if (height >= sizes[i]) {
-            if (!nsize || (height < nsize)) {
-              quality = sizesFmt[i];
-              break;
-            }
+          if (height <= sizes[i]) {
+            quality = sizesFmt[i];
+            break;
           }
         }
 
@@ -257,6 +272,9 @@ export default {
     };
   },
   methods: {
+    isRecording () {
+      return /(recording|vodepisodes)$/gi.test(this.$router.currentRoute.path)
+    },
     requestChatStatus () {
       this.$root.$emit("bv::show::modal", "alert-chat-down");
     },
@@ -270,6 +288,7 @@ export default {
         this.stream = stream;
         this.streamName = this.stream.name;
         this.setupMediaPulse();
+        this.setupViewershipCounter();
         
       } catch (err) {
         // redirect to stream list
@@ -344,6 +363,20 @@ export default {
         }, 1000);
       }, 5000);
     },
+    setupViewershipCounter () {
+
+      (async function updateCounter() {
+        try {
+          let viewers = await StreamService.getStreamViewership(this.streamId)
+          this.clientsCount = viewers || 0
+        } catch (e) {}
+
+        if (this.scopeAlive)
+          setTimeout(updateCounter.bind(this), 3000)
+
+      }.bind(this))()
+
+    },
     onMediaPulse() {
       this.streamAlive = this.stream.enabled && this.mediaPulse && this.mediaPulse.alive
 
@@ -352,10 +385,7 @@ export default {
 
       _.each(codecs, codec => {
         if (!/^v/gi.test(codec.id) || _.isNil(codec.fps)) return;
-
-        let fps = Math.round(codec.fps)
-        if (fps <= 144)
-          this.streamFps = fps;
+        this.streamFps = Math.round(codec.fps);
       });
     },
     unsubscribeMediaPulse() {
@@ -483,6 +513,7 @@ function isValidUrl (url) {
   padding: 12px 0 40px 0;
 }
 .stat-container {
+  margin-bottom: 9px;
 }
 .stat-container .value {
   display: inline-block;
@@ -611,9 +642,10 @@ function isValidUrl (url) {
   padding: 10px 14px;
   color: #ffffff;
   /* background-color: #010329; */
-  background-color: #17193e;
-  border: none;
+  background-color: #202940;
+  border: 1px solid #151c31;
   border-radius: 2px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);

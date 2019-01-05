@@ -7,12 +7,12 @@
               <!-- <div v-if="!isAlive()" class="video-thumb placeholder"> -->
               <div v-if="!stream.enabled" class="video-thumb placeholder">
                 <p class="text-center">
-                  Disabled Stream<br>
+                  Disabled Camera<br>
                   <span style="font-size:13px;opacity:0.7;">( Please enable )</span>
                 </p>
               </div>
               <div v-else-if="!streamAlive" class="video-thumb placeholder">
-                <p>Waiting for stream</p>
+                <p>No Camera Source</p>
               </div>
               <stream-player v-else :stream="stream" class="video-thumb" />
 
@@ -26,7 +26,7 @@
                 <b-row>
                   <b-col><div class="label">Iframe Snippet</div></b-col>
                   <b-col class="text-right">
-                    <span class="label">Enable DVR</span>
+                    <span class="label">Enable DVR Timeline</span>
                     <span class="fas toggle-control"
                           :class="{ 'fa-toggle-on enabled': dvrEmbedEnabled, 
                                   'fa-toggle-off': !dvrEmbedEnabled }"
@@ -56,26 +56,11 @@
               </div> -->
             </div>
           </b-col>
-          <b-col cols="12" lg="8">
+          <b-col cols="7">
 
             <div class="ingest-wrapper">
               <div class="field-container" style="padding:0;">
                 <div class="label">Deployment Region</div>
-                
-                <div class="source-switch-container">
-                  <b-form-group>
-                    <b-form-radio-group id="stream-source-type" 
-                                        buttons
-                                        button-variant="outline-danger"
-                                        v-model="streamSourceTypeModel"
-                                        @input="onSourceTypeChange">
-                      <b-form-radio :value="SourceTypes.Publish"
-                                    :disabled="streamSourceTypeProcessing">Publish</b-form-radio>
-                      <b-form-radio :value="SourceTypes.Pull"
-                                    :disabled="streamSourceTypeProcessing">Pull</b-form-radio>
-                    </b-form-radio-group>
-                  </b-form-group>
-                </div>
 
                 <div class="input">
                   <div style="font-size:15.5px;">
@@ -97,10 +82,12 @@
                   <div style="">{{getStreamPushUrl()}}</div>
                 </div>
               </div>
-              <div v-if="hasPullSource()" class="field-container">
+              <div class="field-container">
                 <b-row>
                   <b-col>
-                    <div class="label">Pull Source</div>
+                    <div class="label">
+                      Camera Source
+                    </div>
                   </b-col>
                   <b-col>
                     <div v-if="stream.enabled && stream.pullUrl" class="text-right">
@@ -115,29 +102,12 @@
                   <input v-model="streamPullUrl"
                          @keypress="onPullUrlChange()"
                          class="input" 
-                         placeholder="specify source url"/>
+                         placeholder="rtsp://cams.example.com:554/cam-q953k7"/>
                 </div>
               </div>
-              <div v-else class="field-container">
-                <div class="label">Streaming Key</div>
-                <div class="input">
-                  <button class="modal-button modal-button-sm highlight float-right"
-                          style="margin-top: -4px; margin-right: -6px;"
-                          @click="toggleStreamKeyVisibility">
-                          {{ streamKeyVisible ? 'Hide ' + (streamKeyVisibleTimeout/1000) : 'Show' }}
-                  </button>
-                  <div v-if="streamKeyVisible" class="flaot-left">
-                    <!-- <span>{{stream.key}}</span> -->
-                    <!-- <span v-if="stream.config && stream.config.password">?password={{stream.config.password}}</span> -->
-                    {{streamKey}}
-                  </div>
-                  <div v-else class="flaot-left">xxxxxxxxxxxxxxxxx</div>
-                </div>
-              </div>
-              <div v-show="streamPullError || hasPullSource()" class="field-container">
+              <div class="field-container" style="padding-top:0;">
                 <div style="margin-right:5px;">
-                    <b-button v-if="hasPullSource()"
-                              style="margin-right:10px;"
+                    <b-button style="margin-right:10px;"
                               variant="primary"
                               @click="setStreamPullUrl"
                               :disabled="!canSavePullUrl() || streamSourceTypeProcessing">
@@ -147,9 +117,12 @@
                       <span v-else>Save</span>
                     </b-button>
 
-                  <div v-if="streamPullError && streamSourceType === SourceTypes.Pull"
+                  <div v-if="streamPullError"
                        class="text-danger"
-                       style="margin-top:10px;">Source pull url is invalid</div>
+                       style="margin-top:10px;">
+                       Invalid camera source url
+                       <div v-show="rtspError">Source must get served over <code>rtsp://</code> protocol</div>
+                    </div>
                 </div>
               </div>
             </div>
@@ -327,11 +300,6 @@
                     okText="Enable Publish Mode"
                     cancelText="Cancel"
                     @modal-confirm="unsetStreamPullUrl"></confirm-modal>
-    
-
-     <alert-modal modal-id="alert-mixer-pull"
-                  message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
-                  okText="Got it"></alert-modal>
 
                    <!-- message="This Feature is not included in current subscription. Please upgrade your subscription " -->
                    <!-- message="Feature is not included in your current subscription. Please upgrade your subscription plan to continue." -->
@@ -360,10 +328,7 @@ import ConfigurePlatformModal from "./ConfigurePlatformModal.vue";
 import platformConfigurations from "./platformConfigurations";
 import utils from "@/utils";
 
-const SourceTypes = {
-  Pull: "pull",
-  Publish: "publish"
-};
+const SourceTypes = { Pull: "pull" };
 
 export default {
   name: "ChannelManage",
@@ -390,8 +355,9 @@ export default {
       processingMessage: null,
       rmptPullUrlProcessing: false,
       streamSourceType: null,
-      streamSourceTypeModel: null,
+      streamSourceTypeModel: SourceTypes.Pull,
       streamPullUrl: null,
+      rtspError: false,
       streamPullError: false,
       streamPullSourceChunksCount: 0,
       pullSourceWorking: true,
@@ -468,7 +434,7 @@ export default {
   methods: {
     navigateToBilling () {
       // /manage/billing?category=live
-      this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
+      this.$router.push({ name: 'Payments', query: { category: 'ipcam', action: 'upgrade' } })
       // this.$root.$emit('bv::show::modal', 'feature-upgrade')
     },
     toggleDvrEmbedStatus () {
@@ -519,20 +485,6 @@ export default {
     onPullUrlChange() {
       this.streamPullError = false;
     },
-    isMixerPullAuthorized() {
-      const exlcudedRegions = ["br"];
-      const curRegion = this.stream.region.identifier;
-
-      let bypassed = true;
-      for (let i = 0; i < exlcudedRegions.length; i++) {
-        if (curRegion === exlcudedRegions[i]) {
-          bypassed = false;
-          break;
-        }
-      }
-
-      return bypassed;
-    },
     canSavePullUrl() {
       let canSave = false;
       // check for valid input
@@ -564,23 +516,6 @@ export default {
         this.streamSourceType = SourceTypes.Pull;
       });
     },
-    requestMixerUsername() {
-      // const res = await IntegrationService.getMixerFTLUrl('tidy')
-      if (!this.isMixerPullAuthorized()) {
-        this.$root.$emit("bv::show::modal", "alert-mixer-pull");
-        return;
-      }
-
-      this.$root.$emit("bv::show::modal", "modal-mixer-username");
-    },
-    async onMixerUsername(mixerUsername, ackCB) {
-      // console.log('mixerUsername', mixerUsername)
-      const res = await IntegrationService.getMixerFTLUrl(mixerUsername);
-      ackCB(!res.mixerPullURL);
-
-      const { mixerPullURL } = res;
-      this.streamPullUrl = mixerPullURL;
-    },
     setPullSourceStatus() {
       let status = this.streamAlive;
       this.pullSourceWorking = status;
@@ -599,29 +534,12 @@ export default {
 
       const pullSource = this.streamPullUrl;
 
-      if (isMixerFTLSource(pullSource) && !this.isMixerPullAuthorized()) {
-        this.$root.$emit("bv::show::modal", "alert-mixer-pull");
-        return;
-      }
-
-      let sub = this.userSubscription;
-      if (!sub) {
-        this.rmptPullUrlProcessing = true;
-        // get user subscription
-        try {
-          sub = await SubscriptionService.getUserSubscriptions(true);
-        } catch (e) {
-          this.$notify({ group: "error", text: e.message });
-        }
-
-        this.userSubscription = sub;
-        this.rmptPullUrlProcessing = false;
-      }
-
-      if (!sub) return;
+      let validurl = isValidUrl(pullSource)
+      let validrtsp = isRTSPSource(pullSource)
+      this.rtspError = !validrtsp
 
       // check if url is valid
-      if (!isValidUrl(pullSource)) {
+      if (!validurl || !validrtsp) {
         this.streamPullError = true;
         return;
       }
@@ -987,11 +905,11 @@ export default {
     getStreamEmbedUrl() {
       // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
       let embedUrl = `https://player.castr.io/${this.stream.key}?`;
-      // const {hostnameCDN} = this.stream.region || {}
-      // if (hostnameCDN) {
-      //   let cdnPop = _.replace(hostnameCDN, /\D/g, '')
-      //   embedUrl += `cdnsrc=${cdnPop}&`
-      // }
+      const {hostnameCDN} = this.stream.region || {}
+      if (hostnameCDN) {
+        let cdnPop = _.replace(hostnameCDN, /\D/g, '')
+        embedUrl += `cdnsrc=${cdnPop}&`
+      }
 
       if (this.dvrEmbedEnabled) {
         embedUrl += 'dvr=true'
@@ -1092,11 +1010,6 @@ function isValidUrl(url) {
   return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url);
 }
 
-function isMixerFTLSource(pullUrl) {
-  // return /^https?\:\/\/(www\.)?mixer\.com/gi.test(pullUrl)
-  return /^https?\:\/\/((\w+)\.)?mixer\.com/gi.test(pullUrl);
-}
-
 function isRTSPSource(pullUrl) {
   return /^rtsp?\:\/\//gi.test(pullUrl);
 }
@@ -1160,7 +1073,7 @@ function isRTSPSource(pullUrl) {
 }
 .video-wrapper {
   width: 100%;
-  height: 220px;
+  height: 285px;
   background-color: #000000;
   position: relative;
 }
@@ -1410,6 +1323,7 @@ function isRTSPSource(pullUrl) {
   height: 100%;
   background-size: 100% auto;
   background-position: center center;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
 }
 .video-thumb.placeholder {
   display: flex;

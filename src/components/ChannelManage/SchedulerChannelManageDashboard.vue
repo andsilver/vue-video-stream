@@ -2,166 +2,11 @@
   <div>
     <div class="content-container">
         <b-row>
-          <b-col class="preveiw-container">
-            <div class="video-wrapper">
-              <!-- <div v-if="!isAlive()" class="video-thumb placeholder"> -->
-              <div v-if="!stream.enabled" class="video-thumb placeholder">
-                <p class="text-center">
-                  Disabled Stream<br>
-                  <span style="font-size:13px;opacity:0.7;">( Please enable )</span>
-                </p>
-              </div>
-              <div v-else-if="!streamAlive" class="video-thumb placeholder">
-                <p>Waiting for stream</p>
-              </div>
-              <stream-player v-else :stream="stream" class="video-thumb" />
-
-            </div>
-            <br>
-            <div>
-              <div class="field-container">
-
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(getStreamIframeCode)">Copy</button>
-                <b-row>
-                  <b-col><div class="label">Iframe Snippet</div></b-col>
-                  <b-col class="text-right">
-                    <span class="label">Enable DVR</span>
-                    <span class="fas toggle-control"
-                          :class="{ 'fa-toggle-on enabled': dvrEmbedEnabled, 
-                                  'fa-toggle-off': !dvrEmbedEnabled }"
-                          @click="toggleDvrEmbedStatus"></span>
-                  </b-col>
-                </b-row>
-                <!-- <div class="label">Iframe Snippet</div> -->
-                <input class="input"
-                       :value="getStreamIframeCode()"
-                       readonly/>
-              </div>
-              <div class="field-container">
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(getStreamEmbedUrl)">Copy</button>
-                <div class="label">Embed Url</div>
-                <input class="input"
-                       :value="getStreamEmbedUrl()"
-                       readonly/>
-              </div>
-              <!-- <div class="field-container">
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(getStreamHlsUrl)">Copy</button>
-                <div class="label">HLS Url</div>
-                <input class="input"
-                       :value="getStreamHlsUrl()"
-                       readonly/>
-              </div> -->
-            </div>
-          </b-col>
-          <b-col cols="12" lg="8">
-
-            <div class="ingest-wrapper">
-              <div class="field-container" style="padding:0;">
-                <div class="label">Deployment Region</div>
-                
-                <div class="source-switch-container">
-                  <b-form-group>
-                    <b-form-radio-group id="stream-source-type" 
-                                        buttons
-                                        button-variant="outline-danger"
-                                        v-model="streamSourceTypeModel"
-                                        @input="onSourceTypeChange">
-                      <b-form-radio :value="SourceTypes.Publish"
-                                    :disabled="streamSourceTypeProcessing">Publish</b-form-radio>
-                      <b-form-radio :value="SourceTypes.Pull"
-                                    :disabled="streamSourceTypeProcessing">Pull</b-form-radio>
-                    </b-form-radio-group>
-                  </b-form-group>
-                </div>
-
-                <div class="input">
-                  <div style="font-size:15.5px;">
-                    <img :src="getRegionFlag()" 
-                         :alt="stream.region.name"
-                         style="width:20px;" />
-                    &nbsp;<span>{{stream.region.name}}</span>
-                  </div>
-                  <!-- <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div> -->
-                </div>
-                <!-- <div class="input">
-                  <div style="">{{getStreamPushUrl()}}</div>
-                </div> -->
-              </div>
-              <div class="field-container field-container-sm">
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(getStreamPushUrl)">Copy</button>
-                <div class="input">
-                  <div style="">{{getStreamPushUrl()}}</div>
-                </div>
-              </div>
-              <div v-if="hasPullSource()" class="field-container">
-                <b-row>
-                  <b-col>
-                    <div class="label">Pull Source</div>
-                  </b-col>
-                  <b-col>
-                    <div v-if="stream.enabled && stream.pullUrl" class="text-right">
-                      <code v-if="streamAlive"
-                            class="platform-connect-status"
-                            style="color:#1d87d2;">connected</code>
-                      <code v-else class="platform-connect-status">connecting..</code>
-                    </div>
-                  </b-col>
-                </b-row>
-                <div>
-                  <input v-model="streamPullUrl"
-                         @keypress="onPullUrlChange()"
-                         class="input" 
-                         placeholder="specify source url"/>
-                </div>
-              </div>
-              <div v-else class="field-container">
-                <div class="label">Streaming Key</div>
-                <div class="input">
-                  <button class="modal-button modal-button-sm highlight float-right"
-                          style="margin-top: -4px; margin-right: -6px;"
-                          @click="toggleStreamKeyVisibility">
-                          {{ streamKeyVisible ? 'Hide ' + (streamKeyVisibleTimeout/1000) : 'Show' }}
-                  </button>
-                  <div v-if="streamKeyVisible" class="flaot-left">
-                    <!-- <span>{{stream.key}}</span> -->
-                    <!-- <span v-if="stream.config && stream.config.password">?password={{stream.config.password}}</span> -->
-                    {{streamKey}}
-                  </div>
-                  <div v-else class="flaot-left">xxxxxxxxxxxxxxxxx</div>
-                </div>
-              </div>
-              <div v-show="streamPullError || hasPullSource()" class="field-container">
-                <div style="margin-right:5px;">
-                    <b-button v-if="hasPullSource()"
-                              style="margin-right:10px;"
-                              variant="primary"
-                              @click="setStreamPullUrl"
-                              :disabled="!canSavePullUrl() || streamSourceTypeProcessing">
-                      <span v-if="streamSourceTypeProcessing">
-                        <i class="fas fa-spinner fa-spin"></i>
-                      </span>
-                      <span v-else>Save</span>
-                    </b-button>
-
-                  <div v-if="streamPullError && streamSourceType === SourceTypes.Pull"
-                       class="text-danger"
-                       style="margin-top:10px;">Source pull url is invalid</div>
-                </div>
-              </div>
-            </div>
-
-            <hr style="border-color:#ffffff24;"/>
-
-            <div style="margin-bottom:25px;"></div>
-
+          <b-col cols="7">
             <div v-if="!streamPlatforms.length" 
                  class="placeholder">
-                 <!-- Ready, Set ... &nbsp;Go! -->
-              <p style="font-size:14px;opacity:1;">Add a platform to get started</p>
+                 Ready, Set ... &nbsp;Go!
+              <p style="font-size:13.5px;opacity:0.75;">Lets add a platform to get started</p>
               <b-button variant="danger"
                         v-b-modal.modal-add-platform>Add Platform</b-button>
             </div>
@@ -172,10 +17,26 @@
               <b-col class="text-right">
                 <b-button variant="danger"
                           v-b-modal.modal-add-platform>Add Platform</b-button>
+                <!-- master toggle control -->
+                <span class="toggle-control toggle-control-master"
+                      :class="{ 
+                        enabled: groupToggleState,
+                        'status-processing': groupToggleProcessing
+                      }"
+                      @click="toggleGroupStatus">
+                      <!-- 'status-processing': !isAlive() || groupToggleProcessing -->
+                  <i class="fa"
+                     :class="{
+                       'fa-toggle-on': groupToggleState,
+                       'fa-toggle-off': !groupToggleState
+                     }"></i>
+                </span>
               </b-col>
             </b-row>
             
             <div class="platform-list">
+              <!-- <b-col> -->
+                <!-- <div v-for="(platform) in stream.platforms" -->
                 <div v-for="(platform) in streamPlatforms"
                        :key="platform._id"
                        class="platform-item">
@@ -187,6 +48,12 @@
                   </div>
                   <b-row>
                     <b-col cols="8">
+                      <div class="platform-icon">
+                        <a target="_blank" :href="platform.serviceChannelUrl">
+                          <i v-if="isCustomPlatform(platform)" :class="getPlatformIcon(platform)"></i>
+                          <img v-else :src="getPlatformIcon(platform)" />
+                        </a>
+                      </div>
                       <div class="platform-name">
                         <!-- <input v-if="platform.template == 'custom'" -->
                         <input v-model="platform.editorName"
@@ -199,13 +66,13 @@
                              style="margin-top:4px;">
                              <i class="fa fa-check-circle"></i> linked
                         </div>
-                        <div v-if="platform.serviceChannelUrl">
-                          <a :href="platform.serviceChannelUrl"
-                             target="_blank"
-                             class="channel-link-btn">
-                            <span>video link</span>
-                          </a>
-                        </div>
+                        <br>
+                        <a v-if="platform.serviceChannelUrl"
+                          :href="platform.serviceChannelUrl"
+                          target="_blank"
+                          class="channel-link-btn">
+                          <span>video link</span>
+                        </a>
                         
                       </div>
                     </b-col>
@@ -305,8 +172,69 @@
 
                    </div>
                  </div>
+              <!-- </b-col> -->
             </div>
 
+          </b-col>
+          <b-col class="preveiw-container">
+            <div class="video-wrapper">
+              <div v-if="!stream.enabled" class="video-thumb placeholder">
+                <p class="text-center">
+                  Disabled Stream<br>
+                  <span style="font-size:13px;opacity:0.7;">( Please enable )</span>
+                </p>
+              </div>
+              <div v-else-if="!streamAlive" class="video-thumb placeholder">
+                <p>Playist Not Configured</p>
+              </div>
+
+              <stream-player v-else :stream="stream" class="video-thumb" />
+
+            </div>
+            <br>
+            <div>
+              <div class="field-container" style="padding-bottom:0;">
+                <div class="label">Deployment Region</div>
+                <div class="input">
+                  <div style="font-size:15.5px;">
+                    <img :src="getRegionFlag()" 
+                         :alt="stream.region.name"
+                         style="width:20px;" />
+                    &nbsp;<span>{{stream.region.name}}</span>
+                  </div>
+                  <!-- <div v-show="!hasPullSource()"  -->
+                  <!-- <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div> -->
+                </div>
+              </div>
+               <div class="field-container field-container-sm" style="padding-top:0;">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamPushUrl)">Copy</button>
+                <div class="input">
+                  <div style="">{{getStreamPushUrl()}}</div>
+                </div>
+              </div>
+
+              <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamIframeCode)">Copy</button>
+                <b-row>
+                  <b-col><div class="label">Iframe Snippet</div></b-col>
+                </b-row>
+                <!-- <div class="label">Iframe Snippet</div> -->
+                <input class="input"
+                       :value="getStreamIframeCode()"
+                       readonly/>
+              </div>
+              <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamEmbedUrl)">Copy</button>
+                <div class="label">Embed Url</div>
+                <input class="input"
+                       :value="getStreamEmbedUrl()"
+                       readonly/>
+              </div>
+
+            </div>
           </b-col>
         </b-row>
     </div>
@@ -322,38 +250,57 @@
                    message="Would you like to remove selected publish platform"
                    @modal-confirm="onPlatformDeleteConfirm(configurablePlatform)"></confirm-modal>
 
-    <confirm-modal modal-id="modal-set-publish-mode"
+    <confirm-modal modal-id="modal-sub-upgrade"
+                   message="This feature is only available in our paid subscriptions"
+                   okText="Upgrade now"
+                   cancelText="No thanks"
+                   @modal-confirm="navigatePaymentsPage"></confirm-modal>
+
+     <confirm-modal modal-id="modal-set-publish-mode"
                     message="Switching to Publish mode will disable your pulled stream"
                     okText="Enable Publish Mode"
                     cancelText="Cancel"
                     @modal-confirm="unsetStreamPullUrl"></confirm-modal>
-    
+     
+     <confirm-modal modal-id="modal-set-publish-mode-webcam"
+                    message="Switching to Webcam mode will disable your pulled stream"
+                    okText="Enable Publish Mode"
+                    cancelText="Cancel"
+                    @modal-confirm="unsetStreamPullUrl(true)"></confirm-modal>
+     
+     <confirm-modal modal-id="modal-webcam-leave-navigation"
+                    message="Webcam will stop streaming if you navigate"
+                    okText="Leave Anyway"
+                    cancelText="Keep Webcam"
+                    @modal-confirm="confirmWebcamLeave"></confirm-modal>
 
      <alert-modal modal-id="alert-mixer-pull"
                   message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
                   okText="Got it"></alert-modal>
+      
+     <prompt-modal modal-id="modal-mixer-username"
+                    message="Enter your Mixer username"
+                    message2="Note: If you are pulling, please disable push to mixer"
+                    okText="Grab Mixer Pull Url"
+                    cancelText="Cancel"
+                    errorMessage="No FTL broadcasts found"
+                    @modal-prompt="onMixerUsername"></prompt-modal>
 
-                   <!-- message="This Feature is not included in current subscription. Please upgrade your subscription " -->
-                   <!-- message="Feature is not included in your current subscription. Please upgrade your subscription plan to continue." -->
-    <confirm-modal modal-id="feature-upgrade"
-                   message="Please upgrade your subscription plan to access this feature"
-                   okText="Upgrade Now"
-                   cancelText="Later"
-                   @modal-confirm="navigateToBilling()"></confirm-modal>
   </div>
 </template>
 
 <script>
-import Vue from "vue";
+import Vue from 'vue'
 import StreamService from "@/services/StreamService";
 import UserService from "@/services/UserService";
 import SubscriptionService from "@/services/SubscriptionService";
 import IntegrationService from "@/services/IntegrationService";
 import StreamThumb from "@/components/StreamThumb.vue";
 import StreamPlayer from "@/components/StreamPlayer.vue";
+import WebcamPlayer from "@/components/WebcamPlayer.vue";
 
 import PromptModal from "@/components/PromptModal.vue";
-import AlertModal from "@/components/AlertModal.vue";
+import AlertModal  from "@/components/AlertModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import AddPlatformModal from "./AddPlatformModal.vue";
 import ConfigurePlatformModal from "./ConfigurePlatformModal.vue";
@@ -362,24 +309,32 @@ import utils from "@/utils";
 
 const SourceTypes = {
   Pull: "pull",
-  Publish: "publish"
+  Publish: "publish",
+  Webcam: "webcam",
 };
 
 export default {
-  name: "ChannelManage",
-  props: ["stream", "streamAlive", "mediaPulse"],
+  name: "ScheduledChannelManage",
+  props: ['stream', 'streamAlive', 'mediaPulse'],
+  beforeRouteLeave (to, from, next) {
+
+    if (this.streamSourceType === SourceTypes.Webcam && this.webcamPushReady) {
+      this.$root.$emit('bv::show::modal', 'modal-webcam-leave-navigation')
+      this.webcamRouteLeaveNavigationCallback = () => next()
+      return
+    }
+
+    next()
+  },
   async mounted() {
     // get stream details
     await this.setupStream();
     // event tracking
-    window.trackEvent(
-      this.stream.name + " - Stream Dashboard Page",
-      this.stream
-    );
+    window.trackEvent(this.stream.name + " - Stream Dashboard Page", this.stream);
   },
   watch: {
-    mediaPulse() {
-      this.onMediaPulseChanged();
+    mediaPulse () {
+      this.onMediaPulseChanged()
     }
   },
   data() {
@@ -396,6 +351,7 @@ export default {
       streamPullSourceChunksCount: 0,
       pullSourceWorking: true,
       pullSourceStatusTimeoutCtrl: -1,
+      webcamPushReady: false,
       streamSourceTypeProcessing: null,
       streamId: null,
       streamFps: null,
@@ -407,7 +363,7 @@ export default {
       streamKeyVisibleTimeoutCtrl: null,
       windowHeight: 0,
       configurablePlatform: {},
-      dvrEmbedEnabled: false,
+      webcamRouteLeaveNavigationCallback: null,
       hasPullSource() {
         return this.streamSourceType === SourceTypes.Pull;
       },
@@ -440,49 +396,18 @@ export default {
 
         return dest;
       },
-      isSuspiciousPullSource() {
-        var suspicious = false;
+      isSuspiciousPullSource () {
+        var suspicious = false
 
         if (this.stream.pullUrl) {
+
         }
 
-        return suspicious;
+        return suspicious
       }
     };
   },
-  computed: {
-    streamKey () {
-      let streamingKey = ''
-      const stream = this.stream
-      if (stream) {
-        streamingKey = stream.key
-      }
-
-      const streamPassword = stream.config && stream.config.password
-      if (streamPassword)
-        streamingKey += '?password='+streamPassword
-
-      return streamingKey
-    }
-  },
   methods: {
-    navigateToBilling () {
-      // /manage/billing?category=live
-      this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
-      // this.$root.$emit('bv::show::modal', 'feature-upgrade')
-    },
-    toggleDvrEmbedStatus () {
-      const ostate = this.dvrEmbedEnabled
-      const nstate = !ostate
-
-      if (!this.stream.dvrHours) {
-        // window.alertt('not available in trial pack')
-        this.$root.$emit('bv::show::modal', 'feature-upgrade')
-        return
-      }
-
-      this.dvrEmbedEnabled = nstate
-    },
     clipboardCopy (text) {
       try {
         if (text instanceof Function) 
@@ -492,107 +417,149 @@ export default {
         this.$notify({ group: "info", text: "Copied to clipboard" });
       } catch (e) {}
     },
-    onMediaPulseChanged() {
-      const platforms = [];
+    getStreamIframeCode() {
+      let embedUrl = this.getStreamEmbedUrl();
+      let htmlCode = `<iframe src="${embedUrl}" width="590" height="431" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+      return htmlCode;
+    },
+    getStreamEmbedUrl() {
+      // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
+      let embedUrl = `https://player.castr.io/${this.stream.key}?`;
+      const {hostnameCDN} = this.stream.region || {}
+      if (hostnameCDN) {
+        let cdnPop = _.replace(hostnameCDN, /\D/g, '')
+        embedUrl += `cdnsrc=${cdnPop}&`
+      }
+
+      return embedUrl;
+    },
+    onMediaPulseChanged () {
+      const platforms = []
       _.each(this.streamPlatforms, (platform, index) => {
-        const platformPushUrl = this.getPlatformPushUrl(platform);
-        const connectStatus = computePlatformStatus(
-          platformPushUrl,
-          this.mediaPulse
-        );
-        if (platform.connected === connectStatus) return;
+        const platformPushUrl = this.getPlatformPushUrl(platform)
+        const connectStatus = computePlatformStatus(platformPushUrl, this.mediaPulse)
+        if (platform.connected === connectStatus) return
 
         // platform.connected = connectStatus
-        const pchanges = _.assign({}, platform, { connected: connectStatus });
-        this.$set(this.streamPlatforms, index, pchanges);
+        const pchanges = _.assign({}, platform, { connected: connectStatus })
+        this.$set(this.streamPlatforms, index, pchanges)
         // this.streamPlatforms.$set(index, pchanges)
         // platforms.push(pchanges)
         // this.streamPlatforms[index] = platform
-      });
+      })
 
       // this.streamPlatforms = platforms
-      this.$emit("stream-updated", { platforms: this.streamPlatforms });
+      this.$emit('stream-updated', { platforms: this.streamPlatforms })
     },
     navigatePaymentsPage() {
       this.$router.push({ path: "/subscribe?action=upgrade" });
     },
-    onPullUrlChange() {
-      this.streamPullError = false;
+    onPullUrlChange () {
+      this.streamPullError = false
     },
-    isMixerPullAuthorized() {
-      const exlcudedRegions = ["br"];
-      const curRegion = this.stream.region.identifier;
-
-      let bypassed = true;
-      for (let i = 0; i < exlcudedRegions.length; i++) {
+    isMixerPullAuthorized () {
+      const exlcudedRegions = ['br']
+      const curRegion = this.stream.region.identifier 
+      
+      let bypassed = true
+      for (let i=0;i<exlcudedRegions.length;i++) {
         if (curRegion === exlcudedRegions[i]) {
-          bypassed = false;
-          break;
-        }
+           bypassed = false
+           break;
+         }
       }
 
-      return bypassed;
+      return bypassed
     },
-    canSavePullUrl() {
-      let canSave = false;
+    canSavePullUrl () {
+      let canSave = false
       // check for valid input
-      const { streamPullUrl } = this;
+      const {streamPullUrl} = this
 
       if (streamPullUrl) {
         // check if pull remained same
-        if (streamPullUrl !== this.stream.pullUrl) canSave = true;
+        if (streamPullUrl !== this.stream.pullUrl)
+          canSave = true
       }
 
-      return canSave;
+      return canSave
+    },
+    onWebcamAuthorized () {
+      console.log('authorized')
+
+      // check if streaming pulling mode is active
+      if (this.stream.pullUrl) 
+        this.$root.$emit("bv::show::modal", "modal-set-publish-mode-webcam");
+    },
+    onWebcamStopped () {
+      this.webcamPushReady = false
+    },
+    onWebcamStarted () {
+      this.webcamPushReady = true
+    },
+    confirmWebcamLeave () {
+      if (this.webcamRouteLeaveNavigationCallback)
+        this.webcamRouteLeaveNavigationCallback()
     },
     async onSourceTypeChange() {
-      this.streamSourceType = this.streamSourceTypeModel;
+
+      if (this.streamSourceType === SourceTypes.Webcam && this.webcamPushReady) {
+        setTimeout(() => {
+          this.streamSourceTypeModel = this.streamSourceType
+        }, 100)
+
+        this.$root.$emit('bv::show::modal', 'modal-webcam-leave-navigation')
+        this.webcamRouteLeaveNavigationCallback = () => {
+          this.streamSourceType = this.streamSourceTypeModel
+        }
+        return
+      }
+
+      this.streamSourceType = this.streamSourceTypeModel
 
       // check if new mode is `publish`
       if (this.streamSourceType === SourceTypes.Publish) {
         // check if operational mode is `pull`
         const hadPullUrl = this.stream.pullUrl;
         // if (hadPullUrl) this.unsetStreamPullUrl();
-        if (hadPullUrl) this.requestPublishPrompt();
+        if (hadPullUrl) this.requestPublishPrompt()
       }
     },
-    requestPublishPrompt(preventSourceRestore) {
+    requestPublishPrompt (preventSourceRestore) {
       this.$root.$emit("bv::show::modal", "modal-set-publish-mode");
 
-      if (preventSourceRestore) return;
-      setTimeout(() => {
-        this.streamSourceType = SourceTypes.Pull;
-      });
+      if (preventSourceRestore) return
+      setTimeout(() => { this.streamSourceType = SourceTypes.Pull })
     },
-    requestMixerUsername() {
+    requestMixerUsername () {
       // const res = await IntegrationService.getMixerFTLUrl('tidy')
       if (!this.isMixerPullAuthorized()) {
-        this.$root.$emit("bv::show::modal", "alert-mixer-pull");
-        return;
+        this.$root.$emit('bv::show::modal', 'alert-mixer-pull')
+        return
       }
 
       this.$root.$emit("bv::show::modal", "modal-mixer-username");
     },
-    async onMixerUsername(mixerUsername, ackCB) {
+    async onMixerUsername (mixerUsername, ackCB) {
       // console.log('mixerUsername', mixerUsername)
-      const res = await IntegrationService.getMixerFTLUrl(mixerUsername);
-      ackCB(!res.mixerPullURL);
+      const res = await IntegrationService.getMixerFTLUrl(mixerUsername)
+      ackCB(!res.mixerPullURL)
 
-      const { mixerPullURL } = res;
-      this.streamPullUrl = mixerPullURL;
+      const {mixerPullURL} = res
+      this.streamPullUrl = mixerPullURL
     },
-    setPullSourceStatus() {
-      let status = this.streamAlive;
-      this.pullSourceWorking = status;
+    setPullSourceStatus () {
+      let status = this.streamAlive
+      this.pullSourceWorking = status
 
       if (status) {
-        const t = setTimeout(this.setPullSourceStatus, 5000);
-        this.pullSourceStatusTimeoutCtrl = t;
+        const t = setTimeout(this.setPullSourceStatus, 5000)
+        this.pullSourceStatusTimeoutCtrl = t
       }
     },
     async setStreamPullUrl() {
-      this.streamPullError = false;
-
+      this.streamPullError = false
+      
       // setTimeout(() => {
       //   this.streamSourceType = SourceTypes.Publish
       // })
@@ -600,8 +567,8 @@ export default {
       const pullSource = this.streamPullUrl;
 
       if (isMixerFTLSource(pullSource) && !this.isMixerPullAuthorized()) {
-        this.$root.$emit("bv::show::modal", "alert-mixer-pull");
-        return;
+        this.$root.$emit('bv::show::modal', 'alert-mixer-pull')
+        return
       }
 
       let sub = this.userSubscription;
@@ -618,30 +585,38 @@ export default {
         this.rmptPullUrlProcessing = false;
       }
 
-      if (!sub) return;
+      if (!sub) return
+
+      if (!isMixerFTLSource(pullSource) && !isRTSPSource(pullSource)) {
+        // check if user has paid subscription
+        const pack = sub.subscription.package;
+        if (pack.baseCharge === 0) {
+          // show upgrade prompt if free subscription
+          this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
+          return;
+        }
+      }
 
       // check if url is valid
       if (!isValidUrl(pullSource)) {
-        this.streamPullError = true;
-        return;
+        this.streamPullError = true
+        return
       }
 
       // swtich source mode to specified pull url
       this.streamSourceTypeProcessing = true;
 
       try {
-        await StreamService.setStreamPullUrl(this.streamId, pullSource);
+        await StreamService.setStreamPullUrl(this.streamId, pullSource)
         this.stream.pullUrl = pullSource;
         this.$notify({ group: "success", text: "stream pull url saved" });
 
         // clearTimeout(this.pullSourceStatusTimeoutCtrl)
         // this.pullSourceWorking = true
         // this.pullSourceStatusTimeoutCtrl = setTimeout(this.setPullSourceStatus, 15000)
+
       } catch (e) {
-        this.$notify({
-          group: "error",
-          text: "could not save stream pull url"
-        });
+        this.$notify({ group: "error", text: "could not save stream pull url" });
       }
 
       this.streamSourceTypeProcessing = false;
@@ -650,43 +625,72 @@ export default {
       this.streamSourceTypeProcessing = true;
 
       try {
-        await StreamService.unsetStreamPullUrl(this.streamId);
+        await StreamService.unsetStreamPullUrl(this.streamId)
         this.stream.pullUrl = null;
         this.$notify({ group: "success", text: "Publish mode activated" });
-
+        
         if (!preventSourceRestore) {
           // change tab to publish
-          this.streamSourceType = SourceTypes.Publish;
-        }
-      } catch (e) {
-        if (!preventSourceRestore) {
-          this.streamSourceType = SourceTypes.Pull;
+          this.streamSourceType = SourceTypes.Publish
         }
 
-        this.$notify({
-          group: "error",
-          text: "could not switch to Publish mode"
-        });
+      } catch(e) {
+        if (!preventSourceRestore) {
+          this.streamSourceType = SourceTypes.Pull
+        }
+
+        this.$notify({ group: "error", text: "could not switch to Publish mode" });
       }
 
       this.streamSourceTypeProcessing = false;
     },
+    async requestRTMPPullUrl() {
+      let sub = this.userSubscription;
+      if (!sub) {
+        this.rmptPullUrlProcessing = true;
+        // get user subscription
+        try {
+          sub = await SubscriptionService.getUserSubscriptions(true);
+        } catch (e) {
+          this.$notify({ group: "error", text: e.message });
+        }
+
+        this.userSubscription = sub;
+        this.rmptPullUrlProcessing = false;
+      }
+
+      if (!sub) return;
+
+      // DISABLED TEMPORARILY
+      // check if user has paid subscription
+      // const pack = sub.subscription.package;
+      // if (pack.baseCharge === 0) {
+      //   // show upgrade prompt if free subscription
+      //   this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
+      //   return;
+      // }
+
+      // try copy to clipboard
+      const rtmpPullUrl = this.getStreamPullUrl();
+      try {
+        this.$copyText(rtmpPullUrl);
+        this.onStreamKeyCopied();
+      } catch (e) {}
+    },
     async setupStream() {
       // get stream details
       try {
-        const { stream } = this;
+        const {stream} = this
         this.stream = stream;
         this.streamId = this.stream._id;
-        this.streamPlatforms = _.map(this.stream.platforms, _.cloneDeep);
+        this.streamPlatforms = _.map(this.stream.platforms, _.cloneDeep)
 
         const hasPullUrl = stream.pullUrl;
         // this.streamSourceType = hasPullUrl ? SourceTypes.Pull : SourceTypes.Publish;
-        this.streamSourceTypeModel = hasPullUrl
-          ? SourceTypes.Pull
-          : SourceTypes.Publish;
-        this.onSourceTypeChange();
+        this.streamSourceTypeModel = hasPullUrl ? SourceTypes.Pull : SourceTypes.Publish;
+        this.onSourceTypeChange()
         if (hasPullUrl) this.streamPullUrl = stream.pullUrl;
-
+        
         // normalize data
         _.each(this.streamPlatforms, this.setupStreamPlatform);
 
@@ -697,14 +701,14 @@ export default {
         this.$notify({ group: "error", title: err.error, text: err.message });
       }
     },
-    setupStreamPlatform(platform) {
+    setupStreamPlatform (platform) {
       platform.editorName = platform.name;
       if (platform.serviceMeta)
         platform.serviceMetaEditor = {
           formProcessing: _.mapValues(platform.serviceMeta, () => false),
           form: _.assign({}, platform.serviceMeta),
           changes: {}
-        };
+        }
     },
     async onPlatformNameChange(platform) {
       const newName = platform.editorName;
@@ -719,7 +723,7 @@ export default {
         );
       } catch (err) {
         platform.editorName = platform.name;
-
+        
         // let platforms = _.cloneDeep(this.stream.platforms);
         // this.stream.platforms = platforms;
         let platforms = _.cloneDeep(this.streamPlatforms);
@@ -732,80 +736,59 @@ export default {
         });
       }
     },
-    toggleMetaEditor(platform) {
-      platform.metaContianerVisible = !platform.metaContianerVisible;
+    toggleMetaEditor (platform) {
+      platform.metaContianerVisible = !platform.metaContianerVisible
     },
-    canSaveMetadataProp(propname, platform) {
-      if (!propname || !platform) return;
-      return (
-        platform.serviceMetaEditor.form[propname] !==
-        platform.serviceMeta[propname]
-      );
+    canSaveMetadataProp (propname, platform) {
+      if (!propname || !platform) return
+      return platform.serviceMetaEditor.form[propname] !== platform.serviceMeta[propname]
     },
-    onMetaPropChange(propname, platform) {
-      if (!propname || !platform) return;
-      const hasChanged =
-        platform.serviceMetaEditor.form[propname] !==
-        platform.serviceMeta[propname];
-      platform.serviceMetaEditor.changes[propname] = hasChanged;
+    onMetaPropChange (propname, platform) {
+      if (!propname || !platform) return
+      const hasChanged = platform.serviceMetaEditor.form[propname] !== platform.serviceMeta[propname]
+      platform.serviceMetaEditor.changes[propname] = hasChanged
 
-      const pindex = _.findIndex(this.streamPlatforms, { _id: platform._id });
-      this.streamPlatforms = utils.updateArrayItem(
-        this.streamPlatforms,
-        platform,
-        pindex
-      );
+      const pindex = _.findIndex(this.streamPlatforms, { _id: platform._id })
+      this.streamPlatforms = utils.updateArrayItem(this.streamPlatforms, platform, pindex)
       // this.streamPlatforms = _.concat(
       //   this.streamPlatforms.slice(0,pindex),
       //   [platform],
       //   this.streamPlatforms.slice(pindex+1),
       // )
+      
     },
-    hasMetaProp(propname, platform) {
-      if (!propname || !platform) return;
-      return propname in platform.serviceMetaEditor.form;
+    hasMetaProp (propname, platform) {
+      if (!propname || !platform) return
+      return propname in platform.serviceMetaEditor.form
     },
-    async saveMetaProp(propname, platform) {
-      if (!propname || !platform) return;
-      const pindex = this.streamPlatforms.indexOf(platform);
+    async saveMetaProp (propname, platform) {
+      if (!propname || !platform) return
+      const pindex = this.streamPlatforms.indexOf(platform)
+      
+      const newValue = platform.serviceMetaEditor.form[propname]
+      platform.serviceMetaEditor.formProcessing[propname] = true
 
-      const newValue = platform.serviceMetaEditor.form[propname];
-      platform.serviceMetaEditor.formProcessing[propname] = true;
-
-      this.streamPlatforms = utils.updateArrayItem(
-        this.streamPlatforms,
-        platform,
-        pindex
-      );
+      this.streamPlatforms = utils.updateArrayItem(this.streamPlatforms, platform, pindex)
 
       try {
         await IntegrationService.updateIntegrationMetadata(
-          platform.linkedServiceCreds,
-          platform.serviceMetaEditor.form
-        );
+          platform.linkedServiceCreds, 
+          platform.serviceMetaEditor.form)
 
-        // update parent model
-        this.$emit("stream-updated", { platforms: this.streamPlatforms });
+          // update parent model
+        this.$emit('stream-updated', { platforms: this.streamPlatforms })
+
       } catch (e) {
-        this.$notify({
-          group: "error",
-          text: "could not update stream metadata"
-        });
+        this.$notify({ group: "error", text: "could not update stream metadata" });
       }
 
-      platform.serviceMetaEditor.formProcessing[propname] = false;
-      platform.serviceMetaEditor.form;
+      platform.serviceMetaEditor.formProcessing[propname] = false
+      platform.serviceMetaEditor.form
       // save changes
-      platform.serviceMeta = _.assign({}, platform.serviceMeta, {
-        [propname]: newValue
-      });
-      platform.serviceMetaEditor.changes[propname] = false;
+      platform.serviceMeta = _.assign({}, platform.serviceMeta, {[propname]: newValue})
+      platform.serviceMetaEditor.changes[propname] = false
 
-      this.streamPlatforms = utils.updateArrayItem(
-        this.streamPlatforms,
-        platform,
-        pindex
-      );
+      this.streamPlatforms = utils.updateArrayItem(this.streamPlatforms, platform, pindex)
     },
     computeGroupToggleState() {
       // const { platforms } = this.stream;
@@ -822,7 +805,7 @@ export default {
 
       if (newState) {
         let timeout = 1000;
-        this.streamKeyVisibleTimeout = 19000;
+        this.streamKeyVisibleTimeout = 9000;
         this.streamKeyVisibleTimeoutCtrl = setInterval(() => {
           this.streamKeyVisibleTimeout -= timeout;
           if (!this.streamKeyVisibleTimeout) this.toggleStreamKeyVisibility();
@@ -848,12 +831,12 @@ export default {
     },
     onNewPlatform(platform) {
       platform.editorName = platform.name;
-      this.setupStreamPlatform(platform);
+      this.setupStreamPlatform(platform)
       // this.stream.platforms = [...this.stream.platforms, platform];
       this.streamPlatforms = [...this.streamPlatforms, platform];
 
       // update parent model
-      this.$emit("stream-updated", { platforms: this.streamPlatforms });
+      this.$emit('stream-updated', { platforms: this.streamPlatforms })
 
       // track event
       window.trackEvent(
@@ -868,7 +851,7 @@ export default {
       platform.streamKey = updates.streamKey;
 
       // update parent model
-      this.$emit("stream-updated", { platforms: this.streamPlatforms });
+      this.$emit('stream-updated', { platforms: this.streamPlatforms })
     },
     toggleGroupStatus() {
       // if (!this.isAlive()) return
@@ -913,11 +896,11 @@ export default {
           platform._id,
           forceState
         );
-
+        
         platform.enabled = newStatus;
 
         // update parent model
-        this.$emit("stream-updated", { platforms: this.streamPlatforms });
+        this.$emit('stream-updated', { platforms: this.streamPlatforms })
 
         // track event
         window.trackEvent(
@@ -974,29 +957,14 @@ export default {
     },
     getStreamHlsUrl() {
       const { region } = this.stream;
-      // let hlsUrl = `http://${region.hostname}/${this.stream.key}/index.m3u8`;
-      const hostname = region.hostnameCDN || region.hostname
-      let hlsUrl = `https://${hostname}/${this.stream.key}/index.m3u8`;
+      // return `rtmp://${this.stream.region.hostname}:1977/static`;
+      // return `rtmp://${region.hostname}:${region.rtmpPort}/static`;
+      // let pushUrl = `rtmp://${region.hostname}`;
+      let hlsUrl = `http://${region.hostname}/${this.stream.key}/index.m3u8`;
       return hlsUrl;
     },
-    getStreamIframeCode() {
-      let embedUrl = this.getStreamEmbedUrl();
-      let htmlCode = `<iframe src="${embedUrl}" width="590" height="431" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
-      return htmlCode;
-    },
     getStreamEmbedUrl() {
-      // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
-      let embedUrl = `https://player.castr.io/${this.stream.key}?`;
-      // const {hostnameCDN} = this.stream.region || {}
-      // if (hostnameCDN) {
-      //   let cdnPop = _.replace(hostnameCDN, /\D/g, '')
-      //   embedUrl += `cdnsrc=${cdnPop}&`
-      // }
-
-      if (this.dvrEmbedEnabled) {
-        embedUrl += 'dvr=true'
-      }
-
+      let embedUrl = `https://player.haxr.io/${this.stream.key}`;
       return embedUrl;
     },
     getStreamPullUrl(hide) {
@@ -1036,7 +1004,7 @@ export default {
         );
 
         // update parent model
-        this.$emit("stream-updated", { platforms: this.streamPlatforms });
+        this.$emit('stream-updated', { platforms: this.streamPlatforms })
 
         this.computeGroupToggleState();
 
@@ -1062,24 +1030,25 @@ export default {
     AlertModal,
     StreamThumb,
     StreamPlayer,
+    WebcamPlayer,
     PromptModal
   }
 };
 
 function computePlatformStatus(platformPushUrl, mediaPulse) {
-  let connected = false;
-  if (!mediaPulse || !mediaPulse.pushStreams) return connected;
+  let connected = false
+  if (!mediaPulse || !mediaPulse.pushStreams) return connected
 
   const pushStats = _.find(mediaPulse.pushStreams, { stream: platformPushUrl });
   connected = pushStats && pushStats.bytes > 0;
 
-  return connected || false;
+  return connected || false
 }
 
-function promisify(func) {
-  return new Promise(resolve => {
-    func.call(0, resolve);
-  });
+function promisify (func) {
+  return new Promise((resolve) => {
+    func.call(0, resolve)
+  })
 }
 
 function flushBlobUrl(blob) {
@@ -1088,17 +1057,17 @@ function flushBlobUrl(blob) {
   }
 }
 
-function isValidUrl(url) {
-  return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url);
+function isValidUrl (url) {
+  return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
 }
 
 function isMixerFTLSource(pullUrl) {
   // return /^https?\:\/\/(www\.)?mixer\.com/gi.test(pullUrl)
-  return /^https?\:\/\/((\w+)\.)?mixer\.com/gi.test(pullUrl);
+  return /^https?\:\/\/((\w+)\.)?mixer\.com/gi.test(pullUrl)
 }
 
 function isRTSPSource(pullUrl) {
-  return /^rtsp?\:\/\//gi.test(pullUrl);
+  return /^rtsp?\:\/\//gi.test(pullUrl)
 }
 </script>
 
@@ -1132,7 +1101,7 @@ function isRTSPSource(pullUrl) {
 }
 .subtitle {
   padding: 5px 0;
-  font-size: 15px;
+  font-size: 16px;
 }
 .content-container {
   padding: 20px 0 40px 0;
@@ -1156,13 +1125,17 @@ function isRTSPSource(pullUrl) {
   margin: 10px 0 15px 0;
 }
 .preveiw-container {
-  padding: 0 10px 0 20px;
+  /* padding: 0 10px 0 20px; */
+  padding: 0 10px 0 10px;
 }
 .video-wrapper {
   width: 100%;
-  height: 220px;
+  height: 275px;
   background-color: #000000;
   position: relative;
+}
+.video-wrapper.webcam-wrapper {
+  background-color: transparent;
 }
 .placeholder {
   font-size: 21px;
@@ -1170,20 +1143,18 @@ function isRTSPSource(pullUrl) {
   margin: 15px 0;
 }
 .source-switch-container {
-  margin-top: 16px;
-  margin-right: 15px;
+  /* margin-top: 20px; */
+  /* display: inline-block; */
+  /* margin-bottom: 20px; */
   float: right;
-  clear: both;
+  clear: both
 }
 
 .field-container {
   /* width: 235px; */
   width: 100%;
   padding: 10px 0;
-  position:relative;
-}
-.field-container-sm {
-  padding:0;
+  position: relative;
 }
 .field-container:last-of-type {
   border-bottom: none;
@@ -1210,41 +1181,20 @@ function isRTSPSource(pullUrl) {
 .input:focus {
   background-color: rgba(18, 23, 37, 0.67);
 }
-.input:read-only:focus {
-  background-color: rgb(42, 49, 68);
-}
-.field-container-sm .input {
-  margin-top:0;
-}
-.field-container .badge-button {
-  opacity: 0;
-  font-size:11px;
-  padding: 4px 9px;
-  position: absolute;
-  right: 10px;
-  top: 46px;
-  pointer-events: none;
-  transition: all 0.15s linear;
-}
-.field-container:hover .badge-button {
-  opacity:1;
-  pointer-events: inherit;
-}
-.field-container-sm .badge-button {
-  top: 8px;
-}
 .platform-list {
   margin: 15px 0;
 }
 .platform-item {
   position: relative;
-  padding: 12px 20px;
-  padding-bottom: 16px;
+  padding: 18px 6px;
+  /* border-bottom: 1px solid rgb(17, 19, 64); */
   margin-bottom: 8px;
   /* background: #040634; */
   background: #202940;
   border-radius: 2px;
   border: none;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 .platform-item:last-of-type {
   border-bottom: none;
@@ -1313,10 +1263,10 @@ function isRTSPSource(pullUrl) {
   text-transform: lowercase;
 }
 .platform-meta-container {
-  font-size: 13px;
-  font-weight: 400;
-  margin-top: 6px;
-  /* margin-left: 110px; */
+   font-size: 13px;
+   font-weight: 400;
+   margin-top: 6px;
+   margin-left: 110px;
 }
 .platform-meta-container .head-toggle {
   font-size: 13.5px;
@@ -1324,7 +1274,7 @@ function isRTSPSource(pullUrl) {
   text-transform: capitalize;
   letter-spacing: 0;
 }
-.platform-meta-container .head-toggle > * {
+.platform-meta-container .head-toggle > *{
   cursor: pointer;
 }
 .platform-meta-container .meta-row {
@@ -1347,7 +1297,7 @@ function isRTSPSource(pullUrl) {
   font-size: 13px;
   width: 320px;
   border: 1px solid transparent;
-  border-bottom-color: rgba(255, 0, 0, 0.4);
+  border-bottom-color: rgba(255,0,0,0.40);
   padding: 8px 2px;
 }
 .platform-meta-container input.platform-meta:hover {
@@ -1418,12 +1368,22 @@ function isRTSPSource(pullUrl) {
   font-size: 18px;
   position: absolute;
 }
-.field-container .toggle-control {
-  color: #ffffff;
-  font-size: 16px;
-  margin: 0 0 0 5px;
+
+.field-container .badge-button {
+  opacity: 0;
+  font-size:11px;
+  padding: 4px 9px;
+  position: absolute;
+  right: 10px;
+  top: 46px;
+  pointer-events: none;
+  transition: all 0.15s linear;
 }
-.toggle-control.enabled {
-  color: #02ffa2;
+.field-container:hover .badge-button {
+  opacity:1;
+  pointer-events: inherit;
+}
+.field-container-sm .badge-button {
+  top: 8px;
 }
 </style>

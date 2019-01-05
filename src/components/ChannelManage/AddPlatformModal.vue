@@ -765,13 +765,14 @@ function getApiBase() {
   transition: all 0.2s ease-in-out;
   cursor: pointer;
   border-radius: 3px;
-  border: 1px solid #31336c;
+  /* border: 1px solid #31336c; */
   margin-right: 10px;
   margin-bottom: 10px;
+  /* box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12); */
 }
 .platform-item:hover {
-  background-color: rgb(40, 44, 131);
-  border-color: rgb(20, 21, 59);
+  background-color: #0f1931 ;
+  border-color: #245fdd;
 }
 .platform-icon {
   font-size: 36px;

@@ -46,6 +46,27 @@
               <div class="desc">Live Stream Using Your Own Player</div>
             </div>
           </b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <!-- <b-dropdown-item v-b-modal.add-cam-channel-modal> -->
+          <b-dropdown-item @click="openCamModal">
+                <div class="dropdown-icon">
+                  <img src="../assets/cctv.png" style="width:25px;margin-left:-3px;" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New IPCam</div>
+                  <div class="desc">You IPCam on the cloud</div>
+                </div>
+              </b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item @click="openScheduledStreamModal">
+                <div class="dropdown-icon">
+                  <img src="../assets/scheduled.png" style="width:22px;margin-left:-1px;" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New Scheduled Stream</div>
+                  <div class="desc">Schedule your live presence</div>
+                </div>
+              </b-dropdown-item>
         </b-dropdown>
       </div>
     </div>
@@ -106,12 +127,21 @@
                   <div class="desc">Live Stream Using Your Own Player</div>
                 </div>
               </b-dropdown-item>
+              <b-dropdown-item v-b-modal.add-cam-channel-modal>
+                <div class="dropdown-icon">
+                  <img src="../assets/live-streaming.svg" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New IPCam</div>
+                  <div class="desc">You IPCam on the cloud</div>
+                </div>
+              </b-dropdown-item>
           </b-dropdown>
         </div>
 
         <li v-for="stream in streams"
             v-bind:key="stream._id"
-            class="col-md-6"
+            class="col-md-4"
             style="padding-left:0;">
           <div class="card-wrapper">
             <stream-card-view :stream="stream"
@@ -123,6 +153,8 @@
     
     <add-channel-modal @new-channel="onNewStream"></add-channel-modal>
     <add-live-channel-modal @new-channel="onNewStream"></add-live-channel-modal>
+    <add-cam-channel-modal @new-channel="onNewStream"></add-cam-channel-modal>
+    <add-scheduled-channel-modal @new-channel="onNewStream"></add-scheduled-channel-modal>
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
   </div>
@@ -130,8 +162,10 @@
 
 <script>
 import StreamCardView from "./StreamCardView.vue";
+import AddCamChannelModal from "./AddCamChannelModal.vue";
 import AddChannelModal from "./AddChannelModal.vue";
 import AddLiveChannelModal from "./AddLiveChannelModal.vue";
+import AddScheduledChannelModal from "./AddSchedulerChannelModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import StreamService from "../services/StreamService";
 
@@ -172,6 +206,12 @@ export default {
     };
   },
   methods: {
+    openCamModal() {
+      this.$root.$emit("bv::show::modal", "modal-add-cam-channel");
+    },
+    openScheduledStreamModal() {
+      this.$root.$emit("bv::show::modal", "modal-add-scheduled-channel");
+    },
     onStreamCreateToggle(state) {
       this.streamCreateDropdownActive = state;
     },
@@ -183,6 +223,10 @@ export default {
       let redirectPath = "/streams/";
       if (stream.type === "live") {
         redirectPath = "/livestreams/";
+      } else if (stream.type === "ipcam") {
+        redirectPath = "/ipcams/";
+      } else if (stream.type === "scheduled") {
+        redirectPath = "/scheduled/";
       }
 
       redirectPath += stream._id;
@@ -227,8 +271,10 @@ export default {
   },
   components: {
     StreamCardView,
+    AddCamChannelModal,
     AddChannelModal,
     AddLiveChannelModal,
+    AddScheduledChannelModal,
     ConfirmModal
   }
 };
@@ -295,7 +341,8 @@ export default {
 }
 #stream-deploy-dropdown .dropdown-menu {
   min-width: 275px;
-  background-color: rgb(61, 70, 115) !important;
+  /* background-color: rgb(61, 70, 115) !important; */
+  background-color: rgb(47, 55, 80) !important;
   color: #ffffff;
   left: 1px !important;
   top: 16px !important;
@@ -306,7 +353,8 @@ export default {
   content: '.';
   display: inline-block;
   position: absolute;
-  background: #3f4672;
+  /* background: #3f4672; */
+  background-color: rgb(47, 55, 80);
   width: 20px;
   height: 20px;
   color: transparent;
@@ -325,7 +373,7 @@ export default {
 }
 #stream-deploy-dropdown .dropdown-item {
   color: inherit;
-  padding: 7px 14px !important;
+  padding: 12px 20px !important;
   background-color: transparent;
   position:relative;
   z-index: 1;
@@ -353,5 +401,7 @@ export default {
 }
 .dropdown-divider {
   border-color: rgba(1, 3, 41, 0.14);
+  margin-top: 0;
+  margin-bottom: 0;
 }
 </style>

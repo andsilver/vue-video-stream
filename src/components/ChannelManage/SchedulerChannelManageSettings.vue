@@ -30,42 +30,6 @@
           </div>
         </div>
       </div>
-      
-      <div class="feature-item">
-        <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.embedRewind.enabled }"
-                @click="toggleFeature('embedRewind')">
-            <i class="fa"
-               :class="{
-                 'fa-toggle-on': features.embedRewind.enabled,
-                 'fa-toggle-off': !features.embedRewind.enabled,
-                 'status-processing': featureProcessing.embedRewind,
-               }"></i>
-          </span>
-        </div>
-        <div class="feature-desc">
-          Enable Embed Player Rewind
-        </div>
-      </div>
-
-      <div class="feature-item">
-        <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.ull.enabled }"
-                @click="toggleFeature('ull')">
-            <i class="fa"
-               :class="{
-                 'fa-toggle-on enabled': features.ull.enabled,
-                 'fa-toggle-off': !features.ull.enabled,
-                 'status-processing': featureProcessing.ull
-               }"></i>
-          </span>
-        </div>
-        <div class="feature-desc">
-          Enable Ultra Low Latency Embeds
-        </div>
-      </div>
 
       <div class="feature-item">
         <div class="feature-control">
@@ -82,104 +46,6 @@
         </div>
         <div class="feature-desc">
           Enable Multi-Bitrate Transcoding
-        </div>
-      </div>
-
-      <div class="feature-item">
-        <div class="feature-desc">
-          <div>Chat Embed Snippet</div>
-          <div class="pane">
-                <input class="input" 
-                       :value="chatEmbedIframeSnippet"
-                       readonly
-                       style="width:500px;margin-left:0;"/>
-                &nbsp;
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(chatEmbedIframeSnippet)">Copy</button>
-                <!-- &nbsp; -->
-                <button class="modal-button modal-button-sm badge-button bordered"
-                        @click="clearChat">
-                        <!-- <i v-show="!chatFlushProcessing" class="fa fa-trash"></i>  -->
-                        {{  chatFlushProcessing ? 'Clearing ..' : 'Clear Messages' }}
-                </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="feature-item">
-        <!-- <div class="feature-control">
-           <span class="toggle-control"
-                :class="{ enabled: features.embedPoster.enabled }"
-                @click="toggleFeature('embedPoster')">
-            <i class="fa"
-               :class="{
-                 'fa-toggle-on enabled': features.embedPoster.enabled,
-                 'fa-toggle-off': !features.embedPoster.enabled,
-                 'status-processing': featureProcessing.embedPoster
-               }"></i>
-          </span>
-        </div> -->
-        <div class="feature-desc">
-          <div>Custom Embed Poster</div>
-          <div class="pane">
-            <div v-if="posterUrl" 
-                 class="poster-thumb-wrapper">
-              <img :src="posterUrl" class="poster-thumb" />
-            </div>
-            
-            <span class="hidden">Image File</span>
-            <input type="file"
-                   id="embed-poster-input"
-                   class="input hidden" 
-                   @change="onEmbedPosterPreview"
-                   placeholder="UA-00000.." />
-
-            <button v-if="!embedPosterTemp"
-                    class="btn btn-danger"
-                    :disabled="featureProcessing.embedPoster"
-                    @click="hitUpload"
-                    style="margin:0;">
-              <span v-if="features.embedPoster.value">Change</span>
-              <span v-else>Select Poster</span>
-            </button>
-            
-            <button v-if="embedPosterTemp"
-                    class="btn btn-success"
-                    :disabled="featureProcessing.embedPoster"
-                    @click="saveEmbedPoster"
-                    style="margin:0;">
-              <!-- <span v-if="features.embedPoster.value">Save Poster</span> -->
-              <span>
-                {{ featureProcessing.embedPoster ? 'Saving ..' : 'Save Poster' }}
-              </span>
-            </button>
-            
-            <button v-if="embedPosterTemp || features.embedPoster.value"
-                    class="btn btn-link"
-                    :disabled="featureProcessing.embedPoster"
-                    @click="cancelUpload">
-              <span v-if="embedPosterTemp && features.embedPoster.value">Restore</span>
-              <span v-else-if="embedPosterTemp">Cancel</span>
-              <span v-else>Remove</span>
-            </button>
-
-            <!-- <div v-else class="inline-block">
-              <div v-if="features.embedPoster.value" 
-                  class="inline-block">
-                <button class="btn btn-primary"
-                        @click="saveEmbedPoster">
-                        {{ featureProcessing.embedPoster ? 'saving ..' :  'save' }}</button>
-            </div> -->
-
-
-            <!-- <button v-if="features.embedPoster.value"
-                    class="btn btn-link"
-                    :disabled="featureProcessing.embedPoster"
-                    @click="removePoster">Remove</button> -->
-            <div v-show="features.embedPoster.error"
-                 class="alert alert-danger"
-                 style="margin-top:10px;">{{features.embedPoster.error}}</div>
-          </div>
         </div>
       </div>
       
@@ -215,12 +81,12 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import utils from "@/utils";
 
 export default {
-  name: "LiveChannelManageSettings",
+  name: "ScheduledChannelManageSettings",
   props: ["stream", "streamAlive", "mediaPulse"],
   async mounted() {
     // event tracking
     window.trackEvent(
-      this.stream.name + " - Live Stream Settings Page",
+      this.stream.name + " - Scheduled Stream Settings Page",
       this.stream
     );
   },
@@ -243,10 +109,6 @@ export default {
           value: null,
           valueType: 'string'
         },
-        chatEnabled: { 
-          enabled: false,
-          valueType: 'bool' 
-        },
         embedRewind: { 
           enabled: false,
           valueType: 'bool' 
@@ -259,21 +121,13 @@ export default {
           enabled: false,
           valueType: 'bool' 
         },
-        embedPoster: { 
-          error: false,
-          enabled: false,
-          value: null,
-          valueType: 'string',
-        },
       },
       featureProcessing: {
         ga: false,
         abr: false,
         chatEnabled: false,
         embedRewind: false,
-        embedPoster: false,
-      },
-      embedPosterTemp: null
+      }
     };
   },
   async mounted () {
@@ -289,28 +143,8 @@ export default {
       }
     })
 
-    // console.log('stream meta', meta)
   },
-  computed: {
-    chatEmbedUrl () {
-      if (this.stream)
-        return `https://voice.castr.io/chat/${this.stream.key}`
-    },
-    chatEmbedIframeSnippet () {
-      let chatUrl = this.chatEmbedUrl
-      if (chatUrl)
-      return `<iframe src="${chatUrl}" width="350" height="500" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
-    },
-    posterUrl () {
-      if (this.embedPosterTemp)
-        return this.embedPosterTemp
-
-      const imageId = this.features.embedPoster.value
-      if (!imageId) return
-
-      return `https://static.castr.io/embedPosters/${imageId}`
-    }
-  },
+  computed: {},
   methods: {
     clipboardCopy (text) {
       try {
@@ -326,31 +160,13 @@ export default {
       this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
       // this.$root.$emit('bv::show::modal', 'feature-upgrade')
     },
-    async clearChat () {
-      if (this.chatFlushProcessing) return
-      
-      this.chatFlushProcessing = true
-
-      try {
-        await IntegrationService.flushStreamChat(this.streamId)
-      } catch (e) {}
-
-      this.chatFlushProcessing = false
-      this.$notify({ group: 'success', text: 'chat messages have been cleared' })
-    },
     async toggleFeature(featureName) {
       if (this.featureProcessing[featureName]) return
       
       const feature = this.features[featureName]
       if (!feature) return
 
-      if (featureName === 'abr') {
-        this.toggleABR()
-        return
-      }
-
-      // if (featureName === 'abr' || featureName === 'ull') {
-      if (featureName === 'ull') {
+      if (featureName === 'abr' || featureName === 'ull') {
         if (window.Intercom)
           window.Intercom('show')
         return
@@ -376,88 +192,11 @@ export default {
       }
 
     },
-    async toggleABR () {
-      let nstate = !this.features.abr.enabled
-      let methodName = nstate === true ? 'enableStreamABR' : 'disableStreamABR'
-
-      try {
-        await StreamService[methodName](this.stream._id)
-        this.features.abr.enabled = nstate
-      } catch(e) {
-        console.log('error', e)
-        this.$notify({group: 'error', text: 'could not toggle stream ABR'})
-      }
-
-    },
     async savePlayerGAId () {
       var gaId = this.features.ga.value
       if(!gaId) return
 
       await this.saveSetting('ga', gaId)
-    },
-    hitUpload () {
-      document.querySelector('#embed-poster-input').click()
-    },
-    onEmbedPosterPreview () {
-      let imageInput = document.querySelector('#embed-poster-input')
-      let imageFile = imageInput.files[0]
-      if (!imageFile) return
-
-      imageReader(imageFile, (base64) => {
-        this.embedPosterTemp = base64
-      })
-    },
-    async saveEmbedPoster (event) {
-      this.features.embedPoster.error = false
-
-      let imageInput = document.querySelector('#embed-poster-input')
-      let imageFile = imageInput.files[0]
-      
-      if (!imageInput.value || !imageFile) {
-        this.features.embedPoster.error = 'please pick an image file'
-        return
-      }
-
-      this.featureProcessing.embedPoster = true
-      
-      // -- upload reuqest --
-      const fdata = new FormData()
-      fdata.append('file', imageFile)
-      const fdataConfig = {
-        headers: {
-          'content-type': 'multipart/form-data'
-        }
-      }
-
-      const res = await StreamService.uploadStreamPoster(this.streamId, fdata)
-      if (res.success) {
-        this.embedPosterTemp = null
-        this.features.embedPoster.value = res.uploadId
-        this.$notify({ group: 'success', text: 'Poster uploaded with success' })
-      } else {
-        this.features.embedPoster.error = 'could not handle image upload. Please try again later'
-      }
-      // -- upload reuqest ends --
-
-      this.featureProcessing.embedPoster = false
-    },
-    async cancelUpload () {
-      if (this.embedPosterTemp) {
-        this.embedPosterTemp = null
-        document.querySelector('#embed-poster-input').value = null
-        return
-      }
-
-      this.removePoster()
-      
-    },
-    async removePoster () {
-      try {
-        await this.saveSetting('embedPoster', null)
-        this.features.embedPoster.value = null
-      } catch (e) {
-        console.log(e)
-      }
     },
     onMediaPulseChanged() {},
     async saveSetting (key, value) {
@@ -478,31 +217,10 @@ export default {
   }
 };
 
-function imageReader(file, cb) {
-  if (!file) {
-    return;
-  }
-
-  var reader = new FileReader();
-  reader.onload = function() {
-    if (cb) {
-      cb(reader.result);
-    }
-  };
-
-  reader.readAsDataURL(file);
-}
-
 function promisify(func) {
   return new Promise(resolve => {
     func.call(0, resolve);
   });
-}
-
-function flushBlobUrl(blob) {
-  if (blob) {
-    window.URL.revokeObjectURL(blob);
-  }
 }
 
 function isValidUrl(url) {

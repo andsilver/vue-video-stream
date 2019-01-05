@@ -50,7 +50,7 @@
                 </div>
                 <div v-else><span class="value">..</span></div>
 
-                <div class="label">incoming</div>
+                <div class="label">bitrate</div>
               </div>
             </b-col>
             <b-col>
@@ -110,11 +110,11 @@
                 <div v-else class="value">..</div>
               </b-col>
               <b-col cols="4" class="stat-container xs">
-                <div class="label">in</div>
+                <!-- <div class="label">in</div>
                 <div class="value">{{ mediaPulse.bytesInTotal | bytes }}</div>
                 &nbsp;
                 <div class="label">out</div>
-                <div class="value">{{ countPushedBytes() | bytes }}</div>
+                <div class="value">{{ countPushedBytes() | bytes }}</div> -->
               </b-col>
               <b-col class="stat-container xs" style="padding-left:0px;">
                 <div class="value">
@@ -503,14 +503,17 @@ function isValidUrl (url) {
   width: auto;
   display: inline-block;
   transition: all 0.2s ease-in-out;
-  border-radius: 2px;
+  border-radius: 4px;
+  outline-color: #0074fc;
+  width: 100%;
+  box-sizing: border-box !important;
 }
 .title input:hover {
-  background-color: #17193e;
+  background-color: rgba(18, 23, 37, 0.67);
 }
 .title input:focus {
   /* background-color: #17193e; */
-  outline-color: #ffffff;
+  background-color: rgba(18, 23, 37, 0.67);
 }
 .subtitle {
   padding: 5px 0;
@@ -649,9 +652,10 @@ function isValidUrl (url) {
   padding: 10px 14px;
   color: #ffffff;
   /* background-color: #010329; */
-  background-color: #17193e;
-  border: none;
+  background-color: #202940;
+  border: 1px solid #151c31;
   border-radius: 2px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);

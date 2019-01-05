@@ -2,7 +2,7 @@
   <div class="footer">
     <div class="container">
       <b-row>
-        <b-col cols="6" lg="3">
+        <b-col cols="3">
           <div class="castr-logo-wrapper">
             <div class="logo-icon-dot"></div>
             <a href="/app/dashboard">

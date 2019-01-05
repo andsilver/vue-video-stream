@@ -1,7 +1,7 @@
 <template>
   <div class="navbar container">
       <div class="row">
-        <div class="col-md-4 col-6">
+        <div class="col-md-4">
           <div class="castr-logo-wrapper">
           <div class="logo-icon-dot"></div>
             <a href="/app/dashboard">

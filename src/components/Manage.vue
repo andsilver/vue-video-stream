@@ -66,7 +66,7 @@ export default {
   cursor: pointer;
 }
 .content-wrapper {
-  background-color: #17193e;
+  background-color: #202940;
   padding: 60px 0;
   min-height: 600px;
 }

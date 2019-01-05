@@ -11,7 +11,7 @@
         <div style="width: 100%">
           <b-row>
             <!-- <b-col><span v-html="modalTitle()"></span></b-col> -->
-            <b-col><span>{{message}}</span></b-col>
+            <b-col><span style="word-break:break-word;">{{message}}</span></b-col>
           </b-row>
         </div>
       </template>

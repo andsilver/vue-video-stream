@@ -115,7 +115,7 @@
          </div>
          <div class="reciept-row">
            <b-row class="reciept-row">
-             <b-col class="key">basic charge</b-col>
+             <b-col class="key">base charge</b-col>
              <b-col class="value currency sm">
                <div v-if="subscriptionPackage">
                  <span>${{getSubscriptionFee()}}</span>
@@ -141,7 +141,7 @@
            </b-row>
          </div>
        </div>
-       <div class="text-center">
+       <div class="text-center" style="background: #202940;padding: 20px;">
          <div v-if="checkoutStep==0 && subscriptionPackage">
            <b-button size="lg"
                      variant="success"
@@ -285,6 +285,7 @@ export default {
       packCategories: [
         { label: 'restreaming', value: 'restream' },
         { label: 'live streaming', value: 'live' },
+        { label: 'ip camera', value: 'ipcam' },
       ],
       quantity: 1,
       getEndingDate() {
@@ -446,14 +447,14 @@ export default {
 }
 .receipt-wrapper {
   width: 500px;
-  background-color: #0b0d3a;
+  background-color: #202940;
   text-align: left;
   border-radius: 5px;
-  margin-bottom: 30px;
+  /* margin-bottom: 30px; */
 }
 .receipt-wrapper .reciept-row {
   padding: 8px 16px;
-  border-bottom: 1px solid rgba(40, 44, 131, 0.45);
+  border-bottom: 1px solid rgba(25, 32, 53, 0.63);
 }
 .receipt-wrapper .reciept-row:last-of-type {
   border-bottom-color: transparent;
