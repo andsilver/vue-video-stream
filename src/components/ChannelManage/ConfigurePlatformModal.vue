@@ -122,14 +122,19 @@ export default {
       platformServers: [],
       formErrors: { server: false, key: false },
       modalTitle() {
-        return this.platform.name;
-        let title;
-        if (this.platform.custom) title = this.platform.name;
-        else
-          title =
-            `<i class="fab fa-${this.platform.name}"></i> &nbsp;` +
-            _.capitalize(this.platform.name);
-
+        let title = '';
+        if (this.platform.custom) title = "Custom Platform";
+        else {
+          let ptemplate = _.find(Platforms, { name: this.platform.template })
+          // title =
+          //   `<i class="fab fa-${this.platform.name}"></i> &nbsp;` +
+          //   _.capitalize(this.platform.name);
+          if (ptemplate && ptemplate.icon)
+              title += `<img src="${ptemplate.icon}" class="picon"/> &nbsp;`
+          
+          title += `<span style="font-size:14px;vertical-align:bottom;">${_.capitalize(this.platform.name)}</span>`;
+        }
+        
         return title;
       },
       onInputChange(prop) {

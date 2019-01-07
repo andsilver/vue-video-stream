@@ -4,11 +4,12 @@
         <div class="col-md-4">
           <div class="castr-logo-wrapper">
           <div class="logo-icon-dot"></div>
-            <a href="/app/dashboard">
+            <!-- <a href="/app/dashboard"> -->
+            <router-link tag="a" :to="{ path: '/dashboard' }">
               <img class="logo-icon" 
                   src="../assets/castr.png"
                     alt="Streaming Dashboard - Castr" />
-            </a>
+            </router-link>
           </div>
           <!-- <h3 class="logo">Castr</h3> -->
         </div>

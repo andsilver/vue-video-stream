@@ -21,6 +21,10 @@
 <script>
 export default {
   name: "AppManage",
+  mounted () {
+    // update win title
+    this.$emit('updateTitle', 'My Account')
+  },
   data() {
     return {
       menu: [

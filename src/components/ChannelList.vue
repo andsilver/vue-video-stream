@@ -167,6 +167,9 @@ export default {
       totalLiveStreams: _.filter(this.streams, { type: 'live' }).length
     });
 
+    // update win title
+    this.$emit('updateTitle', 'Dashboard - Castr Streams')
+
   },
   data() {
     return {

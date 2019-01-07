@@ -268,6 +268,9 @@ export default {
     }
 
     window.trackEvent(`Payments Page`)
+
+    // update win title
+    this.$emit('updateTitle', 'Purchase Subscription')
   },
   data() {
     return {

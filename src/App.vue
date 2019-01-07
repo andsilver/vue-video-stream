@@ -2,7 +2,7 @@
   <div id="app">
     <app-navbar v-if="authenticated()" />
     <div style="margin-bottom: 125px;" :style="{minHeight: winHeight || 'auto'}">
-      <router-view/>
+      <router-view @updateTitle="changeWinTitle"/>
     </div>
     <notifications group="error" classes="vue-notification error" style="top:10px;right:10px"/>
     <notifications group="success" classes="vue-notification success" style="top:10px;right:10px"/>
@@ -19,7 +19,7 @@ import UserService from "./services/UserService";
 export default {
   name: "App",
   mounted() {
-    this.computeWinHeight();
+    this.computeWinHeight();    
   },
   watch: {
     $route(to, form) {
@@ -32,6 +32,15 @@ export default {
     };
   },
   methods: {
+    changeWinTitle (viewTitle) {
+      let updatedTitle = 'Castr WebApp'
+      if (viewTitle)
+        updatedTitle = viewTitle + ' - '  +  updatedTitle
+      else 
+        updatedTitle = 'Castr | '  +  updatedTitle
+
+      document.title = _.trim(updatedTitle)
+    },
     authenticated() {
       return UserService.authenticated();
     },

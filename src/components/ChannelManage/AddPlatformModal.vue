@@ -309,13 +309,15 @@ export default {
         let title = ModalTitles[this.stage];
         if (this.stage === 1) {
           if (this.customPlatform) title = "Custom Platform";
-          else
+          else {
             // title +=
             //   `<i class="fab fa-${this.platform.name}"></i> &nbsp;` +
             //   _.capitalize(this.platform.name);
-            title +=
-              `<img src="${this.platform.icon}" class="picon"/> &nbsp;` +
-              `<span style="font-size:14px;vertical-align:bottom;">${_.capitalize(this.platform.name)}</span>`;
+            if (this.platform.icon)
+              title += `<img src="${this.platform.icon}" class="picon"/> &nbsp;`
+            
+            title += `<span style="font-size:14px;vertical-align:bottom;">${_.capitalize(this.platform.name)}</span>`;
+          }
         }
 
         return title;

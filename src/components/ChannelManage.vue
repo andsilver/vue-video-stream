@@ -28,12 +28,12 @@
                 <div class="label">status</div>
               </div>
             </b-col>
-            <b-col cols="6" sm="2">
+            <b-col cols="6" sm="2" style="padding-right:0;">
               <div class="stat-container">
                 <div v-if="streamAlive">
                   <span class="value">
                     {{mediaPulse.bitrate | number}}
-                    <span style="font-size:16px;">kbps</span>
+                    <span style="font-size:14px;font-weight:400;">kbps</span>
                   </span>
                 </div>
                 <div v-else><span class="value">..</span></div>
@@ -46,7 +46,7 @@
                 <div v-if="streamAlive">
                   <div v-if="streamFps" class="value" style="margin-right:10px;">
                     {{streamFps}}
-                    <span style="font-size:16px;">fps</span>
+                    <span style="font-size:14px;font-weight:400;">FPS</span>
                   </div>
                   <div class="label">codecs</div>
                   <!-- <span class="value">
@@ -213,6 +213,9 @@ export default {
       console.log('root event')
       this.$root.$broadcast('event-from-parent', { message: 'hey' })
     })
+
+    // update win title
+    this.$emit('updateTitle', _.toUpper(this.stream.name) + ' - Castr Restreams')
 
   },
   destroyed() {

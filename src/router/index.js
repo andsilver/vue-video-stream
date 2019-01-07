@@ -166,6 +166,7 @@ const router = new Router({
 const GuestPages = ['Signin', 'Signup', 'RequestPasswordReset', 'ValidatePasswordReset']
 
 router.beforeEach((to, from, cb) => {
+
   const loggedin = UserService.authenticated()
   if (GuestPages.indexOf(to.name) > -1) {
     if (loggedin) {
@@ -185,6 +186,10 @@ router.beforeEach((to, from, cb) => {
 
   cb()
 })
+
+// router.afterEach((to, from) => {
+//   console.log('to', to)
+// })
 
 function NotFoundTemplate() {
   return `<div class='container-wrapper modal-body text-center' style='color: #f7f7f7;padding-top:50px;'>

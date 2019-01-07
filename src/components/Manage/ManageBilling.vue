@@ -35,19 +35,21 @@
       <div v-else class="user-sub-list">
         <div class="user-sub-item head">
           <b-row>
-            <b-col cols="4">&nbsp;&nbsp;subscription</b-col>
+            <b-col cols="4"><span style="padding-left:10px;">subscription</span></b-col>
             <b-col cols="2">streaming type</b-col>
             <b-col cols="4">subscription age</b-col>
             <b-col></b-col>
           </b-row>
         </div>
-        <div class="user-sub-item">
+        <div class="user-sub-item" :class="{ disabled: !isSubEnabled() }">
           <b-row>
             <b-col cols="4">
-              <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
-              <div class="pack-name">{{getSubscriptionName()}}</div>
-              <div>
-                <code style="font-size:13px;">USD ${{getSubscriptionFee()}}/month</code>
+              <div style="padding-left:10px;">
+                <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
+                <div class="pack-name">{{getSubscriptionName()}}</div>
+                <div>
+                  <code style="font-size:13px;">USD ${{getSubscriptionFee()}}/month</code>
+                </div>
               </div>
             </b-col>
             <b-col cols="2">
@@ -62,7 +64,7 @@
             </b-col>
             <b-col class="text-right">
               <router-link :to="subscriptionManagePage(null, 'restream')">
-                <b-button variant="danger" size="sm">
+                <b-button :variant="isSubEnabled() ? 'link' : 'danger'" size="sm">
                   <span v-if="isSubEnabled()">{{isPaidSubscription() ? 'CHANGE' : 'Upgrade'}}</span>
                   <span v-else>PAY NOW</span>
                 </b-button>
@@ -72,19 +74,23 @@
                         variant="link"
                         size="sm"
                         onclick="Intercom('show')">CANCEL</b-button>
+              &nbsp;
             </b-col>
           </b-row>
         </div>
         <div v-if="hasAddonSubscripitons()">
           <div v-for="sub in userSubscription.addonSubscriptions"
                :key="sub._id"
-               class="user-sub-item">
+               class="user-sub-item"
+               :class="{ disabled: !isSubEnabled(sub) }">
           <b-row>
             <b-col cols="4">
-              <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
-              <div class="pack-name">{{getSubscriptionName(sub)}}</div>
-              <div>
-                <code style="font-size:13px;">USD ${{getSubscriptionFee(sub)}}/month</code>
+              <div style="padding-left:10px;">
+                <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
+                <div class="pack-name">{{getSubscriptionName(sub)}}</div>
+                <div>
+                  <code style="font-size:13px;">USD ${{getSubscriptionFee(sub)}}/month</code>
+                </div>
               </div>
             </b-col>
             <b-col cols="2">
@@ -109,6 +115,7 @@
                         variant="link"
                         size="sm"
                         onclick="Intercom('show')">CANCEL</b-button>
+              &nbsp;
             </b-col>
           </b-row>
         </div>
@@ -360,10 +367,6 @@ export default {
   letter-spacing: 0;
   text-transform: capitalize;
 }
-.expired {
-  padding: 10px;
-  background-color: rgba(220, 220, 220, 0.09);
-}
 .user-sub-list {
 
 }
@@ -381,4 +384,8 @@ export default {
   font-size: 15px;
   text-transform: capitalize;
 }
+.user-sub-item.disabled {
+  background-color: rgba(220, 220, 220, 0.09);
+}
 </style>
+
