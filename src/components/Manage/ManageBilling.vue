@@ -65,7 +65,7 @@
             <b-col class="text-right">
               <router-link :to="subscriptionManagePage(null, 'restream')">
                 <b-button :variant="isSubEnabled() ? 'link' : 'danger'" size="sm">
-                  <span v-if="isSubEnabled()">{{isPaidSubscription() ? 'CHANGE' : 'Upgrade'}}</span>
+                  <span v-if="isSubEnabled()">{{isPaidSubscription() ? 'CHANGE' : 'UPGRADE'}}</span>
                   <span v-else>PAY NOW</span>
                 </b-button>
               </router-link>
