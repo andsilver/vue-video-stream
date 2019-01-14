@@ -223,14 +223,12 @@ const platforms = [{
   { name: 'bilibili', servers: bilibiliServers, icon: '/static/images/platforms/bilibili.svg', streamKeyPlaceholder: 'streamname=live_..&key=...' },
   { name: 'picarto TV', servers: PricartoServers, icon: '/static/images/platforms/picartotv.svg', streamKeyPlaceholder: 'ptv_125095_01115ae8b3cd' },
   { name: 'web TV', servers: webTvServers, icon: '/static/images/platforms/webtv.png' },
-  { 
-    name: 'GamePlank',
-    servers: gamePlankServers,
-    // customServer: true,
-    // serverInputPlaceholder: 'rtmp://gameplank.tv/live',
-    streamKeyPlaceholder: 'GamePlank_xxxxxxxxxxxxxxxxxxxxxxx',
-    icon: '/static/images/platforms/gameplank.png' 
-  },
+  // {
+  //   name: 'GamePlank',
+  //   servers: gamePlankServers,
+  //   streamKeyPlaceholder: 'GamePlank_xxxxxxxxxxxxxxxxxxxxxxx',
+  //   icon: '/static/images/platforms/gameplank.png' 
+  // },
   { name: 'vaughn live', servers: VaughnSoftServers, icon: '/static/images/platforms/vaughnlivelogotype.svg' },
   { name: 'breakers TV', servers: VaughnSoftServers, icon: '/static/images/platforms/breakerstv.svg' },
   { name: 'instagib', servers: VaughnSoftServers, icon: '/static/images/platforms/instagib.svg' },
