@@ -13,6 +13,7 @@ const smashcastServers = [{ 'text': 'Default', 'value': 'rtmp://live.smashcast.t
 
 const mobcrushServers = ['rtmp://live.mobcrush.net/stream']
 const goodgameServers = ['rtmp://msk.goodgame.ru:1940/live']
+const vimmtvServers = ['rtmp://us.vimm.tv/live']
 const cybergameServers = [
   { text: 'RU Origin', value: 'rtmp://st.cybergame.tv:1953/live' },
   { text: 'RU Premium', value: 'rtmp://premium.cybergame.tv:1953/premium' },
@@ -217,6 +218,7 @@ const platforms = [{
     streamKeyPlaceholder: 'tP43J7523M_zp',
     icon: '/static/images/platforms/vk.png'
   },
+  { name: 'Vimm.tv', servers: vimmtvServers, icon: '/static/images/platforms/vimmtv.png', streamKeyPlaceholder: 'stream-key' },
   { name: 'GoodGame', servers: goodgameServers, icon: '/static/images/platforms/gg.svg', streamKeyPlaceholder: '30549?pwd=000a0000b00000b0' },
   { name: 'cybergame', servers: cybergameServers, icon: '/static/images/platforms/cybergame.svg', streamKeyPlaceholder: 'example?key=tJz0m0XRsZZktYOuv' },
   { name: 'StreamMe', servers: StreamMeServers, icon: '/static/images/platforms/streamme.svg' },
