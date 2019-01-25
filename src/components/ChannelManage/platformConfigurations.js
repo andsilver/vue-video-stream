@@ -31,12 +31,13 @@ const steamServers = [
   { text: 'Sydney, AU', value: 'rtmp://upload.broadcast.syd.steamstatic.com/app' }
 ]
 const StreamMeServers = [
-  { text: 'Default', value: 'rtmp://uc-origin.stream.me/origin' },
+  // { text: 'Default', value: 'rtmp://uc-origin.stream.me/origin' },
   { text: 'US East', value: 'rtmp://ue-origin.stream.me/origin' },
   { text: 'US West', value: 'rtmp://uw-origin.stream.me/origin' },
   { text: 'Europe West', value: 'rtmp://ew-origin.stream.me/origin' },
   { text: 'Asia East', value: 'rtmp://ae-origin.stream.me/origin' },
-  { text: '4k', value: 'rtmp://sea-origin.stream.me/origin' }
+  { text: '4k', value: 'rtmp://sea-origin.stream.me/origin' },
+  { text: 'Default [ DEPRECATED ]', value: 'rtmp://uc-origin.stream.me/origin' }
 ]
 const PricartoServers = [
   { text: 'Default', value: 'rtmp://live.us.picarto.tv/golive' },
