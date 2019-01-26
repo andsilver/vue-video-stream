@@ -1137,7 +1137,7 @@ function flushBlobUrl(blob) {
 }
 
 function isValidUrl (url) {
-  return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
+  return /^(tshttp|http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
 }
 
 function isMixerFTLSource(pullUrl) {
