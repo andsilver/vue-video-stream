@@ -20,12 +20,22 @@
         </div>
         <div class="col-md-9">
           <b-row>
-            <b-col cols="3">
+            <b-col cols="2">
               <div class="stat-container">
                 <div>
                   <span class="value" :style="{color: streamAlive ? '#2ad640' : 'inherit' }">{{getStreamStatus()}}</span>
                 </div>
                 <div class="label">status</div>
+              </div>
+            </b-col>
+            <b-col cols="2">
+              <div class="stat-container">
+                <div v-if="bandwidthStats.loaded">
+                  <span class="value">{{ bandwidthStats.value }}</span>
+                  <span class="text-uppercase" style="font-size:14px;">{{ bandwidthStats.unit }}</span>
+                </div>
+                <div v-else><span class="value">..</span></div>
+                <div class="label">Bandwidth</div>
               </div>
             </b-col>
             <b-col cols="2">
@@ -40,7 +50,7 @@
                 <div class="label">viewers</div>
               </div>
             </b-col>
-            <b-col cols="3">
+            <b-col cols="2">
               <div class="stat-container">
                 <div v-if="streamAlive">
                   <span class="value">
@@ -105,7 +115,7 @@
               <b-col cols="5" class="stat-container xs">
                 <div v-if="mediaPulse.alive" class="value">
                   <strong class="text-uppercase">{{getStreamQuality()}}</strong>
-                  <span style="margin-left:5px;font-size:14px;">{{mediaPulse.width}} x {{mediaPulse.height}}</span>
+                  <span style="margin-left:5px;font-size:14px;">{{mediaPulse.width}}x{{mediaPulse.height}}</span>
                 </div>
                 <div v-else class="value">..</div>
               </b-col>
@@ -197,6 +207,7 @@ import ConfirmModal from "./ConfirmModal.vue";
 import StreamService from "../services/StreamService";
 import UserService from "../services/UserService";
 import SubscriptionService from "../services/SubscriptionService";
+import MetricsService from "../services/MetricsService";
 
 const SourceTypes = {
   Pull: "pull",
@@ -220,6 +231,8 @@ export default {
     if (baseSub) {
       this.trialSubscription = /trial/gi.test(baseSub.package.name)
     }
+
+    this.baseSubscription = baseSub
 
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Page", this.stream);
@@ -246,6 +259,7 @@ export default {
       SourceTypes,
       nameEdit: false,
       userSubscription: null,
+      baseSubscription: null,
       processing: true,
       processingMessage: null,
       stream: null,
@@ -256,6 +270,12 @@ export default {
       streamFps: null,
       mediaPulse: null,
       clientsCount: 0,
+      bandwidthDownloaded: 0,
+      bandwidthStats: {
+        value: 0,
+        unit: 'bytes',
+        loaded: false,
+      },
       windowHeight: 0,
       countPushedBytes() {
         const { bytesOutTotal = 0, pushStatsTotal = 0 } = this.mediaPulse;
@@ -300,6 +320,7 @@ export default {
         this.streamName = this.stream.name;
         this.setupMediaPulse();
         this.setupViewershipCounter();
+        this.setupBandwidthCounter();
         
       } catch (err) {
         // redirect to stream list
@@ -384,6 +405,28 @@ export default {
 
         if (this.scopeAlive)
           setTimeout(updateCounter.bind(this), 3000)
+
+      }.bind(this))()
+
+    },
+    setupBandwidthCounter () {
+
+      (async function updateCounter() {
+        try {
+          let startTime = this.baseSubscription.cstart
+          if (_.isString(startTime)) {
+            startTime = new Date(startTime).getTime()
+          }
+
+          const bandwidthRes = await MetricsService.getStreamBandwidth(this.streamId, startTime)
+          let downloadedBytes = _.get(bandwidthRes, 'bytes') || 0
+          let bytesInfo = this.$options.filters.bytes(downloadedBytes, true, 2, true)
+          this.bandwidthStats = _.assign({}, this.bandwidthStats, bytesInfo, { loaded: true })
+
+        } catch (e) {}
+
+        if (this.scopeAlive)
+          setTimeout(updateCounter.bind(this), 10000)
 
       }.bind(this))()
 

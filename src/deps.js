@@ -39,7 +39,7 @@ export default function(vueInstance) {
 
     return dHours + ':' + dMins + ':' + dSecs
   })
-  
+
   vueInstance.filter('elapsed2', function(value) {
     value /= 1000
     let hours = parseInt(Math.floor(value / 3600))
@@ -59,7 +59,7 @@ export default function(vueInstance) {
     }
   })
 
-  vueInstance.filter('bytes', function(num, breakSegments) {
+  vueInstance.filter('bytes', function(num, breakSegments, decimalPlaces = 3, mini = false) {
     // jacked from: https://github.com/sindresorhus/pretty-bytes
     if (typeof num !== 'number' || isNaN(num)) {
       throw new TypeError('Expected a number')
@@ -68,23 +68,23 @@ export default function(vueInstance) {
     let unit
     let exponent
     let neg = num < 0
-    let units = ['Bytes', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    let units = [ mini ? 'B': 'Bytes', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
     if (neg) num = -num
     if (num < 1) {
       const value = (neg ? '-' : '') + num
-      return breakSegments ? { value, unit: 'Bytes' } : (value + ' Bytes')
+      return breakSegments ? { value, unit: units[0] } : (value + ' Bytes')
     }
 
     exponent = Math.min(Math.floor(Math.log(num) / Math.log(1000)), units.length - 1)
-    num = (num / Math.pow(1000, exponent)).toFixed(3) * 1
+    num = (num / Math.pow(1000, exponent)).toFixed(decimalPlaces) * 1
     unit = units[exponent]
     unit = unit.toLowerCase()
 
     const value = (neg ? '-' : '') + num
     return breakSegments ? { value, unit } : (value + ' ' + unit);
   })
-  
+
   vueInstance.filter('capitalize', function(text) {
     // copied from https://github.com/sindresorhus/pretty-bytes
     return _.capitalize(text)

@@ -5,6 +5,24 @@
       <div class="feature-item">
         <div class="feature-control">
           <span class="toggle-control"
+                :class="{ enabled: features.embedAutoplay.enabled }"
+                @click="toggleFeature('embedAutoplay')">
+            <i class="fa"
+               :class="{
+                 'fa-toggle-on enabled': features.embedAutoplay.enabled,
+                 'fa-toggle-off': !features.embedAutoplay.enabled,
+                 'status-processing': featureProcessing.embedAutoplay,
+               }"></i>
+          </span>
+        </div>
+        <div class="feature-desc">
+          <div>Autoplay Embed Player</div>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-control">
+          <span class="toggle-control"
                 :class="{ enabled: features.ga.enabled }"
                 @click="toggleFeature('ga')">
             <i class="fa"
@@ -265,6 +283,12 @@ export default {
           value: null,
           valueType: 'string',
         },
+        embedAutoplay: { 
+          error: false,
+          enabled: true,
+          value: null,
+          valueType: 'bool',
+        },
       },
       featureProcessing: {
         ga: false,
@@ -272,6 +296,7 @@ export default {
         chatEnabled: false,
         embedRewind: false,
         embedPoster: false,
+        embedAutoplay: false,
       },
       embedPosterTemp: null
     };
@@ -281,10 +306,11 @@ export default {
 
     const meta = await StreamService.getStreamMetadata(this.streamId)
     _.forIn(meta, (value, key) => {
-      if (value && key in this.features) {
-        this.features[key].enabled = true
+      if (value != undefined && key in this.features) {
+        this.features[key].enabled = value === false ? false : true
         if(value.constructor !== Boolean) {
           this.features[key].value = value
+          // console.log('setting', this.features[key])
         }
       }
     })

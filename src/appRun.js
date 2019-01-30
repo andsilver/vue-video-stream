@@ -56,7 +56,7 @@ export default function appRun() {
 
     // const connUrl = baseURL + `?authkey=${UserService.getUserToken()}`
     const connUrl = baseURL + `?authkey=${UserService.getUserToken()}`
-    console.log('connUrl', connUrl)
+    // console.log('connUrl', connUrl)
     const socket = io(connUrl)
     socket.on('connect', () => {
       console.log('app event system connected')
