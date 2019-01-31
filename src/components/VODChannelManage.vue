@@ -22,127 +22,41 @@
           <b-row>
             <b-col cols="3">
               <div class="stat-container">
-                <div>
-                  <span class="value" :style="{color: streamAlive ? '#2ad640' : 'inherit' }">{{getStreamStatus()}}</span>
-                </div>
-                <div class="label">status</div>
-              </div>
-            </b-col>
-            <b-col cols="2">
-              <div class="stat-container">
-                <div v-if="streamAlive">
+                <div v-if="videoFilesRetrieved">
                   <span class="value">
-                    <!-- {{mediaPulse.clients | number}} -->
-                    {{clientsCount | number}}
+                    {{bucketSize | bytes}}
                   </span>
                 </div>
                 <div v-else><span class="value">..</span></div>
-                <div class="label">viewers</div>
+                <div class="label">Storage</div>
               </div>
             </b-col>
-            <b-col cols="3">
-              <div class="stat-container">
-                <div v-if="streamAlive">
-                  <span class="value">
-                    {{mediaPulse.bitrate | number}}
-                    <span style="font-size:16px;">kbps</span>
-                  </span>
-                </div>
-                <div v-else><span class="value">..</span></div>
-
-                <div class="label">incoming</div>
-              </div>
-            </b-col>
-            <b-col>
-              <div class="stat-container" style="padding-left:50px;">
-                <div v-if="streamAlive">
-                  <div v-if="streamFps" class="value" style="margin-right:10px;">
-                    {{streamFps}}
-                    <span style="font-size:16px;">fps</span>
-                  </div>
-                  
-                  <!-- <span class="value">
-                    <span v-for="(track, index) in mediaPulse.tracks" 
-                          :key="index" 
-                          class="media-codec"
-                          :class="getTrackType(track)">{{track.codec}}</span>
-                  </span> -->
-                  
-                </div>
-                <div v-else><span class="value">..</span></div>
-
-              </div>
-            </b-col>
+            <b-col></b-col>
             <b-col cols="1" class="text-right" style="padding-left:0;">
-              
-              <!-- <button class="head-button"
-                      @click="requestStreamDelete">
-                <span class="icon far fa-trash-alt"></span>
-              </button> -->
-
               <div>
-                <div v-if="statusProcessing"><i class="fas fa-spinner fa-spin"></i></div>
-                <div v-else>
-                  <button v-if="stream.enabled" 
-                    class="btn-status outlined"
-                    @click="toggleStatus($event)">disable</button>
-                  <button v-else 
-                        class="btn-status no-dimm"
-                        @click="toggleStatus($event)">enable</button>
-                  </div>
-                </div>
-
               <div style="margin-top:8px;">
                 <button class="btn-status danger outlined"
                         @click="requestStreamDelete">delete</button>
-              </div>
-              
-              
+              </div>              
+            </div>              
             </b-col>
           </b-row>
-
-          <b-row v-if="streamAlive">
-              <b-col cols="5" class="stat-container xs">
-                <div v-if="mediaPulse.alive" class="value">
-                  <strong class="text-uppercase">{{getStreamQuality()}}</strong>
-                  <span style="margin-left:5px;font-size:14px;">{{mediaPulse.width}} x {{mediaPulse.height}}</span>
-                </div>
-                <div v-else class="value">..</div>
-              </b-col>
-              <b-col cols="4" class="stat-container xs">
-                <div class="label">in</div>
-                <div class="value">{{ mediaPulse.bytesInTotal | bytes }}</div>
-                &nbsp;
-                <div class="label">out</div>
-                <div class="value">{{ countPushedBytes() | bytes }}</div>
-              </b-col>
-              <b-col class="stat-container xs" style="padding-left:0px;">
-                <div class="value">
-                    <span v-for="(track, index) in mediaPulse.tracks" 
-                          :key="index" 
-                          class="media-codec"
-                          :class="getTrackType(track)">{{track.codec}}</span>
-                </div>
-                <!-- <div class="label">uptime</div>
-                <div class="value">{{ mediaPulse.lifetime | elapsed }}</div> -->
-              </b-col>
-            </b-row>
         </div>
       </div>
       <div class="content-container">
         <ul class="nav-menu-inline page-menu">
-          <router-link tag="li" 
-                       :to="{name: 'ScheduledChannelManageDashboard'}"
-                       active-class="active">dashboard</router-link>
+          <!-- <router-link tag="li" 
+                       :to="{name: 'VODChannelManageDashboard'}"
+                       active-class="active">dashboard</router-link> -->
           <!-- <router-link v-if="stream.dvrHours" -->
           <router-link tag="li" 
-                       :to="{name: 'ScheduledChannelManageVideos'}"
-                       active-class="active">playlist</router-link>
+                       :to="{name: 'VODChannelManageVideos'}"
+                       active-class="active">videos</router-link>
 
           <!-- <router-link v-if="stream.dvrHours" -->
           <router-link tag="li" 
-                       :to="{name: 'ScheduledChannelManageSettings'}"
-                       active-class="active">playback settings</router-link>
+                       :to="{name: 'VODChannelManageSettings'}"
+                       active-class="active">video settings</router-link>
         </ul>
 
         <!-- <div v-if="trialSubscription"
@@ -155,7 +69,8 @@
         <router-view :stream="stream" 
                      :streamAlive="streamAlive"
                      :mediaPulse="mediaPulse"
-                     @stream-updated="onStreamUpdates"></router-view>
+                     @stream-updated="onStreamUpdates"
+                     @video-files="onVideoFiles"></router-view>
 
       </div>
     </div>
@@ -191,7 +106,7 @@ const SourceTypes = {
 };
 
 export default {
-  name: "ScheduledChannelManage",
+  name: "VODChannelManage",
   async mounted() {
     this.windowHeight = window.innerHeight - 200;
     this.streamId = this.$route.params.streamId;
@@ -203,7 +118,7 @@ export default {
     if (!this.stream) return;
     
     const userSub = await SubscriptionService.getUserSubscriptions(true)
-    const baseSub = _.find(userSub.addonSubscriptions, { category: 'scheduled' })
+    const baseSub = _.find(userSub.addonSubscriptions, { category: 'vod' })
     if (baseSub) {
       this.trialSubscription = /trial/gi.test(baseSub.package.name)
     }
@@ -229,6 +144,8 @@ export default {
       scopeAlive: true,
       SourceTypes,
       nameEdit: false,
+      bucketSize: 0,
+      videoFilesRetrieved: false,
       userSubscription: null,
       processing: true,
       processingMessage: null,
@@ -275,6 +192,17 @@ export default {
     },
     onStreamUpdates (updates) {
       this.stream = _.assign({}, this.stream, updates)
+    },
+    onVideoFiles (videos) {
+      console.log('videos', videos)
+      let bytes = 0
+      _.each(videos, video => {
+        if(!video || !video.bytes) return
+        bytes += video.bytes
+      })
+
+      this.bucketSize = bytes
+      this.videoFilesRetrieved = true
     },
     async setupStream() {
       // get stream details
@@ -516,6 +444,9 @@ function isValidUrl (url) {
   font-weight: 600;
   margin-right: 3px;
   height: 34px;
+}
+.stat-container .value.sm {
+  font-size:18px;
 }
 .stat-container.lg .value {
   font-size: 28px;

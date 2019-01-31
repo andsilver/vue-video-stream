@@ -20,6 +20,7 @@ export default {
   addLiveStream,
   addCamStream,
   addScheduledStream,
+  addVODChannel,
   setStreamName,
   toggleStream,
   setStreamPullUrl,
@@ -155,6 +156,24 @@ function addScheduledStream(name, regionId) {
         name,
         region: regionId,
         type: 'scheduled'
+      }
+    }
+  })
+}
+
+/**
+ * @param {string} name
+ * @param {string} regionId
+ */
+function addVODChannel(name, regionId) {
+  return makeRequest({
+    path: '/streams/deploy',
+    method: 'post',
+    data: {
+      stream: {
+        name,
+        region: regionId,
+        type: 'vod'
       }
     }
   })

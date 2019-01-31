@@ -149,16 +149,11 @@ const router = new Router({
       name: 'VODChannelManage',
       component: VODChannelManage,
       redirect: {
-        name: 'VODChannelManageDashboard'
+        name: 'VODChannelManageVideos'
       },
-      children: [{
-          path: 'dashboard',
-          name: 'VODChannelManageDashboard',
-          component: VODChannelManageDashboard,
-          props: true
-        },
+      children: [
         {
-          path: 'videos',
+          path: 'dashboard',
           name: 'VODChannelManageVideos',
           component: VODChannelManageVideos,
           props: true

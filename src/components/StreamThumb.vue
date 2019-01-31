@@ -9,7 +9,9 @@
            <span v-if="mediaPulse && mediaPulse.alive" 
                  class="message">Waiting for frames</span>
            <span v-else class="message">
-             {{ stream.type === 'ipcam' ? 'No camera source ' :  'Waiting for stream' }}
+            <span v-if="stream.type=='ipcam'">No camera source</span>
+            <span v-else-if="stream.type=='vod'">Static Media Files</span>
+            <span v-else>Waiting for stream</span>
            </span>
          </div>
          <span v-else 

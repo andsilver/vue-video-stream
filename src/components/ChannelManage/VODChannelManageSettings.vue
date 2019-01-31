@@ -5,35 +5,6 @@
       <div class="feature-item">
         <div class="feature-control">
           <span class="toggle-control"
-                :class="{ enabled: features.ga.enabled }"
-                @click="toggleFeature('ga')">
-            <i class="fa"
-               :class="{
-                 'fa-toggle-on enabled': features.ga.enabled,
-                 'fa-toggle-off': !features.ga.enabled,
-                 'status-processing': featureProcessing.ga,
-               }"></i>
-          </span>
-        </div>
-        <div class="feature-desc">
-          <div>Enable Google Analytics</div>
-          <div v-if="features.ga.enabled" class="pane">
-            <span>GA ID</span>
-            <input class="input" 
-                   v-model="features.ga.value"
-                   placeholder="UA-00000.." />
-            <button class="btn btn-primary"
-                    :disabled="!features.ga.value"
-                    @click="savePlayerGAId">
-                {{ featureProcessing.ga ? 'saving ..' : 'save' }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="feature-item">
-        <div class="feature-control">
-          <span class="toggle-control"
                 :class="{ enabled: features.abr.enabled }"
                 @click="toggleFeature('abr')">
             <i class="fa"
