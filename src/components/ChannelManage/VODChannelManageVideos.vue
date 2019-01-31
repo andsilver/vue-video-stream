@@ -673,7 +673,7 @@ function imageReader(file, cb) {
   color: #ffffff;
 }
 .upload-wrapper {
-  /* padding-left: 15px; */
+  padding-left: 0 !important;
   width: 175px;
 }
 .progress {
