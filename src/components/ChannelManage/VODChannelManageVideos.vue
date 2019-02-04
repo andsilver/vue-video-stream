@@ -205,22 +205,24 @@
                   </b-col>
                 </b-row>
                 <div class="field-container">
-                    <!-- <input class="input"
-                          :value="getHlsUrl(video)"
-                          placeholder="media hls url"
-                          readonly/> -->
+                    <button class="modal-button modal-button-sm highlight badge-button"
+                            @click="clipboardCopy(getHlsUrl(video))">Copy</button>
                     <div class="label">&nbsp;HLS Url</div>
                     <code class="input">{{getHlsUrl(video)}}</code>
                 </div>
                 <br>
                 <div class="field-container">
+                    <button class="modal-button modal-button-sm highlight badge-button"
+                            @click="clipboardCopy(getPlayerUrl(video))">Copy</button>
                     <div class="label">&nbsp;Embed Url</div>
                     <code class="input">{{getPlayerUrl(video)}}</code>
                 </div>
                 <br>
                 <div class="field-container">
+                    <button class="modal-button modal-button-sm highlight badge-button"
+                            @click="clipboardCopy(getEpisodeIframeSnippet(video))">Copy</button>
                     <div class="label">&nbsp;Iframe Snippet</div>
-                    <code class="input">{{getEpisodeIframeSnippet(video)}}</code>
+                    <code class="input" style="padding-right:60px;">{{getEpisodeIframeSnippet(video)}}</code>
                 </div>
               </div>
 
@@ -233,6 +235,10 @@
       <alert-modal modal-id="alert-video-encoding" 
                      message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
                      okText="Got it, thanks"></alert-modal>
+      
+      <alert-modal modal-id="alert-video-size" 
+                   message="You can upload media with size upto of 50MB only"
+                   okText="Fine"></alert-modal>
       
       <confirm-modal modal-id="confirm-video-removal" 
                      :message="'You are about to delete video named `' + (focusedVideo && focusedVideo.fileName || '') + '`'"
@@ -248,6 +254,8 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import AlertModal from "@/components/AlertModal.vue";
 import StreamService from '@/services/StreamService'
 import utils from '@/utils'
+
+const MaxVideoUploadSize = 50 * 1024 * 1024
 
 export default {
   name: "VODChannelManageVideos",
@@ -312,7 +320,7 @@ export default {
       let nstate = !video.expanded
       this.videoFiles = utils.updateArrayItem(this.videoFiles, _.assign({}, video, { expanded: nstate }), index)
       // this.videoFiles[index] = 
-      console.log(this.videoFiles[index])
+      // console.log(this.videoFiles[index])
     },
     getHlsUrl (video) {
       if (!this.stream) return
@@ -321,12 +329,13 @@ export default {
       return hls
     },
     getPlayerUrl (video) {
-      let playerUri = 'https://player.castr.io/embed?src='+this.getHlsUrl(video)
+      // let playerUri = 'https://player.castr.io/embed?src='+this.getHlsUrl(video)
+      let playerUri = `https://player.castr.io/vod/${this.stream.key}/${video.id}`
       return playerUri
     },
     getEpisodeIframeSnippet (video) {
       let iframeSrc = this.getPlayerUrl(video)
-      return `<iframe src="${iframeSrc}" width="590" height="430" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+      return `<iframe src="${iframeSrc}" frameborder="0" width="590" height="430" allow="autoplay"  scrolling="no"  allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
     },
     initVideoUpload () {
       const el = document.getElementById('video-input')
@@ -348,6 +357,13 @@ export default {
           el.value = null
           return
         }
+        
+        if (file.size > MaxVideoUploadSize) {
+          vm.$root.$emit("bv::show::modal", "alert-video-size")
+          el.value = null
+          return
+        }
+        
 
         let newVideo = {
           id: 'unnamed_' + Date.now(),
@@ -481,36 +497,6 @@ export default {
       this.videoFiles.splice(index, 1)
 
       this.$emit('video-files', this.videoFiles)
-    },
-    copyIframeCode (video) {
-      let text = this.getVideoIframeSnippet(video)
-      try {
-        this.$copyText(text);
-        this.$notify({ group: "info", text: "Copied to clipboard" });
-      } catch (e) {}
-    },
-    getVideoIframeSnippet (video) {
-      let iframeSrc = 'https://player.castr.io/embed?src='+video.playbackUrl
-      return `<iframe src="${iframeSrc}" width="590" height="430" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
-    },
-    canMoveVideo (videoId, moveDir) {
-      if (!moveDir) return 
-
-      const videoIndex = _.findIndex(this.videoFiles, { id: videoId })
-      if (videoIndex === -1) return
-
-      let siblingVideoIndex = videoIndex + moveDir
-      if (siblingVideoIndex === videoIndex) return
-
-      // console.log(
-      //   moveDir == 1 ? 'down': 'up', 
-      //   this.videoFiles[videoIndex].fileName,
-      //   videoIndex, 
-      //   siblingVideoIndex)
-
-      let siblingVideo = this.videoFiles[siblingVideoIndex]
-
-      return !!siblingVideo
     }
   },
   components: {
@@ -718,5 +704,22 @@ function imageReader(file, cb) {
 }
 .field-container .input:read-only:focus {
   background-color: rgb(42, 49, 68);
+}
+.field-container .badge-button {
+  opacity: 0;
+  font-size:11px;
+  padding: 4px 9px;
+  position: absolute;
+  right: 6px;
+  top: 25px;
+  pointer-events: none;
+  transition: all 0.15s linear;
+}
+.field-container:hover .badge-button {
+  opacity:1;
+  pointer-events: inherit;
+}
+.field-container-sm .badge-button {
+  top: 8px;
 }
 </style>
