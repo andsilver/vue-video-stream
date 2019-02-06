@@ -4,9 +4,7 @@
     :class="{ disabled: !streamStatus,
                  'opacity-75 no-pointer': stream.removing,
                  [stream.type]: true
-              }"
-    @click="navigateManage"
-  >
+              }"@click="navigateManage">
     <div v-if="stream.type==='live'" class="type-badge">
       <code><i class="fa fa-play"></i> LIVESTREAM</code>
     </div>
@@ -15,6 +13,9 @@
     </div>
     <div v-else-if="stream.type==='scheduled'" class="type-badge scheduled">
       <code>SCHEDULED</code>
+    </div>
+    <div v-else-if="stream.type==='vod'" class="type-badge vod">
+      <code>VOD Bucket</code>
     </div>
 
     <div class="thumb">
@@ -151,6 +152,8 @@ export default {
       else if (this.stream.type === "ipcam") viewName = "CamChannelManage";
       else if (this.stream.type === "scheduled")
         viewName = "ScheduledChannelManage";
+      else if (this.stream.type === "vod")
+        viewName = "VODChannelManage";
 
       this.$router.push({
         name: viewName,
@@ -436,6 +439,9 @@ export default {
 }
 .scheduled .type-badge {
   background-color: #108aa6;
+}
+.type-badge.vod {
+  background-color: #205ad6;
 }
 
 .card.disabled .type-badge {

@@ -18,15 +18,20 @@ import LiveChannelManage from '@/components/LiveChannelManage'
 import LiveChannelManageDashboard from '@/components/ChannelManage/LiveChannelManageDashboard'
 import LiveChannelManageSettings from '@/components/ChannelManage/LiveChannelManageSettings'
 
-import CamChannelManage from '@/components/CamChannelManage'
-import CamChannelManageDashboard from '@/components/ChannelManage/CamChannelManageDashboard'
-import CamChannelManageSettings from '@/components/ChannelManage/CamChannelManageSettings'
+// import CamChannelManage from '@/components/CamChannelManage'
+// import CamChannelManageDashboard from '@/components/ChannelManage/CamChannelManageDashboard'
+// import CamChannelManageSettings from '@/components/ChannelManage/CamChannelManageSettings'
 
 import ScheduledChannelManage from '@/components//SchedulerChannelManage'
 import ScheduledChannelManageDashboard from '@/components/ChannelManage/SchedulerChannelManageDashboard'
-import ScheduledChannelManageTimeline from '@/components/ChannelManage/SchedulerChannelManageTimeline'
+// import ScheduledChannelManageTimeline from '@/components/ChannelManage/SchedulerChannelManageTimeline'
 import ScheduledChannelManageVideos from '@/components/ChannelManage/SchedulerChannelManageVideos'
 import ScheduledChannelManageSettings from '@/components/ChannelManage/SchedulerChannelManageSettings'
+
+import VODChannelManage from '@/components//VODChannelManage'
+import VODChannelManageDashboard from '@/components/ChannelManage/VODChannelManageDashboard'
+import VODChannelManageVideos from '@/components/ChannelManage/VODChannelManageVideos'
+import VODChannelManageSettings from '@/components/ChannelManage/VODChannelManageSettings'
 
 import AppManage from '@/components/Manage'
 import AdminStats from '@/components/AdminStats'
@@ -138,7 +143,63 @@ const router = new Router({
           props: true
         }
       ]
-    }, {
+    },
+    {
+      path: '/vods/:streamId',
+      name: 'VODChannelManage',
+      component: VODChannelManage,
+      redirect: {
+        name: 'VODChannelManageVideos'
+      },
+      children: [
+        {
+          path: 'dashboard',
+          name: 'VODChannelManageVideos',
+          component: VODChannelManageVideos,
+          props: true
+        },
+        {
+          path: 'settings',
+          name: 'VODChannelManageSettings',
+          component: VODChannelManageSettings,
+          props: true
+        }
+      ]
+    },
+    {
+      path: '/scheduled/:streamId',
+      name: 'ScheduledChannelManage',
+      component: ScheduledChannelManage,
+      redirect: {
+        name: 'ScheduledChannelManageDashboard'
+      },
+      children: [{
+          path: 'dashboard',
+          name: 'ScheduledChannelManageDashboard',
+          component: ScheduledChannelManageDashboard,
+          props: true
+        },
+        // {
+        //   path: 'timeline',
+        //   name: 'ScheduledChannelManageTimeline',
+        //   component: ScheduledChannelManageTimeline,
+        //   props: true
+        // },
+        {
+          path: 'videos',
+          name: 'ScheduledChannelManageVideos',
+          component: ScheduledChannelManageVideos,
+          props: true
+        },
+        {
+          path: 'settings',
+          name: 'ScheduledChannelManageSettings',
+          component: ScheduledChannelManageSettings,
+          props: true
+        }
+      ]
+    },
+    {
       path: '/manage',
       name: 'AppManage',
       redirect: '/manage/account',
