@@ -37,9 +37,12 @@ export default {
   enableStreamABR,
   disableStreamABR,
   uploadStreamPoster,
+
+  getStreamScheduleSettings,
+  saveStreamScheduleSettings,
+
   uploadStreamPlaylistVideo,
   deleteStreamPlaylistVideoFile,
-
   getStreamPlaylist,
   saveStreamPlaylistVideo,
   moveStreamPlaylistVideo,
@@ -381,6 +384,35 @@ function uploadStreamPoster(streamId, fdata) {
     data: fdata,
     headers: {
       'content-type': 'multipart/form-data'
+    }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function getStreamScheduleSettings(streamId) {
+  return makeRequest(`/streams/${streamId}/schedular/config`)
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} mode
+ * @param {number} [datetime]
+ */
+function saveStreamScheduleSettings(streamId, mode, datetime) {
+  if (!_.isNumber(datetime)) {
+    datetime = datetime.getTime()
+  }
+
+  return makeRequest({
+    path: `/streams/${streamId}/schedular/config`,
+    method: 'post',
+    data: {
+      updates: {
+        mode,
+        datetime
+      }
     }
   })
 }
