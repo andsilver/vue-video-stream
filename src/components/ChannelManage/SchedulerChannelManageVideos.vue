@@ -18,7 +18,7 @@
 
         <div v-if="!videoFiles.length" class="text-center">
           <div style="font-size: 15.5px;">
-            <p>No Videos files uploaded yet</p>
+            <p>No Media uploaded yet</p>
           </div>
           <button class="btn btn-primary btn-lg"
                       @click="triggerFileUpload">Upload Video</button>

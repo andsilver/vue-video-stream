@@ -46,9 +46,19 @@
               <div class="desc">Live Stream Using Your Own Player</div>
             </div>
           </b-dropdown-item>
+          <b-dropdown-item @click="openScheduledStreamModal">
+                <div class="dropdown-icon ico">
+                  <!-- <i class="far fa-calendar-alt"></i> -->
+                  <i class="far fa-clock"></i>
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New Scheduled Stream</div>
+                  <div class="desc">Schedule your live presence</div>
+                </div>
+              </b-dropdown-item>
           <b-dropdown-item v-b-modal.modal-add-vod-channel>
             <div class="dropdown-icon ico">
-              <i class="far fa-play-circle" style="color:#4949fd;"></i>
+              <i class="far fa-play-circle"></i>
             </div>
             <div class="dropdown-text">
               <div class="main">New VOD Bucket</div>
@@ -114,6 +124,15 @@
                 <div class="dropdown-text">
                   <div class="main">New Live Stream</div>
                   <div class="desc">Live Stream Using Your Own Player</div>
+                </div>
+              </b-dropdown-item>
+              <b-dropdown-item @click="openScheduledStreamModal">
+                <div class="dropdown-icon">
+                  <img src="../assets/scheduled.png" style="width:22px;margin-left:-1px;" />
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New Scheduled Stream</div>
+                  <div class="desc">Schedule your live presence</div>
                 </div>
               </b-dropdown-item>
               <b-dropdown-item v-b-modal.modal-add-vod-channel>
@@ -383,6 +402,7 @@ export default {
   width: 32px;
 }
 .dropdown-icon.ico {
+  color: #4949fd;
   vertical-align: super;
 }
 .dropdown-icon img {

@@ -3,36 +3,41 @@
     <div class="content-container">
         <b-row>
           <b-col cols="7">
-            <div v-if="!streamPlatforms.length" 
-                 class="placeholder">
-                 Ready, Set ... &nbsp;Go!
-              <p style="font-size:13.5px;opacity:0.75;">Lets add a platform to get started</p>
-              <b-button variant="danger"
-                        v-b-modal.modal-add-platform>Add Platform</b-button>
-            </div>
-            <b-row v-else>
-              <b-col>
-                <div class="subtitle">Published Platforms</div>
-              </b-col>
-              <b-col class="text-right">
+
+            <div>
+            
+              <div v-if="!streamPlatforms.length" 
+                  class="placeholder">
+                No Platforms yet
+                <p style="font-size:14px;">Lets add a platform to get started</p>
                 <b-button variant="danger"
-                          v-b-modal.modal-add-platform>Add Platform</b-button>
-                <!-- master toggle control -->
-                <span class="toggle-control toggle-control-master"
-                      :class="{ 
-                        enabled: groupToggleState,
-                        'status-processing': groupToggleProcessing
-                      }"
-                      @click="toggleGroupStatus">
-                      <!-- 'status-processing': !isAlive() || groupToggleProcessing -->
-                  <i class="fa"
-                     :class="{
-                       'fa-toggle-on': groupToggleState,
-                       'fa-toggle-off': !groupToggleState
-                     }"></i>
-                </span>
-              </b-col>
-            </b-row>
+                          v-b-modal.modal-add-platform>Add Publish Platform</b-button>
+              </div>
+              <b-row v-else>
+                <b-col>
+                  <div class="subtitle">Published Platforms</div>
+                </b-col>
+                <b-col class="text-right">
+                  <b-button variant="danger"
+                            v-b-modal.modal-add-platform>Add Platform</b-button>
+                  <!-- master toggle control -->
+                  <span class="toggle-control toggle-control-master"
+                        :class="{ 
+                          enabled: groupToggleState,
+                          'status-processing': groupToggleProcessing
+                        }"
+                        @click="toggleGroupStatus">
+                        <!-- 'status-processing': !isAlive() || groupToggleProcessing -->
+                    <i class="fa"
+                      :class="{
+                        'fa-toggle-on': groupToggleState,
+                        'fa-toggle-off': !groupToggleState
+                      }"></i>
+                  </span>
+                </b-col>
+              </b-row>
+
+            </div>
             
             <div class="platform-list">
               <!-- <b-col> -->
@@ -172,7 +177,6 @@
 
                    </div>
                  </div>
-              <!-- </b-col> -->
             </div>
 
           </b-col>
@@ -185,54 +189,10 @@
                 </p>
               </div>
               <div v-else-if="!streamAlive" class="video-thumb placeholder">
-                <p>Playist Not Configured</p>
+                <p>No stream</p>
               </div>
 
               <stream-player v-else :stream="stream" class="video-thumb" />
-
-            </div>
-            <br>
-            <div>
-              <div class="field-container" style="padding-bottom:0;">
-                <div class="label">Deployment Region</div>
-                <div class="input">
-                  <div style="font-size:15.5px;">
-                    <img :src="getRegionFlag()" 
-                         :alt="stream.region.name"
-                         style="width:20px;" />
-                    &nbsp;<span>{{stream.region.name}}</span>
-                  </div>
-                  <!-- <div v-show="!hasPullSource()"  -->
-                  <!-- <div style="font-size:13px;margin-top:6px;opacity:0.65;">{{getStreamPushUrl()}}</div> -->
-                </div>
-              </div>
-               <div class="field-container field-container-sm" style="padding-top:0;">
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(getStreamPushUrl)">Copy</button>
-                <div class="input">
-                  <div style="">{{getStreamPushUrl()}}</div>
-                </div>
-              </div>
-
-              <div class="field-container">
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(getStreamIframeCode)">Copy</button>
-                <b-row>
-                  <b-col><div class="label">Iframe Snippet</div></b-col>
-                </b-row>
-                <!-- <div class="label">Iframe Snippet</div> -->
-                <input class="input"
-                       :value="getStreamIframeCode()"
-                       readonly/>
-              </div>
-              <div class="field-container">
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(getStreamEmbedUrl)">Copy</button>
-                <div class="label">Embed Url</div>
-                <input class="input"
-                       :value="getStreamEmbedUrl()"
-                       readonly/>
-              </div>
 
             </div>
           </b-col>
@@ -256,36 +216,6 @@
                    cancelText="No thanks"
                    @modal-confirm="navigatePaymentsPage"></confirm-modal>
 
-     <confirm-modal modal-id="modal-set-publish-mode"
-                    message="Switching to Publish mode will disable your pulled stream"
-                    okText="Enable Publish Mode"
-                    cancelText="Cancel"
-                    @modal-confirm="unsetStreamPullUrl"></confirm-modal>
-     
-     <confirm-modal modal-id="modal-set-publish-mode-webcam"
-                    message="Switching to Webcam mode will disable your pulled stream"
-                    okText="Enable Publish Mode"
-                    cancelText="Cancel"
-                    @modal-confirm="unsetStreamPullUrl(true)"></confirm-modal>
-     
-     <confirm-modal modal-id="modal-webcam-leave-navigation"
-                    message="Webcam will stop streaming if you navigate"
-                    okText="Leave Anyway"
-                    cancelText="Keep Webcam"
-                    @modal-confirm="confirmWebcamLeave"></confirm-modal>
-
-     <alert-modal modal-id="alert-mixer-pull"
-                  message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
-                  okText="Got it"></alert-modal>
-      
-     <prompt-modal modal-id="modal-mixer-username"
-                    message="Enter your Mixer username"
-                    message2="Note: If you are pulling, please disable push to mixer"
-                    okText="Grab Mixer Pull Url"
-                    cancelText="Cancel"
-                    errorMessage="No FTL broadcasts found"
-                    @modal-prompt="onMixerUsername"></prompt-modal>
-
   </div>
 </template>
 
@@ -297,7 +227,6 @@ import SubscriptionService from "@/services/SubscriptionService";
 import IntegrationService from "@/services/IntegrationService";
 import StreamThumb from "@/components/StreamThumb.vue";
 import StreamPlayer from "@/components/StreamPlayer.vue";
-import WebcamPlayer from "@/components/WebcamPlayer.vue";
 
 import PromptModal from "@/components/PromptModal.vue";
 import AlertModal  from "@/components/AlertModal.vue";
@@ -317,20 +246,14 @@ export default {
   name: "ScheduledChannelManage",
   props: ['stream', 'streamAlive', 'mediaPulse'],
   beforeRouteLeave (to, from, next) {
-
-    if (this.streamSourceType === SourceTypes.Webcam && this.webcamPushReady) {
-      this.$root.$emit('bv::show::modal', 'modal-webcam-leave-navigation')
-      this.webcamRouteLeaveNavigationCallback = () => next()
-      return
-    }
-
     next()
   },
   async mounted() {
-    // get stream details
-    await this.setupStream();
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Dashboard Page", this.stream);
+
+    // get stream details
+    await this.setupStream();
   },
   watch: {
     mediaPulse () {
@@ -343,30 +266,12 @@ export default {
       userSubscription: null,
       processing: true,
       processingMessage: null,
-      rmptPullUrlProcessing: false,
-      streamSourceType: null,
-      streamSourceTypeModel: null,
-      streamPullUrl: null,
-      streamPullError: false,
-      streamPullSourceChunksCount: 0,
-      pullSourceWorking: true,
-      pullSourceStatusTimeoutCtrl: -1,
-      webcamPushReady: false,
-      streamSourceTypeProcessing: null,
       streamId: null,
-      streamFps: null,
       streamPlatforms: [],
       groupToggleProcessing: false,
       groupToggleState: false,
-      streamKeyVisible: false,
-      streamKeyVisibleTimeout: 0,
-      streamKeyVisibleTimeoutCtrl: null,
       windowHeight: 0,
       configurablePlatform: {},
-      webcamRouteLeaveNavigationCallback: null,
-      hasPullSource() {
-        return this.streamSourceType === SourceTypes.Pull;
-      },
       isCustomPlatform(platform) {
         return platform.template === "custom";
       },
@@ -395,19 +300,28 @@ export default {
         if (dest.length > maxLen) dest = dest.substr(0, maxLen) + " ..";
 
         return dest;
-      },
-      isSuspiciousPullSource () {
-        var suspicious = false
-
-        if (this.stream.pullUrl) {
-
-        }
-
-        return suspicious
       }
-    };
+    }
   },
   methods: {
+    async saveSchedulerConfig () {
+      this.schedulerConfigProcessing = true
+      try {
+        await StreamService.saveStreamScheduleSettings(this.stream._id, this.scheduleMode, new Date(this.scheduledDateTime))
+
+        let updatedConfig = { mode: this.scheduleMode }
+        if (this.scheduleMode === 'datetime')
+          updatedConfig.datetime = this.scheduledDateTime
+
+        this.savedSchedulerConfig = updatedConfig
+
+      } catch(e) { 
+        this.$notify({ group: 'error', text: 'Could not update scheduler settings' })
+        console.log(e) 
+      }
+
+      this.schedulerConfigProcessing = false
+    },
     clipboardCopy (text) {
       try {
         if (text instanceof Function) 
@@ -416,22 +330,6 @@ export default {
         this.$copyText(text);
         this.$notify({ group: "info", text: "Copied to clipboard" });
       } catch (e) {}
-    },
-    getStreamIframeCode() {
-      let embedUrl = this.getStreamEmbedUrl();
-      let htmlCode = `<iframe src="${embedUrl}" width="590" height="431" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
-      return htmlCode;
-    },
-    getStreamEmbedUrl() {
-      // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
-      let embedUrl = `https://player.castr.io/${this.stream.key}?`;
-      const {hostnameCDN} = this.stream.region || {}
-      if (hostnameCDN) {
-        let cdnPop = _.replace(hostnameCDN, /\D/g, '')
-        embedUrl += `cdnsrc=${cdnPop}&`
-      }
-
-      return embedUrl;
     },
     onMediaPulseChanged () {
       const platforms = []
@@ -454,229 +352,6 @@ export default {
     navigatePaymentsPage() {
       this.$router.push({ path: "/subscribe?action=upgrade" });
     },
-    onPullUrlChange () {
-      this.streamPullError = false
-    },
-    isMixerPullAuthorized () {
-      const exlcudedRegions = ['br']
-      const curRegion = this.stream.region.identifier 
-      
-      let bypassed = true
-      for (let i=0;i<exlcudedRegions.length;i++) {
-        if (curRegion === exlcudedRegions[i]) {
-           bypassed = false
-           break;
-         }
-      }
-
-      return bypassed
-    },
-    canSavePullUrl () {
-      let canSave = false
-      // check for valid input
-      const {streamPullUrl} = this
-
-      if (streamPullUrl) {
-        // check if pull remained same
-        if (streamPullUrl !== this.stream.pullUrl)
-          canSave = true
-      }
-
-      return canSave
-    },
-    onWebcamAuthorized () {
-      console.log('authorized')
-
-      // check if streaming pulling mode is active
-      if (this.stream.pullUrl) 
-        this.$root.$emit("bv::show::modal", "modal-set-publish-mode-webcam");
-    },
-    onWebcamStopped () {
-      this.webcamPushReady = false
-    },
-    onWebcamStarted () {
-      this.webcamPushReady = true
-    },
-    confirmWebcamLeave () {
-      if (this.webcamRouteLeaveNavigationCallback)
-        this.webcamRouteLeaveNavigationCallback()
-    },
-    async onSourceTypeChange() {
-
-      if (this.streamSourceType === SourceTypes.Webcam && this.webcamPushReady) {
-        setTimeout(() => {
-          this.streamSourceTypeModel = this.streamSourceType
-        }, 100)
-
-        this.$root.$emit('bv::show::modal', 'modal-webcam-leave-navigation')
-        this.webcamRouteLeaveNavigationCallback = () => {
-          this.streamSourceType = this.streamSourceTypeModel
-        }
-        return
-      }
-
-      this.streamSourceType = this.streamSourceTypeModel
-
-      // check if new mode is `publish`
-      if (this.streamSourceType === SourceTypes.Publish) {
-        // check if operational mode is `pull`
-        const hadPullUrl = this.stream.pullUrl;
-        // if (hadPullUrl) this.unsetStreamPullUrl();
-        if (hadPullUrl) this.requestPublishPrompt()
-      }
-    },
-    requestPublishPrompt (preventSourceRestore) {
-      this.$root.$emit("bv::show::modal", "modal-set-publish-mode");
-
-      if (preventSourceRestore) return
-      setTimeout(() => { this.streamSourceType = SourceTypes.Pull })
-    },
-    requestMixerUsername () {
-      // const res = await IntegrationService.getMixerFTLUrl('tidy')
-      if (!this.isMixerPullAuthorized()) {
-        this.$root.$emit('bv::show::modal', 'alert-mixer-pull')
-        return
-      }
-
-      this.$root.$emit("bv::show::modal", "modal-mixer-username");
-    },
-    async onMixerUsername (mixerUsername, ackCB) {
-      // console.log('mixerUsername', mixerUsername)
-      const res = await IntegrationService.getMixerFTLUrl(mixerUsername)
-      ackCB(!res.mixerPullURL)
-
-      const {mixerPullURL} = res
-      this.streamPullUrl = mixerPullURL
-    },
-    setPullSourceStatus () {
-      let status = this.streamAlive
-      this.pullSourceWorking = status
-
-      if (status) {
-        const t = setTimeout(this.setPullSourceStatus, 5000)
-        this.pullSourceStatusTimeoutCtrl = t
-      }
-    },
-    async setStreamPullUrl() {
-      this.streamPullError = false
-      
-      // setTimeout(() => {
-      //   this.streamSourceType = SourceTypes.Publish
-      // })
-
-      const pullSource = this.streamPullUrl;
-
-      if (isMixerFTLSource(pullSource) && !this.isMixerPullAuthorized()) {
-        this.$root.$emit('bv::show::modal', 'alert-mixer-pull')
-        return
-      }
-
-      let sub = this.userSubscription;
-      if (!sub) {
-        this.rmptPullUrlProcessing = true;
-        // get user subscription
-        try {
-          sub = await SubscriptionService.getUserSubscriptions(true);
-        } catch (e) {
-          this.$notify({ group: "error", text: e.message });
-        }
-
-        this.userSubscription = sub;
-        this.rmptPullUrlProcessing = false;
-      }
-
-      if (!sub) return
-
-      if (!isMixerFTLSource(pullSource) && !isRTSPSource(pullSource)) {
-        // check if user has paid subscription
-        const pack = sub.subscription.package;
-        if (pack.baseCharge === 0) {
-          // show upgrade prompt if free subscription
-          this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
-          return;
-        }
-      }
-
-      // check if url is valid
-      if (!isValidUrl(pullSource)) {
-        this.streamPullError = true
-        return
-      }
-
-      // swtich source mode to specified pull url
-      this.streamSourceTypeProcessing = true;
-
-      try {
-        await StreamService.setStreamPullUrl(this.streamId, pullSource)
-        this.stream.pullUrl = pullSource;
-        this.$notify({ group: "success", text: "stream pull url saved" });
-
-        // clearTimeout(this.pullSourceStatusTimeoutCtrl)
-        // this.pullSourceWorking = true
-        // this.pullSourceStatusTimeoutCtrl = setTimeout(this.setPullSourceStatus, 15000)
-
-      } catch (e) {
-        this.$notify({ group: "error", text: "could not save stream pull url" });
-      }
-
-      this.streamSourceTypeProcessing = false;
-    },
-    async unsetStreamPullUrl(preventSourceRestore) {
-      this.streamSourceTypeProcessing = true;
-
-      try {
-        await StreamService.unsetStreamPullUrl(this.streamId)
-        this.stream.pullUrl = null;
-        this.$notify({ group: "success", text: "Publish mode activated" });
-        
-        if (!preventSourceRestore) {
-          // change tab to publish
-          this.streamSourceType = SourceTypes.Publish
-        }
-
-      } catch(e) {
-        if (!preventSourceRestore) {
-          this.streamSourceType = SourceTypes.Pull
-        }
-
-        this.$notify({ group: "error", text: "could not switch to Publish mode" });
-      }
-
-      this.streamSourceTypeProcessing = false;
-    },
-    async requestRTMPPullUrl() {
-      let sub = this.userSubscription;
-      if (!sub) {
-        this.rmptPullUrlProcessing = true;
-        // get user subscription
-        try {
-          sub = await SubscriptionService.getUserSubscriptions(true);
-        } catch (e) {
-          this.$notify({ group: "error", text: e.message });
-        }
-
-        this.userSubscription = sub;
-        this.rmptPullUrlProcessing = false;
-      }
-
-      if (!sub) return;
-
-      // DISABLED TEMPORARILY
-      // check if user has paid subscription
-      // const pack = sub.subscription.package;
-      // if (pack.baseCharge === 0) {
-      //   // show upgrade prompt if free subscription
-      //   this.$root.$emit("bv::show::modal", "modal-sub-upgrade");
-      //   return;
-      // }
-
-      // try copy to clipboard
-      const rtmpPullUrl = this.getStreamPullUrl();
-      try {
-        this.$copyText(rtmpPullUrl);
-        this.onStreamKeyCopied();
-      } catch (e) {}
-    },
     async setupStream() {
       // get stream details
       try {
@@ -685,16 +360,11 @@ export default {
         this.streamId = this.stream._id;
         this.streamPlatforms = _.map(this.stream.platforms, _.cloneDeep)
 
-        const hasPullUrl = stream.pullUrl;
-        // this.streamSourceType = hasPullUrl ? SourceTypes.Pull : SourceTypes.Publish;
-        this.streamSourceTypeModel = hasPullUrl ? SourceTypes.Pull : SourceTypes.Publish;
-        this.onSourceTypeChange()
-        if (hasPullUrl) this.streamPullUrl = stream.pullUrl;
-        
         // normalize data
         _.each(this.streamPlatforms, this.setupStreamPlatform);
 
         this.computeGroupToggleState();
+      
       } catch (err) {
         // redirect to stream list
         this.$router.push({ name: "ChannelList" });
@@ -797,28 +467,6 @@ export default {
       const enabledPlatformCount = _.size(_.filter(platforms, p => p.enabled));
 
       this.groupToggleState = enabledPlatformCount > platformCount / 2;
-    },
-    toggleStreamKeyVisibility() {
-      window.clearInterval(this.streamKeyVisibleTimeoutCtrl);
-      const newState = !this.streamKeyVisible;
-      this.streamKeyVisible = newState;
-
-      if (newState) {
-        let timeout = 1000;
-        this.streamKeyVisibleTimeout = 9000;
-        this.streamKeyVisibleTimeoutCtrl = setInterval(() => {
-          this.streamKeyVisibleTimeout -= timeout;
-          if (!this.streamKeyVisibleTimeout) this.toggleStreamKeyVisibility();
-        }, timeout);
-
-        // track event
-        window.trackEvent(`Viewed Stream key in stream ${this.stream.name}`);
-      }
-    },
-    onStreamKeyCopied() {
-      this.$notify({ group: "info", text: "Copied to clipboard" });
-      // track event
-      window.trackEvent(`Copied RTMP pull for stream ${this.stream.name}`);
     },
     getTrackType(track) {
       if (!track) return;
@@ -937,44 +585,6 @@ export default {
       this.configurablePlatform = platform;
       this.$root.$emit("bv::show::modal", "modal-configure-platform");
     },
-    getRegionFlag() {
-      return `https://countryflags.io/${
-        this.stream.region.identifier
-      }/flat/24.png`;
-    },
-    getStreamPushUrl() {
-      const { region } = this.stream;
-      // return `rtmp://${this.stream.region.hostname}:1977/static`;
-      // return `rtmp://${region.hostname}:${region.rtmpPort}/static`;
-      // let pushUrl = `rtmp://${region.hostname}`;
-      let pushUrl = `rtmp://${region.hostname}/static`;
-      if (region.rtmpPort != 1935) {
-        pushUrl += ":" + region.rtmpPort;
-      }
-
-      // return pushUrl + '/';
-      return pushUrl;
-    },
-    getStreamHlsUrl() {
-      const { region } = this.stream;
-      // return `rtmp://${this.stream.region.hostname}:1977/static`;
-      // return `rtmp://${region.hostname}:${region.rtmpPort}/static`;
-      // let pushUrl = `rtmp://${region.hostname}`;
-      let hlsUrl = `http://${region.hostname}/${this.stream.key}/index.m3u8`;
-      return hlsUrl;
-    },
-    getStreamEmbedUrl() {
-      let embedUrl = `https://player.haxr.io/${this.stream.key}`;
-      return embedUrl;
-    },
-    getStreamPullUrl(hide) {
-      let server = this.getStreamPushUrl();
-      if (!/\/$/gi.test(server)) server += "/";
-
-      const pullUrl = server + (hide ? "xxxx" : this.stream.key);
-
-      return pullUrl;
-    },
     getPlatformPushUrl(platform) {
       if (!platform) return;
       return `${platform.server}/${platform.key}`;
@@ -1030,7 +640,6 @@ export default {
     AlertModal,
     StreamThumb,
     StreamPlayer,
-    WebcamPlayer,
     PromptModal
   }
 };
@@ -1051,23 +660,8 @@ function promisify (func) {
   })
 }
 
-function flushBlobUrl(blob) {
-  if (blob) {
-    window.URL.revokeObjectURL(blob);
-  }
-}
-
 function isValidUrl (url) {
   return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
-}
-
-function isMixerFTLSource(pullUrl) {
-  // return /^https?\:\/\/(www\.)?mixer\.com/gi.test(pullUrl)
-  return /^https?\:\/\/((\w+)\.)?mixer\.com/gi.test(pullUrl)
-}
-
-function isRTSPSource(pullUrl) {
-  return /^rtsp?\:\/\//gi.test(pullUrl)
 }
 </script>
 
@@ -1177,6 +771,7 @@ function isRTSPSource(pullUrl) {
   border-radius: 4px;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
   outline-color: #0074fc;
+  line-height: 17px;
 }
 .input:focus {
   background-color: rgba(18, 23, 37, 0.67);
@@ -1385,5 +980,27 @@ function isRTSPSource(pullUrl) {
 }
 .field-container-sm .badge-button {
   top: 8px;
+}
+
+</style>
+<style>
+.datetime-input{
+  display: block;
+  width: 100%;
+  height: auto !important;
+  margin: 10px 0 10px 0;
+  padding: 10px 14px;
+  color: #ffffff;
+  /* background-color: #010329; */
+  background-color: #202940;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  outline-color: #0074fc;
+  cursor: pointer;
+  line-height: 17px;
+}
+.datetime-input:focus {
+  background-color: rgba(18, 23, 37, 0.67);
 }
 </style>
