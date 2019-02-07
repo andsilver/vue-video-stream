@@ -85,6 +85,7 @@
                         type="datetime"
                         v-model="scheduledDateTime"
                         input-class="datetime-input"
+                        :min-datetime="minScheduleDateTime"
                         style="cursor:pointer"
                       ></datetime>
                     </div>
@@ -298,6 +299,12 @@ export default {
         return changed;
       },
     };
+  },
+  computed: {
+    minScheduleDateTime () {
+      let minTime = new Date(Date.now() + 180*1000)
+      return minTime.toISOString()
+    }
   },
   methods: {
     async saveSchedulerConfig () {
@@ -737,5 +744,26 @@ function isValidUrl(url) {
 }
 .btn-status:hover {
   background-color: #2647a3;
+}
+</style>
+<style>
+.datetime-input{
+  display: block;
+  width: 100%;
+  height: auto !important;
+  margin: 10px 0 10px 0;
+  padding: 10px 14px;
+  color: #ffffff;
+  /* background-color: #010329; */
+  background-color: #202940;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  outline-color: #0074fc;
+  cursor: pointer;
+  line-height: 17px;
+}
+.datetime-input:focus {
+  background-color: rgba(18, 23, 37, 0.67);
 }
 </style>
