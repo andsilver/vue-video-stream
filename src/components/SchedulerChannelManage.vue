@@ -22,7 +22,7 @@
         </div>
         <div class="col-md-9">
           <b-row>
-            <b-col cols="2">
+            <b-col cols="2" style="padding-right:0;">
               <div class="stat-container">
                 <div>
                   <span
@@ -693,8 +693,8 @@ function isValidUrl(url) {
   display: block;
   width: 100%;
   height: auto !important;
-  margin: 10px 0 10px 0;
-  padding: 10px 14px;
+  margin: 10px 0 10px 0 !important;;
+  padding: 10px 14px !important;
   color: #ffffff;
   /* background-color: #010329; */
   background-color: #202940;
