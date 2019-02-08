@@ -5,10 +5,10 @@
           <b-col cols="12" lg="8">
             <div v-if="!streamPlatforms.length" 
                  class="placeholder">
-                 Ready, Set ... &nbsp;Go!
-              <p style="font-size:13.5px;opacity:0.75;">Lets add a platform to get started</p>
-              <b-button variant="danger"
-                        v-b-modal.modal-add-platform>Add Platform</b-button>
+                 No Platforms yet
+                <p style="font-size:14px;">Lets add a platform to get started</p>
+                <b-button variant="danger"
+                          v-b-modal.modal-add-platform>Add Publish Platform</b-button>
             </div>
             <b-row v-else>
               <b-col>

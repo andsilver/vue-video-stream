@@ -123,7 +123,7 @@
                 <b-col cols="2">
 
                   <div v-if="video.uploadable" 
-                       class="inline-block upload-wrapper">
+                       class="upload-wrapper">
 
                     <div v-if="video.uploading">
                       <b-progress :value="video.uploadProgress || 0"
@@ -157,14 +157,25 @@
                       <code>removing ..</code>
                     </div>
                     <div v-else>
-                      <button class="btn btn-primary btn-sm" 
-                              @click="clipboardCopy(getHlsUrl(video))">Copy hls</button>
-                      
                       <!-- &nbsp;<button class="video-action-btn"  -->
-                      &nbsp;<button class="btn btn-default btn-sm" 
-                              @click="toggleExpand(index)">{{ video.expanded ? 'Less' : 'More' }}</button>
+                      <button class="btn btn-link btn-sm"
+                              style="border:1px solid;" 
+                              @click="toggleExpand(index)">
+                              {{ video.expanded ? 'Less' : 'More' }}
+                              <!-- <i class="fa fa-angle-down"></i> -->
+                      </button>
+                              
+                      &nbsp;<button class="btn btn-danger btn-sm" 
+                              @click="playVideo(video)">
+                              <!-- <i class="fa fa-play"></i> -->
+                              Play
+                              </button>
+
+                      &nbsp;<button class="btn btn-primary btn-sm" 
+                              @click="clipboardCopy(getHlsUrl(video))">HLS</button>
+
                       
-                      <!-- &nbsp;<button class="video-action-btn delete"  -->
+                      
                       &nbsp;<button class="btn btn-danger btn-sm" 
                               @click="requestVideoRemoval(video.id)">Delete</button>
 
@@ -232,12 +243,18 @@
         </div>
       </div>
 
+      <vod-video-modal :stream="stream" :video="selectedVideo"></vod-video-modal>
+      
       <alert-modal modal-id="alert-video-encoding" 
                      message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
                      okText="Got it, thanks"></alert-modal>
       
       <alert-modal modal-id="alert-video-size" 
                    message="You can upload media with size upto of 50MB only"
+                   okText="Fine"></alert-modal>
+
+      <alert-modal modal-id="alert-leaving-active-uploads"
+                   message="Video(s) are being uploaded. Please cancel active uploads before leaving"
                    okText="Fine"></alert-modal>
       
       <confirm-modal modal-id="confirm-video-removal" 
@@ -252,6 +269,7 @@
 import Vue from 'vue'
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import AlertModal from "@/components/AlertModal.vue";
+import VodVideoModal from "@/components/VODVideoModal.vue";
 import StreamService from '@/services/StreamService'
 import utils from '@/utils'
 
@@ -260,6 +278,18 @@ const MaxVideoUploadSize = 50 * 1024 * 1024
 export default {
   name: "VODChannelManageVideos",
   props: ['stream'],
+  beforeRouteLeave (to, from, next) {
+
+    let videosUploading = _.filter(this.videoFiles, { uploading: true })
+    if (_.size(videosUploading)) {
+      this.$root.$emit('bv::show::modal', 'alert-leaving-active-uploads')
+      return
+    }
+
+    next()
+
+    next()
+  },
   async mounted () {
     
     try {
@@ -288,7 +318,8 @@ export default {
     return {
       processing: true,
       focusedVideo: {},
-      videoFiles: []
+      videoFiles: [],
+      selectedVideo: null
     }
   },
   computed: {
@@ -306,6 +337,12 @@ export default {
     }
   },
   methods: {
+    playVideo (video) {
+      if (!video) return
+      this.selectedVideo = video
+      this.$root.$emit("bv::show::modal", "modal-vod-video")
+      console.log('video', video)
+    },
     clipboardCopy (text) {
       try {
         if (text instanceof Function) 
@@ -501,7 +538,8 @@ export default {
   },
   components: {
     AlertModal,
-    ConfirmModal
+    ConfirmModal,
+    VodVideoModal
   }
 };
 
@@ -659,8 +697,7 @@ function imageReader(file, cb) {
   color: #ffffff;
 }
 .upload-wrapper {
-  padding-left: 0 !important;
-  width: 175px;
+  width: 100%;
 }
 .progress {
   height: 18px;

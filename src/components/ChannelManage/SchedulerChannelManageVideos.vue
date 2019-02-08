@@ -14,7 +14,7 @@
         </div>
       </div>
       <div v-else>
-        <input id="video-input" type="file" style="visibility:hidden;"/>
+        <input id="video-input" type="file" style="visibility:hidden;position:absolute;"/>
 
         <div v-if="!videoFiles.length" class="text-center">
           <div style="font-size: 15.5px;">
@@ -25,15 +25,15 @@
         </div>
         <div v-else>
           
-          <b-row>
+          <!-- <b-row>
             
             <b-col>
               <button class="btn btn-primary"
-                      @click="triggerFileUpload">Upload Video</button>              
-              <!-- <button class="btn btn-link">Clear All</button> -->
+                      :disabled="videoFiles.length"
+                      @click="triggerFileUpload">Upload Video</button>
             </b-col>
 
-          </b-row>
+          </b-row> -->
 
           <br>
 
@@ -78,7 +78,7 @@
                   </b-row>
                 </b-col>
                 
-                <b-col  cols="1">
+                <b-col  cols="1" style="padding-right:0;">
                   <div v-if="video.mediaInfo">
                     <span v-if="video.mediaInfo.duration<60">{{video.mediaInfo.duration}} secs</span>
                     <span v-else-if="video.mediaInfo.duration">{{video.mediaInfo.duration/60|number}} mins</span>
@@ -88,41 +88,45 @@
                 
                 <b-col cols="4">
 
-                  <span v-if="video.bytes">
-                    {{ video.bytes | bytes }}
-                    &nbsp;
-                  </span>
+                  <b-row>
+                    <b-col cols="3" style="padding-right:0;">
+                      <span v-if="video.bytes">
+                        {{ video.bytes | bytes }}
+                        &nbsp;
+                      </span>
+                    </b-col>
+                    <b-col :cols="video.uploadable ? 7 : 9">
+                      <div v-if="video.uploadable" 
+                           class="inline-block upload-wrapper">
 
-                  <div v-if="video.uploadable" 
-                       class="inline-block upload-wrapper">
+                        <div v-if="video.uploading">
+                          <b-progress :value="video.uploadProgress || 0"
+                                      :max="100" 
+                                      show-progress 
+                                      animated></b-progress>
+                          <!-- <button class="badge">UPLOADING ..</button> -->
+                        </div>
+                        <button v-else class="video-action-btn">awaiting upload</button>
 
-                    <div v-if="video.uploading">
-                      <b-progress :value="video.uploadProgress || 0"
-                                  :max="100" 
-                                  show-progress 
-                                  animated></b-progress>
-                      <!-- <button class="badge">UPLOADING ..</button> -->
-                    </div>
-                    <button v-else class="video-action-btn">awaiting upload</button>
-
-                  </div>
-
-                  <div v-else class="inline-block">
-                    <span v-if="video.mediaInfo">{{video.mediaInfo.width}} x {{video.mediaInfo.height}}</span>
-                    &nbsp;
-                    
-                    <code v-if="video.mediaInfo" style="font-size:13px;">{{video.mediaInfo.fps}} FPS</code>
-                    &nbsp;
-
-                    <!-- media codecs -->
-                    <span v-if="video.mediaInfo && video.mediaInfo.codecs">
-                      <span v-for="(codec, index) in video.mediaInfo.codecs" 
-                            :key="index" 
-                            v-if="codec.type !== 'general'"
-                            class="media-codec"
-                            :class="codec.type">{{codec.codec}}</span>
-                    </span>
-                  </div>
+                      </div>
+                      <!-- <div v-if="!video.uploadable" class="inline-block"> -->
+                      <div v-else class="inline-block">
+                        <span v-if="video.mediaInfo">{{video.mediaInfo.width}}x{{video.mediaInfo.height}}</span>
+                        &nbsp;
+                        <code v-if="video.mediaInfo" style="font-size:13px;">{{video.mediaInfo.fps}} FPS</code>
+                        &nbsp;
+                        <!-- media codecs -->
+                        <span v-if="video.mediaInfo && video.mediaInfo.codecs">
+                          <span v-for="(codec, index) in video.mediaInfo.codecs" 
+                                :key="index" 
+                                v-if="codec.type !== 'general'"
+                                class="media-codec"
+                                :class="codec.type">{{codec.codec}}</span>
+                        </span>
+                      </div>
+                    </b-col>
+                    <b-col v-if="video.uploadable" cols="1"></b-col>
+                  </b-row>
 
                 </b-col>
                 
@@ -167,8 +171,12 @@
       </div>
 
       <alert-modal modal-id="alert-video-encoding" 
-                     message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
-                     okText="Got it, thanks"></alert-modal>
+                   message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
+                   okText="Got it, thanks"></alert-modal>
+
+      <alert-modal modal-id="alert-leaving-active-uploads"
+                   message="Video(s) are being uploaded. Please cancel active uploads before leaving"
+                   okText="Fine"></alert-modal>
       
       <confirm-modal modal-id="confirm-video-removal" 
                      :message="'You are about to delete video named `' + (focusedVideo && focusedVideo.fileName || '') + '`'"
@@ -188,6 +196,16 @@ import utils from '@/utils'
 export default {
   name: "ScheduledChannelManageVideos",
   props: ['stream'],
+  beforeRouteLeave (to, from, next) {
+
+    let videosUploading = _.filter(this.videoFiles, { uploading: true })
+    if (_.size(videosUploading)) {
+      this.$root.$emit('bv::show::modal', 'alert-leaving-active-uploads')
+      return
+    }
+
+    next()
+  },
   async mounted () {
     
     try {
@@ -622,8 +640,8 @@ function imageReader(file, cb) {
   color: #ffffff;
 }
 .upload-wrapper {
-  padding-left: 15px;
-  width: 220px;
+  /* padding-left: 15px; */
+  width: 100%;
 }
 .progress {
   height: 18px;

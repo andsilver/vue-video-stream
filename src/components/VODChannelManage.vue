@@ -22,11 +22,13 @@
           <b-row>
             <b-col cols="3">
               <div class="stat-container">
-                <div v-if="videoFilesRetrieved">
-                  <span class="value">
+                  <div v-if="videoFilesRetrieved">
+                    <span class="value">{{ storageStats.value }}</span>
+                    <span class="text-uppercase" style="font-size:14px;">{{ storageStats.unit }}</span>
+                  </div>
+                  <!-- <span class="value">
                     {{bucketSize | bytes}}
-                  </span>
-                </div>
+                  </span> -->
                 <div v-else><span class="value">..</span></div>
                 <div class="label">Storage</div>
               </div>
@@ -158,6 +160,11 @@ export default {
       mediaPulse: null,
       clientsCount: null,
       windowHeight: 0,
+      storageStats: {
+        value: 0,
+        unit: 'bytes',
+        loaded: false,
+      },
       countPushedBytes() {
         const { bytesOutTotal = 0, pushStatsTotal = 0 } = this.mediaPulse;
         return _.sum([bytesOutTotal, pushStatsTotal]);
@@ -195,13 +202,7 @@ export default {
     },
     onVideoFiles (videos) {
       console.log('videos', videos)
-      let bytes = 0
-      _.each(videos, video => {
-        if(!video || !video.bytes) return
-        bytes += video.bytes
-      })
-
-      this.bucketSize = bytes
+      this.updateStorageUsage(videos)
       this.videoFilesRetrieved = true
     },
     async setupStream() {
@@ -369,6 +370,16 @@ export default {
       }
 
       this.processing = false;
+    },
+    updateStorageUsage (videos) {
+      let bytes = 0
+      _.each(videos, video => {
+        if(!video || !video.bytes) return
+        bytes += video.bytes
+      })
+
+      let bytesInfo = this.$options.filters.bytes(bytes, true, 2, true)
+      this.storageStats = _.assign({}, bytesInfo, { loaded: true })
     }
   },
   components: {

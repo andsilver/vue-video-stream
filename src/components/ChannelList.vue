@@ -48,17 +48,16 @@
           </b-dropdown-item>
           <b-dropdown-item @click="openScheduledStreamModal">
                 <div class="dropdown-icon ico">
-                  <!-- <i class="far fa-calendar-alt"></i> -->
-                  <i class="far fa-clock"></i>
+                  <i class="far fa-calendar-alt"></i>
                 </div>
                 <div class="dropdown-text">
                   <div class="main">New Scheduled Stream</div>
                   <div class="desc">Schedule your live presence</div>
                 </div>
-              </b-dropdown-item>
+          </b-dropdown-item>
           <b-dropdown-item v-b-modal.modal-add-vod-channel>
             <div class="dropdown-icon ico">
-              <i class="far fa-play-circle"></i>
+              <i class="fa fa-stream"></i>
             </div>
             <div class="dropdown-text">
               <div class="main">New VOD Bucket</div>
@@ -127,8 +126,8 @@
                 </div>
               </b-dropdown-item>
               <b-dropdown-item @click="openScheduledStreamModal">
-                <div class="dropdown-icon">
-                  <img src="../assets/scheduled.png" style="width:22px;margin-left:-1px;" />
+                <div class="dropdown-icon ico">
+                  <i class="far fa-calendar-alt"></i>
                 </div>
                 <div class="dropdown-text">
                   <div class="main">New Scheduled Stream</div>
@@ -137,7 +136,7 @@
               </b-dropdown-item>
               <b-dropdown-item v-b-modal.modal-add-vod-channel>
                 <div class="dropdown-icon ico">
-                  <i class="far fa-play-circle" style="color:#4949fd;"></i>
+                  <i class="fab fa-stream" style="color:#4949fd;"></i>
                 </div>
                 <div class="dropdown-text">
                   <div class="main">New VOD Bucket</div>
