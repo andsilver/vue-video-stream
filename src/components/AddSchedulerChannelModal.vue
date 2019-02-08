@@ -16,6 +16,7 @@
         </div>
       </template>
       <div>
+
         <!-- error placeholder -->
         <div v-if="error && !error.role" 
              class="alert alert-danger">
@@ -27,7 +28,7 @@
             </router-link>
           </div>
         </div>
-        
+
         <div v-if="error">
           <div v-if="error.role"
                style="margin-top:10px;font-size:14px;">
@@ -68,7 +69,7 @@
             <p v-show="formErrors.name"
               class="text-danger">specify stream name</p>
           </div>
-          <div class="field-container">
+          <div class="field-container hidden">
             <div class="label">hosting region</div>
             
             <b-dropdown no-caret class="region-dropdown w-100" style="margin:7px 0;">
@@ -137,6 +138,7 @@ export default {
     this.$refs.modalAddScheduledChannel.$on("hide", this.onDismiss);
     this.$refs.modalAddScheduledChannel.$on("shown", this.onInit);
     this.regions = await StreamService.getAvailableRegions('scheduled');
+    this.selectRegion(_.head(this.regions))
   },
   data() {
     return {
