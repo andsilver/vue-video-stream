@@ -1,18 +1,57 @@
 <template>
   <div>
     <div class="content-container">
+      <div class="feature-item">
+        <!-- <div class="feature-control"></div> -->
+        <div class="feature-desc">
+          <div>Player Theme Color</div>
+        </div>
+        <div class="feature-desc" style="position:relative;height:17px;">
+          <b-dropdown
+            v-if="embedThemeColorSelection"
+            id="player-color"
+            variant="link"
+            class="m-md-2"
+            style="margin:0 0 0 15px !important;position:absolute;">
+            <template slot="button-content">
+              <span style="color: white;">
+                <div
+                  class="color-preview-box"
+                  :style="{ 'background-color': embedThemeColorSelection.color }"
+                ></div>
+                <span class="text-capitalize">{{embedThemeColorSelection.label}}</span>
+              </span>
+            </template>
+            <b-dropdown-item v-for="(color,index) in streamMeta.options.embedThemeColors" 
+                             :key="index" 
+                             @click="selectEmbedThemeColor($event, color)">
+              <div class="color-preview-box" :style="{ 'background-color': color.color }"></div>
+              <span class="text-capitalize">{{color.label}}</span>
+            </b-dropdown-item>
+          </b-dropdown>
+          <button v-show="canSaveEmbedThemeColor()"
+              class="modal-button modal-button-sm highlight badge-button"
+              @click="saveEmbedThemeColor" 
+              style="margin-left:125px;">Save</button>
+        </div>
+        <!-- <div class="muted sm">Player border, frames seekbar, volume control etc</div> -->
+      </div>
 
       <div class="feature-item">
         <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.embedAutoplay.enabled }"
-                @click="toggleFeature('embedAutoplay')">
-            <i class="fa"
-               :class="{
+          <span
+            class="toggle-control"
+            :class="{ enabled: features.embedAutoplay.enabled }"
+            @click="toggleFeature('embedAutoplay')"
+          >
+            <i
+              class="fa"
+              :class="{
                  'fa-toggle-on enabled': features.embedAutoplay.enabled,
                  'fa-toggle-off': !features.embedAutoplay.enabled,
                  'status-processing': featureProcessing.embedAutoplay,
-               }"></i>
+               }"
+            ></i>
           </span>
         </div>
         <div class="feature-desc">
@@ -22,104 +61,115 @@
 
       <div class="feature-item">
         <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.ga.enabled }"
-                @click="toggleFeature('ga')">
-            <i class="fa"
-               :class="{
+          <span
+            class="toggle-control"
+            :class="{ enabled: features.ga.enabled }"
+            @click="toggleFeature('ga')"
+          >
+            <i
+              class="fa"
+              :class="{
                  'fa-toggle-on enabled': features.ga.enabled,
                  'fa-toggle-off': !features.ga.enabled,
                  'status-processing': featureProcessing.ga,
-               }"></i>
+               }"
+            ></i>
           </span>
         </div>
         <div class="feature-desc">
           <div>Enable Google Analytics</div>
           <div v-if="features.ga.enabled" class="pane">
             <span>GA ID</span>
-            <input class="input" 
-                   v-model="features.ga.value"
-                   placeholder="UA-00000.." />
-            <button class="btn btn-primary"
-                    :disabled="!features.ga.value"
-                    @click="savePlayerGAId">
-                {{ featureProcessing.ga ? 'saving ..' : 'save' }}
-            </button>
+            <input class="input" v-model="features.ga.value" placeholder="UA-00000..">
+            <button
+              class="btn btn-primary"
+              :disabled="!features.ga.value"
+              @click="savePlayerGAId"
+            >{{ featureProcessing.ga ? 'saving ..' : 'save' }}</button>
           </div>
         </div>
       </div>
-      
+
       <div class="feature-item">
         <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.embedRewind.enabled }"
-                @click="toggleFeature('embedRewind')">
-            <i class="fa"
-               :class="{
+          <span
+            class="toggle-control"
+            :class="{ enabled: features.embedRewind.enabled }"
+            @click="toggleFeature('embedRewind')"
+          >
+            <i
+              class="fa"
+              :class="{
                  'fa-toggle-on': features.embedRewind.enabled,
                  'fa-toggle-off': !features.embedRewind.enabled,
                  'status-processing': featureProcessing.embedRewind,
-               }"></i>
+               }"
+            ></i>
           </span>
         </div>
-        <div class="feature-desc">
-          Enable Embed Player Rewind
-        </div>
+        <div class="feature-desc">Enable Embed Player Rewind</div>
       </div>
 
       <div class="feature-item">
         <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.ull.enabled }"
-                @click="toggleFeature('ull')">
-            <i class="fa"
-               :class="{
+          <span
+            class="toggle-control"
+            :class="{ enabled: features.ull.enabled }"
+            @click="toggleFeature('ull')"
+          >
+            <i
+              class="fa"
+              :class="{
                  'fa-toggle-on enabled': features.ull.enabled,
                  'fa-toggle-off': !features.ull.enabled,
                  'status-processing': featureProcessing.ull
-               }"></i>
+               }"
+            ></i>
           </span>
         </div>
-        <div class="feature-desc">
-          Enable Ultra Low Latency Embeds
-        </div>
+        <div class="feature-desc">Enable Ultra Low Latency Embeds</div>
       </div>
 
       <div class="feature-item">
         <div class="feature-control">
-          <span class="toggle-control"
-                :class="{ enabled: features.abr.enabled }"
-                @click="toggleFeature('abr')">
-            <i class="fa"
-               :class="{
+          <span
+            class="toggle-control"
+            :class="{ enabled: features.abr.enabled }"
+            @click="toggleFeature('abr')"
+          >
+            <i
+              class="fa"
+              :class="{
                  'fa-toggle-on enabled': features.abr.enabled,
                  'fa-toggle-off': !features.abr.enabled,
                  'status-processing': featureProcessing.abr
-               }"></i>
+               }"
+            ></i>
           </span>
         </div>
-        <div class="feature-desc">
-          Enable Multi-Bitrate Transcoding
-        </div>
+        <div class="feature-desc">Enable Multi-Bitrate Transcoding</div>
       </div>
 
       <div class="feature-item">
         <div class="feature-desc">
           <div>Chat Embed Snippet</div>
           <div class="pane">
-                <input class="input" 
-                       :value="chatEmbedIframeSnippet"
-                       readonly
-                       style="width:500px;margin-left:0;"/>
-                &nbsp;
-                <button class="modal-button modal-button-sm highlight badge-button"
-                        @click="clipboardCopy(chatEmbedIframeSnippet)">Copy</button>
-                <!-- &nbsp; -->
-                <button class="modal-button modal-button-sm badge-button bordered"
-                        @click="clearChat">
-                        <!-- <i v-show="!chatFlushProcessing" class="fa fa-trash"></i>  -->
-                        {{  chatFlushProcessing ? 'Clearing ..' : 'Clear Messages' }}
-                </button>
+            <input
+              class="input"
+              :value="chatEmbedIframeSnippet"
+              readonly
+              style="width:500px;margin-left:0;"
+            >
+            &nbsp;
+            <button
+              class="modal-button modal-button-sm highlight badge-button"
+              @click="clipboardCopy(chatEmbedIframeSnippet)"
+            >Copy</button>
+            <!-- &nbsp; -->
+            <button class="modal-button modal-button-sm badge-button bordered" @click="clearChat">
+              <!-- <i v-show="!chatFlushProcessing" class="fa fa-trash"></i>  -->
+              {{ chatFlushProcessing ? 'Clearing ..' : 'Clear Messages' }}
+            </button>
           </div>
         </div>
       </div>
@@ -136,46 +186,51 @@
                  'status-processing': featureProcessing.embedPoster
                }"></i>
           </span>
-        </div> -->
+        </div>-->
         <div class="feature-desc">
           <div>Custom Embed Poster</div>
           <div class="pane">
-            <div v-if="posterUrl" 
-                 class="poster-thumb-wrapper">
-              <img :src="posterUrl" class="poster-thumb" />
+            <div v-if="posterUrl" class="poster-thumb-wrapper">
+              <img :src="posterUrl" class="poster-thumb">
             </div>
-            
-            <span class="hidden">Image File</span>
-            <input type="file"
-                   id="embed-poster-input"
-                   class="input hidden" 
-                   @change="onEmbedPosterPreview"
-                   placeholder="UA-00000.." />
 
-            <button v-if="!embedPosterTemp"
-                    class="btn btn-danger"
-                    :disabled="featureProcessing.embedPoster"
-                    @click="hitUpload"
-                    style="margin:0;">
+            <span class="hidden">Image File</span>
+            <input
+              type="file"
+              id="embed-poster-input"
+              class="input hidden"
+              @change="onEmbedPosterPreview"
+              placeholder="UA-00000.."
+            >
+            
+            <button
+              v-if="!embedPosterTemp"
+              class="btn btn-danger"
+              :disabled="featureProcessing.embedPoster"
+              @click="hitUpload"
+              style="margin:0;"
+            >
               <span v-if="features.embedPoster.value">Change</span>
               <span v-else>Select Poster</span>
             </button>
             
-            <button v-if="embedPosterTemp"
-                    class="btn btn-success"
-                    :disabled="featureProcessing.embedPoster"
-                    @click="saveEmbedPoster"
-                    style="margin:0;">
+            <button
+              v-if="embedPosterTemp"
+              class="btn btn-success"
+              :disabled="featureProcessing.embedPoster"
+              @click="saveEmbedPoster"
+              style="margin:0;"
+            >
               <!-- <span v-if="features.embedPoster.value">Save Poster</span> -->
-              <span>
-                {{ featureProcessing.embedPoster ? 'Saving ..' : 'Save Poster' }}
-              </span>
+              <span>{{ featureProcessing.embedPoster ? 'Saving ..' : 'Save Poster' }}</span>
             </button>
             
-            <button v-if="embedPosterTemp || features.embedPoster.value"
-                    class="btn btn-link"
-                    :disabled="featureProcessing.embedPoster"
-                    @click="cancelUpload">
+            <button
+              v-if="embedPosterTemp || features.embedPoster.value"
+              class="btn btn-link"
+              :disabled="featureProcessing.embedPoster"
+              @click="cancelUpload"
+            >
               <span v-if="embedPosterTemp && features.embedPoster.value">Restore</span>
               <span v-else-if="embedPosterTemp">Cancel</span>
               <span v-else>Remove</span>
@@ -187,36 +242,40 @@
                 <button class="btn btn-primary"
                         @click="saveEmbedPoster">
                         {{ featureProcessing.embedPoster ? 'saving ..' :  'save' }}</button>
-            </div> -->
-
-
+            </div>-->
             <!-- <button v-if="features.embedPoster.value"
                     class="btn btn-link"
                     :disabled="featureProcessing.embedPoster"
-                    @click="removePoster">Remove</button> -->
-            <div v-show="features.embedPoster.error"
-                 class="alert alert-danger"
-                 style="margin-top:10px;">{{features.embedPoster.error}}</div>
+            @click="removePoster">Remove</button>-->
+            <div
+              v-show="features.embedPoster.error"
+              class="alert alert-danger"
+              style="margin-top:10px;"
+            >{{features.embedPoster.error}}</div>
           </div>
         </div>
       </div>
-      
     </div>
 
-    <confirm-modal modal-id="platform-delete-confirm"
-                   message="Would you like to remove selected publish platform"
-                   @modal-confirm="onPlatformDeleteConfirm(configurablePlatform)"></confirm-modal>
-    
+    <confirm-modal
+      modal-id="platform-delete-confirm"
+      message="Would you like to remove selected publish platform"
+      @modal-confirm="onPlatformDeleteConfirm(configurablePlatform)"
+    ></confirm-modal>
 
-     <alert-modal modal-id="alert-mixer-pull"
-                  message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
-                  okText="Got it"></alert-modal>
+    <alert-modal
+      modal-id="alert-mixer-pull"
+      message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
+      okText="Got it"
+    ></alert-modal>
 
-    <confirm-modal modal-id="feature-upgrade"
-                   message="Please upgrade your subscription plan to access this feature"
-                   okText="Upgrade Now"
-                   cancelText="Later"
-                   @modal-confirm="navigateToBilling()"></confirm-modal>
+    <confirm-modal
+      modal-id="feature-upgrade"
+      message="Please upgrade your subscription plan to access this feature"
+      okText="Upgrade Now"
+      cancelText="Later"
+      @modal-confirm="navigateToBilling()"
+    ></confirm-modal>
   </div>
 </template>
 
@@ -232,63 +291,85 @@ import AlertModal from "@/components/AlertModal.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import utils from "@/utils";
 
+const PlayerThemeColors = [
+  { color: "red", label: "red" },
+  { color: "blue", label: "blue" },
+  { color: "green", label: "green" }
+];
+
 export default {
   name: "LiveChannelManageSettings",
-  props: ["stream", "streamAlive", "mediaPulse"],
+  props: ["stream", "streamAlive"],
   async mounted() {
+    this.streamId = this.stream._id;
+
+    const meta = await StreamService.getStreamMetadata(this.streamId);
+    this.streamMeta = meta;
+
+    _.forIn(meta, (value, key) => {
+      if (value != undefined && key in this.features) {
+        this.features[key].enabled = value === false ? false : true;
+        if (value.constructor !== Boolean) {
+          this.features[key].value = value;
+          // console.log('setting', this.features[key])
+        }
+      }
+    })
+
+    // PlayerThemeColors.unshift({ label: "default", color: meta.embedThemeColorDefault })
+    this.embedThemeColorSelection = _.find(meta.options.embedThemeColors, { color: meta.embedThemeColor })
+
+    // console.log('stream meta', meta)
     // event tracking
     window.trackEvent(
       this.stream.name + " - Live Stream Settings Page",
       this.stream
     );
   },
-  watch: {
-    mediaPulse() {
-      this.onMediaPulseChanged();
-    }
-  },
   data() {
     return {
+      Options: null,
       processing: true,
       processingMessage: null,
       chatFlushProcessing: null,
       streamId: null,
+      streamMeta: null,
+      embedThemeColorSelection: null,
       userSubscription: null,
-      streamMeta: {},
       features: {
-        ga: { 
-          enabled: false, 
+        ga: {
+          enabled: false,
           value: null,
-          valueType: 'string'
+          valueType: "string"
         },
-        chatEnabled: { 
+        chatEnabled: {
           enabled: false,
-          valueType: 'bool' 
+          valueType: "bool"
         },
-        embedRewind: { 
+        embedRewind: {
           enabled: false,
-          valueType: 'bool' 
+          valueType: "bool"
         },
-        ull: { 
+        ull: {
           enabled: false,
-          valueType: 'bool' 
+          valueType: "bool"
         },
-        abr: { 
+        abr: {
           enabled: false,
-          valueType: 'bool' 
+          valueType: "bool"
         },
-        embedPoster: { 
+        embedPoster: {
           error: false,
           enabled: false,
           value: null,
-          valueType: 'string',
+          valueType: "string"
         },
-        embedAutoplay: { 
+        embedAutoplay: {
           error: false,
           enabled: true,
           value: null,
-          valueType: 'bool',
-        },
+          valueType: "bool"
+        }
       },
       featureProcessing: {
         ga: false,
@@ -296,210 +377,235 @@ export default {
         chatEnabled: false,
         embedRewind: false,
         embedPoster: false,
-        embedAutoplay: false,
+        embedAutoplay: false
       },
       embedPosterTemp: null
     };
   },
-  async mounted () {
-    this.streamId = this.stream._id
-
-    const meta = await StreamService.getStreamMetadata(this.streamId)
-    _.forIn(meta, (value, key) => {
-      if (value != undefined && key in this.features) {
-        this.features[key].enabled = value === false ? false : true
-        if(value.constructor !== Boolean) {
-          this.features[key].value = value
-          // console.log('setting', this.features[key])
-        }
-      }
-    })
-
-    // console.log('stream meta', meta)
-  },
   computed: {
-    chatEmbedUrl () {
-      if (this.stream)
-        return `https://voice.castr.io/chat/${this.stream.key}`
+    chatEmbedUrl() {
+      if (this.stream) return `https://voice.castr.io/chat/${this.stream.key}`;
     },
-    chatEmbedIframeSnippet () {
-      let chatUrl = this.chatEmbedUrl
+    chatEmbedIframeSnippet() {
+      let chatUrl = this.chatEmbedUrl;
       if (chatUrl)
-      return `<iframe src="${chatUrl}" width="350" height="500" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+        return `<iframe src="${chatUrl}" width="350" height="500" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`;
     },
-    posterUrl () {
-      if (this.embedPosterTemp)
-        return this.embedPosterTemp
+    posterUrl() {
+      if (this.embedPosterTemp) return this.embedPosterTemp;
 
-      const imageId = this.features.embedPoster.value
-      if (!imageId) return
+      const imageId = this.features.embedPoster.value;
+      if (!imageId) return;
 
-      return `https://static.castr.io/embedPosters/${imageId}`
+      return `https://static.castr.io/embedPosters/${imageId}`;
     }
   },
   methods: {
-    clipboardCopy (text) {
+    getSelectedEmbedThemeColor() {
+      if (!this.streamMeta) return;
+      return this.streamMeta.embedThemeColor;
+    },
+    selectEmbedThemeColor(event, color) {
+      event.preventDefault()
+      // let colornode = _.find(PlayerThemeColors, { color });
+      // if (!colornode) return;
+
+      this.embedThemeColorSelection = color;
+    },
+    async saveEmbedThemeColor() {
+      if (!this.streamMeta) return;
+      
+      let colorNode = this.embedThemeColorSelection
       try {
-        if (text instanceof Function) 
-          text = text()
+        let color = colorNode.color
+        await this.saveSetting("embedThemeColor", color)
+        this.streamMeta.embedThemeColor = color
+      } catch(e) {
+        this.$notify({ group: 'error', text: 'could not update player color' })
+      }
+
+      // save changes
+    },
+    canSaveEmbedThemeColor () {
+      if (!this.embedThemeColorSelection) return
+      return this.embedThemeColorSelection.color !== this.streamMeta.embedThemeColor
+    },
+    clipboardCopy(text) {
+      try {
+        if (text instanceof Function) text = text();
 
         this.$copyText(text);
         this.$notify({ group: "info", text: "Copied to clipboard" });
       } catch (e) {}
     },
-    navigateToBilling () {
+    navigateToBilling() {
       // /manage/billing?category=live
-      this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
+      this.$router.push({
+        name: "Payments",
+        query: { category: "live", action: "upgrade" }
+      });
       // this.$root.$emit('bv::show::modal', 'feature-upgrade')
     },
-    async clearChat () {
-      if (this.chatFlushProcessing) return
-      
-      this.chatFlushProcessing = true
+    async clearChat() {
+      if (this.chatFlushProcessing) return;
+
+      this.chatFlushProcessing = true;
 
       try {
-        await IntegrationService.flushStreamChat(this.streamId)
+        await IntegrationService.flushStreamChat(this.streamId);
       } catch (e) {}
 
-      this.chatFlushProcessing = false
-      this.$notify({ group: 'success', text: 'chat messages have been cleared' })
+      this.chatFlushProcessing = false;
+      this.$notify({
+        group: "success",
+        text: "chat messages have been cleared"
+      });
     },
     async toggleFeature(featureName) {
-      if (this.featureProcessing[featureName]) return
-      
-      const feature = this.features[featureName]
-      if (!feature) return
+      if (this.featureProcessing[featureName]) return;
 
-      if (featureName === 'abr') {
-        this.toggleABR()
-        return
+      const feature = this.features[featureName];
+      if (!feature) return;
+
+      if (featureName === "abr") {
+        this.toggleABR();
+        return;
       }
 
       // if (featureName === 'abr' || featureName === 'ull') {
-      if (featureName === 'ull') {
-        if (window.Intercom)
-          window.Intercom('show')
-        return
+      if (featureName === "ull") {
+        if (window.Intercom) window.Intercom("show");
+        return;
       }
-      
+
       // ignore if chat toggled
-      if (featureName === 'chatEnabled') {
-        this.features.chatEnabled.enabled = !feature.enabled
-        return
+      if (featureName === "chatEnabled") {
+        this.features.chatEnabled.enabled = !feature.enabled;
+        return;
       }
 
-      if (featureName === 'embedRewind' && !this.stream.dvrHours) {
+      if (featureName === "embedRewind" && !this.stream.dvrHours) {
         // window.alertt('not available in trial pack')
-        this.$root.$emit('bv::show::modal', 'feature-upgrade')
-        return
-      }
-      
-      const nstate = !feature.enabled
-      feature.enabled = nstate
-      
-      if (feature.valueType === 'bool' || !nstate) {
-        await this.saveSetting(featureName, nstate)
+        this.$root.$emit("bv::show::modal", "feature-upgrade");
+        return;
       }
 
+      const nstate = !feature.enabled;
+      feature.enabled = nstate;
+
+      if (feature.valueType === "bool" || !nstate) {
+        await this.saveSetting(featureName, nstate);
+      }
     },
-    async toggleABR () {
-      let nstate = !this.features.abr.enabled
-      let methodName = nstate === true ? 'enableStreamABR' : 'disableStreamABR'
+    async toggleABR() {
+      let nstate = !this.features.abr.enabled;
+      let methodName = nstate === true ? "enableStreamABR" : "disableStreamABR";
 
       try {
-        await StreamService[methodName](this.stream._id)
-        this.features.abr.enabled = nstate
-      } catch(e) {
-        if (_.includes(_.get(e, 'message')), 'upgrade') {
-          this.$root.$emit('bv::show::modal', 'feature-upgrade')
+        await StreamService[methodName](this.stream._id);
+        this.features.abr.enabled = nstate;
+      } catch (e) {
+        if ((_.includes(_.get(e, "message")), "upgrade")) {
+          this.$root.$emit("bv::show::modal", "feature-upgrade");
         } else {
-          console.log('api-error', e)
+          console.log("api-error", e);
         }
 
-        this.$notify({group: 'error', text: 'could not toggle stream ABR'})
+        this.$notify({ group: "error", text: "could not toggle stream ABR" });
       }
-
     },
-    async savePlayerGAId () {
-      var gaId = this.features.ga.value
-      if(!gaId) return
+    async savePlayerGAId() {
+      var gaId = this.features.ga.value;
+      if (!gaId) return;
 
-      await this.saveSetting('ga', gaId)
+      await this.saveSetting("ga", gaId);
     },
-    hitUpload () {
-      document.querySelector('#embed-poster-input').click()
+    hitUpload() {
+      document.querySelector("#embed-poster-input").click();
     },
-    onEmbedPosterPreview () {
-      let imageInput = document.querySelector('#embed-poster-input')
-      let imageFile = imageInput.files[0]
-      if (!imageFile) return
+    onEmbedPosterPreview() {
+      let imageInput = document.querySelector("#embed-poster-input");
+      let imageFile = imageInput.files[0];
+      if (!imageFile) return;
 
-      imageReader(imageFile, (base64) => {
-        this.embedPosterTemp = base64
-      })
+      imageReader(imageFile, base64 => {
+        this.embedPosterTemp = base64;
+      });
     },
-    async saveEmbedPoster (event) {
-      this.features.embedPoster.error = false
+    async saveEmbedPoster(event) {
+      this.features.embedPoster.error = false;
 
-      let imageInput = document.querySelector('#embed-poster-input')
-      let imageFile = imageInput.files[0]
-      
+      let imageInput = document.querySelector("#embed-poster-input");
+      let imageFile = imageInput.files[0];
+
       if (!imageInput.value || !imageFile) {
-        this.features.embedPoster.error = 'please pick an image file'
-        return
+        this.features.embedPoster.error = "please pick an image file";
+        return;
       }
 
-      this.featureProcessing.embedPoster = true
-      
+      this.featureProcessing.embedPoster = true;
+
       // -- upload reuqest --
-      const fdata = new FormData()
-      fdata.append('file', imageFile)
+      const fdata = new FormData();
+      fdata.append("file", imageFile);
       const fdataConfig = {
         headers: {
-          'content-type': 'multipart/form-data'
+          "content-type": "multipart/form-data"
         }
-      }
+      };
 
-      const res = await StreamService.uploadStreamPoster(this.streamId, fdata)
+      const res = await StreamService.uploadStreamPoster(this.streamId, fdata);
       if (res.success) {
-        this.embedPosterTemp = null
-        this.features.embedPoster.value = res.uploadId
-        this.$notify({ group: 'success', text: 'Poster uploaded with success' })
+        this.embedPosterTemp = null;
+        this.features.embedPoster.value = res.uploadId;
+        this.$notify({
+          group: "success",
+          text: "Poster uploaded with success"
+        });
       } else {
-        this.features.embedPoster.error = 'could not handle image upload. Please try again later'
+        this.features.embedPoster.error =
+          "could not handle image upload. Please try again later";
       }
       // -- upload reuqest ends --
 
-      this.featureProcessing.embedPoster = false
+      this.featureProcessing.embedPoster = false;
     },
-    async cancelUpload () {
+    async cancelUpload() {
       if (this.embedPosterTemp) {
-        this.embedPosterTemp = null
-        document.querySelector('#embed-poster-input').value = null
-        return
+        this.embedPosterTemp = null;
+        document.querySelector("#embed-poster-input").value = null;
+        return;
       }
 
-      this.removePoster()
-      
+      this.removePoster();
     },
-    async removePoster () {
+    async removePoster() {
       try {
-        await this.saveSetting('embedPoster', null)
-        this.features.embedPoster.value = null
+        await this.saveSetting("embedPoster", null);
+        this.features.embedPoster.value = null;
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     },
     onMediaPulseChanged() {},
-    async saveSetting (key, value) {
-      this.featureProcessing[key]=true
+    async saveSetting(key, value) {
+      this.featureProcessing[key] = true;
       try {
-        const nmeta = await StreamService.saveStreamMetadata(this.streamId, key, value)
-        console.log('new meta', nmeta)
+        const nmeta = await StreamService.saveStreamMetadata(
+          this.streamId,
+          key,
+          value
+        );
+
+        console.log("new meta", nmeta);
+
+        // clear stream meta cache in embed player
+        await StreamService.clearStreamMetadataCache(this.streamId)
+
       } catch (e) {
-        this.$notify({ group: 'error', text: 'could not save changes' })
+        this.$notify({ group: "error", text: "could not save changes" });
       }
-      this.featureProcessing[key]=false
+      this.featureProcessing[key] = false;
     }
   },
   components: {
@@ -651,7 +757,8 @@ function isRTSPSource(pullUrl) {
   background-color: rgba(18, 23, 37, 0.67);
   border: none;
   border-radius: 2px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
+    0 2px 1px -1px rgba(0, 0, 0, 0.12);
   outline-color: #0074fc;
 }
 .input:focus {
@@ -901,7 +1008,7 @@ function isRTSPSource(pullUrl) {
   color: #c5c5c5;
 }
 .feature-item .input {
-  margin:0;
+  margin: 0;
   margin-left: 8px;
   display: inline-block;
   width: unset;
@@ -921,6 +1028,15 @@ function isRTSPSource(pullUrl) {
 .poster-thumb {
   display: inline-block;
   width: 196px;
-  border: 1px solid #010329; 
+  border: 1px solid #010329;
+}
+.color-preview-box {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+  vertical-align: middle;
 }
 </style>

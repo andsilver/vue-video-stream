@@ -33,6 +33,7 @@ export default {
   getAvailableRegions,
   getStreamMetadata,
   saveStreamMetadata,
+  clearStreamMetadataCache,
   enableStreamABR,
   disableStreamABR,
   uploadStreamPoster,
@@ -326,6 +327,16 @@ function saveStreamMetadata(streamId, key, value) {
         value
       }
     }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function clearStreamMetadataCache(streamId) {
+  return makeRequest({
+    path: `https://player.castr.io/cache/clear?stream=${streamId}`,
+    method: 'post'
   })
 }
 

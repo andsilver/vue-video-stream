@@ -94,6 +94,19 @@ body {
   padding: 0 !important;
 }
 
+#player-color .dropdown-item {
+  padding: 5px 9px !important;
+}
+#player-color .dropdown-item:hover {
+  /* background-color: red; */
+  background-color: rgba(145, 145, 145, 0.3);
+}
+#player-color button.btn {
+  padding-top: 0!important;
+  padding-bottom: 0!important;
+}
+/* rgb(92, 92, 92) */
+
 .dropdown-item a,
 .dropdown-item .a {
   display: block;
