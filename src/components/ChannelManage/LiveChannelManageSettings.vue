@@ -600,7 +600,7 @@ export default {
         console.log("new meta", nmeta);
 
         // clear stream meta cache in embed player
-        await StreamService.clearStreamMetadataCache(this.streamId)
+        StreamService.clearStreamMetadataCache(this.streamId)
 
       } catch (e) {
         this.$notify({ group: "error", text: "could not save changes" });
