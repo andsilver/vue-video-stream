@@ -90,7 +90,7 @@
       </div>
     </div>
 
-    <confirm-modal message="Would you like to delete this stream and all of its content?"
+    <confirm-modal message="Deleting VOD will discard all of your saved videos. Continue?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
   </div>
 </template>
