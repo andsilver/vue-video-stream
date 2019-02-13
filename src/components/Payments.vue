@@ -288,7 +288,7 @@ export default {
       packCategories: [
         { label: 'restreaming', value: 'restream' },
         { label: 'live streaming', value: 'live' },
-        // { label: 'VOD bucket', value: 'vod' },
+        { label: 'VOD bucket', value: 'vod' },
         // { label: 'ip camera', value: 'ipcam' },
       ],
       quantity: 1,
