@@ -46,7 +46,7 @@
               <div class="desc">Live Stream Using Your Own Player</div>
             </div>
           </b-dropdown-item>
-          <b-dropdown-item v-b-modal.modal-add-vod-channel>
+          <!-- <b-dropdown-item v-b-modal.modal-add-vod-channel>
             <div class="dropdown-icon ico">
               <i class="fa fa-stream"></i>
             </div>
@@ -54,7 +54,7 @@
               <div class="main">New VOD Bucket</div>
               <div class="desc">HLS Videos With Castr CDN</div>
             </div>
-          </b-dropdown-item>
+          </b-dropdown-item> -->
         </b-dropdown>
       </div>
     </div>
@@ -116,7 +116,7 @@
                   <div class="desc">Live Stream Using Your Own Player</div>
                 </div>
               </b-dropdown-item>
-              <b-dropdown-item v-b-modal.modal-add-vod-channel>
+              <!-- <b-dropdown-item v-b-modal.modal-add-vod-channel>
                 <div class="dropdown-icon ico">
                   <i class="fab fa-stream" style="color:#4949fd;"></i>
                 </div>
@@ -124,7 +124,7 @@
                   <div class="main">New VOD Bucket</div>
                   <div class="desc">HLS Videos With Castr CDN</div>
                 </div>
-              </b-dropdown-item>
+              </b-dropdown-item> -->
           </b-dropdown>
         </div>
 
