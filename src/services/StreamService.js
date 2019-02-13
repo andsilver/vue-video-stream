@@ -20,6 +20,7 @@ export default {
   addLiveStream,
   addCamStream,
   addScheduledStream,
+  addVODChannel,
   setStreamName,
   toggleStream,
   setStreamPullUrl,
@@ -37,9 +38,12 @@ export default {
   enableStreamABR,
   disableStreamABR,
   uploadStreamPoster,
+
+  getStreamScheduleSettings,
+  saveStreamScheduleSettings,
+
   uploadStreamPlaylistVideo,
   deleteStreamPlaylistVideoFile,
-
   getStreamPlaylist,
   saveStreamPlaylistVideo,
   moveStreamPlaylistVideo,
@@ -156,6 +160,24 @@ function addScheduledStream(name, regionId) {
         name,
         region: regionId,
         type: 'scheduled'
+      }
+    }
+  })
+}
+
+/**
+ * @param {string} name
+ * @param {string} regionId
+ */
+function addVODChannel(name, regionId) {
+  return makeRequest({
+    path: '/streams/deploy',
+    method: 'post',
+    data: {
+      stream: {
+        name,
+        region: regionId,
+        type: 'vod'
       }
     }
   })
@@ -373,6 +395,35 @@ function uploadStreamPoster(streamId, fdata) {
     data: fdata,
     headers: {
       'content-type': 'multipart/form-data'
+    }
+  })
+}
+
+/**
+ * @param {string} streamId
+ */
+function getStreamScheduleSettings(streamId) {
+  return makeRequest(`/streams/${streamId}/schedular/config`)
+}
+
+/**
+ * @param {string} streamId
+ * @param {string} mode
+ * @param {number} [datetime]
+ */
+function saveStreamScheduleSettings(streamId, mode, datetime) {
+  if (!_.isNumber(datetime)) {
+    datetime = datetime.getTime()
+  }
+
+  return makeRequest({
+    path: `/streams/${streamId}/schedular/config`,
+    method: 'post',
+    data: {
+      updates: {
+        mode,
+        datetime
+      }
     }
   })
 }

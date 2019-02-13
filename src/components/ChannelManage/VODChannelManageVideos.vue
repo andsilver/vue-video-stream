@@ -14,119 +14,128 @@
         </div>
       </div>
       <div v-else>
-        <input id="video-input" type="file" style="visibility:hidden;position:absolute;"/>
+        <input id="video-input" type="file" style="visibility:hidden;"/>
 
         <div v-if="!videoFiles.length" class="text-center">
           <div style="font-size: 15.5px;">
-            <p>No Media uploaded yet</p>
+            <p>No Videos files uploaded yet</p>
           </div>
           <button class="btn btn-primary btn-lg"
-                      @click="triggerFileUpload">Upload Video</button>
+                      @click="triggerFileUpload">
+                      <i class="fas fa-plus"></i>
+                      Upload Video</button>
         </div>
         <div v-else>
           
-          <!-- <b-row>
+          <b-row>
             
             <b-col>
               <button class="btn btn-primary"
-                      :disabled="videoFiles.length"
-                      @click="triggerFileUpload">Upload Video</button>
+                      @click="triggerFileUpload">
+                      <i class="fas fa-plus"></i>
+                      Upload Video</button>              
+              <!-- <button class="btn btn-link">Clear All</button> -->
             </b-col>
 
-          </b-row> -->
+          </b-row>
 
           <br>
 
           <div class="video-list">
             <div class="video-item-header">
               <b-row>
-                <b-col cols="5">
+                <b-col cols="4">
                   <b-row>
-                    <b-col cols="1"></b-col>
-                    <b-col col>Clip</b-col>
+                    <!-- <b-col cols="1"></b-col> -->
+                    <b-col col>Media Clip</b-col>
                   </b-row>
 
                 </b-col>
-                <b-col cols="1">Duration</b-col>
-                <b-col cols="4">Media</b-col>
+                <b-col cols="1" style="padding-left:0;">Duration</b-col>
+                <b-col cols="2">Size</b-col>
+                <b-col cols="2">Creation</b-col>
                 <b-col></b-col>
               </b-row>
             </div>
             <!-- <div v-for="(video, index) in videoFiles" -->
-            <div v-for="video in sortedVideoFiles"
+            <div v-for="(video, index) in sortedVideoFiles"
                  :key="video.id"
                  class="video-item"
-                 :class="{ uploadable: video.uploadable }">
+                 :class="{ uploadable: video.uploadable, expanded: video.expanded }">
               <b-row>
-                <b-col cols="5" style="padding-top:3px;font-size:14.5px;">
+                <b-col cols="4" style="padding-top:3px;font-size:14.5px;">
                   <b-row>
                     <!-- <b-col cols="4">
                       <img class="video-thumb" />
                     </b-col> -->
-                    <b-col cols="1">
+                    <!-- <b-col cols="1">
                       <span class="fas toggle-control"
                             :class="{ 'fa-toggle-on enabled': video.enabled, 
                                       'fa-toggle-off': !video.enabled,
                                       'status-processing': video.file || video.statusProcessing }"
                              @click="toggleVideoStatus(video.id) "></span>
 
-                    </b-col>
+                    </b-col> -->
                     <b-col>
-                      <div style="font-size:13px;word-break:break-word;">{{video.fileName}}</div>
-                      <code>{{video.id}}</code>
+                      <!-- <input class="input"
+                          :value="getHlsUrl(video)"
+                          placeholder="media hls url"
+                          readonly/> -->
+                      <!-- <div style="font-size:13px;word-break:break-word;">{{video.fileName}}</div> -->
+                      <code class="video-name" style="font-size:14px;">&nbsp;{{video.fileName}}</code>
                     </b-col>
                   </b-row>
                 </b-col>
                 
-                <b-col  cols="1" style="padding-right:0;">
+                <b-col  cols="1" style="padding-left:0;">
                   <div v-if="video.mediaInfo">
-                    <span v-if="video.mediaInfo.duration<60">{{video.mediaInfo.duration}} secs</span>
-                    <span v-else-if="video.mediaInfo.duration">{{video.mediaInfo.duration/60|number}} mins</span>
+                    <span v-if="video.mediaInfo.duration<60">{{video.mediaInfo.duration}} <small>SECS</small> </span>
+                    <span v-else-if="video.mediaInfo.duration">{{video.mediaInfo.duration/60|number}} <small>MINS</small> </span>
                     <span v-else>n/a</span>
                   </div>
                 </b-col>
                 
-                <b-col cols="4">
+                <b-col cols="2">
 
-                  <b-row>
-                    <b-col cols="3" style="padding-right:0;">
-                      <span v-if="video.bytes">
-                        {{ video.bytes | bytes }}
-                        &nbsp;
-                      </span>
-                    </b-col>
-                    <b-col :cols="video.uploadable ? 7 : 9">
-                      <div v-if="video.uploadable" 
-                           class="inline-block upload-wrapper">
+                  <span v-if="video.bytes">
+                    {{ video.bytes | bytes }}
+                    &nbsp;
+                  </span>
 
-                        <div v-if="video.uploading">
-                          <b-progress :value="video.uploadProgress || 0"
-                                      :max="100" 
-                                      show-progress 
-                                      animated></b-progress>
-                          <!-- <button class="badge">UPLOADING ..</button> -->
-                        </div>
-                        <button v-else class="video-action-btn">awaiting upload</button>
+                  <div v-else class="inline-block">
+                    <!-- <span v-if="video.mediaInfo">{{video.mediaInfo.width}} x {{video.mediaInfo.height}}</span>
+                    &nbsp; -->
+                    
+                    <!-- <code v-if="video.mediaInfo" style="font-size:13px;">{{video.mediaInfo.fps}} FPS</code>
+                    &nbsp; -->
 
-                      </div>
-                      <!-- <div v-if="!video.uploadable" class="inline-block"> -->
-                      <div v-else class="inline-block">
-                        <span v-if="video.mediaInfo">{{video.mediaInfo.width}}x{{video.mediaInfo.height}}</span>
-                        &nbsp;
-                        <code v-if="video.mediaInfo" style="font-size:13px;">{{video.mediaInfo.fps}} FPS</code>
-                        &nbsp;
-                        <!-- media codecs -->
-                        <span v-if="video.mediaInfo && video.mediaInfo.codecs">
-                          <span v-for="(codec, index) in video.mediaInfo.codecs" 
-                                :key="index" 
-                                v-if="codec.type !== 'general'"
-                                class="media-codec"
-                                :class="codec.type">{{codec.codec}}</span>
-                        </span>
-                      </div>
-                    </b-col>
-                    <b-col v-if="video.uploadable" cols="1"></b-col>
-                  </b-row>
+                    <!-- media codecs -->
+                    <!-- <span v-if="video.mediaInfo && video.mediaInfo.codecs">
+                      <span v-for="(codec, index) in video.mediaInfo.codecs" 
+                            :key="index" 
+                            v-if="codec.type !== 'general'"
+                            class="media-codec"
+                            :class="codec.type">{{codec.codec}}</span>
+                    </span> -->
+                  </div>
+
+                </b-col>
+                <b-col cols="2">
+
+                  <div v-if="video.uploadable" 
+                       class="upload-wrapper">
+
+                    <div v-if="video.uploading">
+                      <b-progress :value="video.uploadProgress || 0"
+                                  :max="100" 
+                                  show-progress 
+                                  animated></b-progress>
+                      <!-- <button class="badge">UPLOADING ..</button> -->
+                    </div>
+                    <button v-else class="video-action-btn">awaiting upload</button>
+
+                  </div>
+                  <div v-else>{{ video.creationTime | date }}</div>
 
                 </b-col>
                 
@@ -148,31 +157,101 @@
                       <code>removing ..</code>
                     </div>
                     <div v-else>
-                      <button v-if="canMoveVideo(video.id, -1)"
-                              class="video-action-btn"
-                              @click="moveVideoFile(video.id, -1)">Up</button>
+                      <!-- &nbsp;<button class="video-action-btn"  -->
+                      <button class="btn btn-link btn-sm"
+                              style="border:1px solid;" 
+                              @click="toggleExpand(index)">
+                              {{ video.expanded ? 'Less' : 'More' }}
+                              <!-- <i class="fa fa-angle-down"></i> -->
+                      </button>
+                              
+                      &nbsp;<button class="btn btn-danger btn-sm" 
+                              @click="playVideo(video)">
+                              <!-- <i class="fa fa-play"></i> -->
+                              Play
+                              </button>
+
+                      &nbsp;<button class="btn btn-primary btn-sm" 
+                              @click="clipboardCopy(getHlsUrl(video))">HLS</button>
+
                       
-                      <button v-if="canMoveVideo(video.id, 1)"
-                              class="video-action-btn"
-                              @click="moveVideoFile(video.id, 1)">Down</button>
                       
-                      <button class="video-action-btn delete" 
+                      &nbsp;<button class="btn btn-danger btn-sm" 
                               @click="requestVideoRemoval(video.id)">Delete</button>
+
                     </div>
                   </div>
 
                 </b-col>
 
               </b-row>
+
+              <div style="margin-top:15px;">
+                <b-row>
+                  <!-- <b-col cols="4">
+                    <div class="field-container" style="margin-bottom:10px;">
+                      <div class="label">&nbsp;Video Id</div>
+                      <code>&nbsp;{{video.id}}</code>
+                    </div>
+                  </b-col> -->
+                  <b-col>
+                    <div class="field-container" style="margin-bottom:10px;">
+                      <div class="label">&nbsp;Media</div>
+                      <!-- <code>&nbsp;{{video.creationTime | date}}</code> -->
+                      &nbsp;<span v-if="video.mediaInfo">{{video.mediaInfo.width}} x {{video.mediaInfo.height}}</span>
+                      &nbsp;
+                      
+                      <code v-if="video.mediaInfo" style="font-size:13px;">{{video.mediaInfo.fps}} FPS</code>
+                      &nbsp;
+
+                      <!-- media codecs -->
+                      <span v-if="video.mediaInfo && video.mediaInfo.codecs">
+                        <span v-for="(codec, index) in video.mediaInfo.codecs" 
+                              :key="index" 
+                              v-if="codec.type !== 'general'"
+                              class="media-codec"
+                              :class="codec.type">{{codec.codec}}</span>
+                      </span>
+                    </div>
+                  </b-col>
+                </b-row>
+                <div class="field-container">
+                    <button class="modal-button modal-button-sm highlight badge-button"
+                            @click="clipboardCopy(getHlsUrl(video))">Copy</button>
+                    <div class="label">&nbsp;HLS Url</div>
+                    <code class="input">{{getHlsUrl(video)}}</code>
+                </div>
+                <br>
+                <div class="field-container">
+                    <button class="modal-button modal-button-sm highlight badge-button"
+                            @click="clipboardCopy(getPlayerUrl(video))">Copy</button>
+                    <div class="label">&nbsp;Embed Url</div>
+                    <code class="input">{{getPlayerUrl(video)}}</code>
+                </div>
+                <br>
+                <div class="field-container">
+                    <button class="modal-button modal-button-sm highlight badge-button"
+                            @click="clipboardCopy(getEpisodeIframeSnippet(video))">Copy</button>
+                    <div class="label">&nbsp;Iframe Snippet</div>
+                    <code class="input" style="padding-right:60px;">{{getEpisodeIframeSnippet(video)}}</code>
+                </div>
+              </div>
+
             </div>
           </div>
 
         </div>
       </div>
 
+      <vod-video-modal :stream="stream" :video="selectedVideo"></vod-video-modal>
+      
       <alert-modal modal-id="alert-video-encoding" 
-                   message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
-                   okText="Got it, thanks"></alert-modal>
+                     message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
+                     okText="Got it, thanks"></alert-modal>
+      
+      <alert-modal modal-id="alert-video-size" 
+                   message="You can upload media with size upto of 50MB only"
+                   okText="Fine"></alert-modal>
 
       <alert-modal modal-id="alert-leaving-active-uploads"
                    message="Video(s) are being uploaded. Please cancel active uploads before leaving"
@@ -190,11 +269,14 @@
 import Vue from 'vue'
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import AlertModal from "@/components/AlertModal.vue";
+import VodVideoModal from "@/components/VODVideoModal.vue";
 import StreamService from '@/services/StreamService'
 import utils from '@/utils'
 
+const MaxVideoUploadSize = 50 * 1024 * 1024
+
 export default {
-  name: "ScheduledChannelManageVideos",
+  name: "VODChannelManageVideos",
   props: ['stream'],
   beforeRouteLeave (to, from, next) {
 
@@ -203,6 +285,8 @@ export default {
       this.$root.$emit('bv::show::modal', 'alert-leaving-active-uploads')
       return
     }
+
+    next()
 
     next()
   },
@@ -215,12 +299,16 @@ export default {
     }
 
     this.videoFiles = _.compact(this.videoFiles).map((videoFile) => {
+      videoFile.expanded = false
       videoFile.removing = false
       videoFile.statusProcessing = false
       videoFile.uploadTime = new Date(videoFile.uploadTime)
       
       return videoFile
     })
+
+
+    this.$emit('video-files', this.videoFiles)
 
     this.processing = false
     
@@ -230,7 +318,8 @@ export default {
     return {
       processing: true,
       focusedVideo: {},
-      videoFiles: []
+      videoFiles: [],
+      selectedVideo: null
     }
   },
   computed: {
@@ -248,6 +337,43 @@ export default {
     }
   },
   methods: {
+    playVideo (video) {
+      if (!video) return
+      this.selectedVideo = video
+      this.$root.$emit("bv::show::modal", "modal-vod-video")
+      console.log('video', video)
+    },
+    clipboardCopy (text) {
+      try {
+        if (text instanceof Function) 
+          text = text()
+
+        this.$copyText(text);
+        this.$notify({ group: "info", text: "Copied to clipboard" });
+      } catch (e) {}
+    },
+    toggleExpand (index) {
+      const video = this.videoFiles[index]
+      let nstate = !video.expanded
+      this.videoFiles = utils.updateArrayItem(this.videoFiles, _.assign({}, video, { expanded: nstate }), index)
+      // this.videoFiles[index] = 
+      // console.log(this.videoFiles[index])
+    },
+    getHlsUrl (video) {
+      if (!this.stream) return
+      let hostname = this.stream.region.hostnameCDN || this.stream.region.hostname
+      let hls = `https://${hostname}/${this.stream.key}/${video.id}/index.m3u8`
+      return hls
+    },
+    getPlayerUrl (video) {
+      // let playerUri = 'https://player.castr.io/embed?src='+this.getHlsUrl(video)
+      let playerUri = `https://player.castr.io/vod/${this.stream.key}/${video.id}`
+      return playerUri
+    },
+    getEpisodeIframeSnippet (video) {
+      let iframeSrc = this.getPlayerUrl(video)
+      return `<iframe src="${iframeSrc}" frameborder="0" width="590" height="430" allow="autoplay"  scrolling="no"  allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+    },
     initVideoUpload () {
       const el = document.getElementById('video-input')
       if (!el) {
@@ -268,13 +394,20 @@ export default {
           el.value = null
           return
         }
+        
+        if (file.size > MaxVideoUploadSize) {
+          vm.$root.$emit("bv::show::modal", "alert-video-size")
+          el.value = null
+          return
+        }
+        
 
         let newVideo = {
           id: 'unnamed_' + Date.now(),
           fileName: file.name,
           bytes: file.size,
           mediaInfo: {},
-          precedence: vm.computeVideoPrecedence(),
+          precedence: 0,
           enabled: true,
           removing: false,
           statusProcessing: false,
@@ -308,7 +441,8 @@ export default {
       video.cancelSource = cancelSource
 
       const uploadHandle = StreamService.uploadStreamPlaylistVideo(
-        this.stream._id, 
+        // this.stream._id, 
+        this.stream.key, 
         video.file, 
         onBytes, 
         cancelSource.token)
@@ -329,6 +463,9 @@ export default {
 
       video.id = uploadResult.fileId
       video.mediaInfo = _.assign({}, uploadResult.mediaInfo)
+      video.creationTime = new Date()
+
+      this.$emit('video-files', this.videoFiles)
       // video.precedence = this.computeVideoPrecedence(video)
 
       const videoMeta = await this.saveVideoMeta(video)
@@ -363,36 +500,6 @@ export default {
       this.focusedVideo = video
       this.$root.$emit("bv::show::modal", "confirm-video-removal");
     },
-    async moveVideoFile (videoId, moveDir) {
-      if (!moveDir) return 
-
-      const videoIndex = _.findIndex(this.videoFiles, { id: videoId })
-      const videoIndex2 = videoIndex + moveDir
-
-      const vid1 = this.videoFiles[videoIndex]
-      const vid2 = this.videoFiles[videoIndex2]
-      if (!vid2) return
-
-      this.swapVideos(videoIndex, videoIndex2)
-      
-      try {
-        await StreamService.moveStreamPlaylistVideo(this.stream._id, videoId, vid2.id)
-      } catch(e) {
-        this.$notify({ group: 'error', text: 'Could not change playlist order' })
-        this.swapVideos(videoIndex, videoIndex2)
-        console.log('video-move-error', e)
-      }
-
-    },
-    swapVideos (videoIndex, videoIndex2) {
-      let oprecedence = this.videoFiles[videoIndex].precedence
-      let nprecedence = this.videoFiles[videoIndex2].precedence
-
-      this.videoFiles[videoIndex].precedence = nprecedence
-      this.videoFiles[videoIndex2].precedence = oprecedence
-
-      this.videoFiles = utils.swapArray(this.videoFiles, videoIndex, videoIndex2)
-    },
     cancelVideoUpload (videoId) {
       videoId = videoId || this.focusedVideo.id
       const video = _.find(this.videoFiles, { id: videoId })
@@ -412,7 +519,7 @@ export default {
         await StreamService.removeStreamPlaylistVideo(this.stream._id, videoId)
         
         StreamService
-          .deleteStreamPlaylistVideoFile(this.stream._id, videoId)
+          .deleteStreamPlaylistVideoFile(this.stream.key, videoId)
           .catch((e) => {
             console.log('playlist video removal error', e)
           })
@@ -425,77 +532,14 @@ export default {
 
       let index = this.videoFiles.indexOf(video)
       this.videoFiles.splice(index, 1)
-    },
-    async toggleVideoStatus (videoId) {
-      const video = _.find(this.videoFiles, { id: videoId })
-      if (!video || video.file) return
 
-      video.statusProcessing = true
-
-      let nstate = !video.enabled
-
-      try {
-        await StreamService.togleStreamPlaylistVideoStatus(this.stream._id, videoId, nstate)
-        video.enabled = nstate
-      } catch (e) {
-        console.log('e', e)
-      }
-
-      video.statusProcessing = false
-    },
-    computeVideoPrecedence (video) {
-      let precedence = 0
-      // let siblingVids = _.filter(this.videoFiles, v => !v.hasOwnProperty('file'))
-      let siblingVids = this.videoFiles
-      if (video) {
-        siblingVids = _.filter(this.videoFiles, v => v.id !== video.id)
-      }
-      
-      precedence = _.size(siblingVids)
-
-      // if (_.size(siblingVids)) {
-      //   let sortedVids = _.sortBy(siblingVids, vid => -vid.precedence)
-      //   let prevPrecedense = sortedVids[0] && sortedVids[0].precedence
-      //   prevPrecedense = prevPrecedense || 0
-      //   precedence = prevPrecedense +1
-      // }
-
-      return precedence
-    },
-    copyIframeCode (video) {
-      let text = this.getVideoIframeSnippet(video)
-      try {
-        this.$copyText(text);
-        this.$notify({ group: "info", text: "Copied to clipboard" });
-      } catch (e) {}
-    },
-    getVideoIframeSnippet (video) {
-      let iframeSrc = 'https://player.castr.io/embed?src='+video.playbackUrl
-      return `<iframe src="${iframeSrc}" width="590" height="430" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
-    },
-    canMoveVideo (videoId, moveDir) {
-      if (!moveDir) return 
-
-      const videoIndex = _.findIndex(this.videoFiles, { id: videoId })
-      if (videoIndex === -1) return
-
-      let siblingVideoIndex = videoIndex + moveDir
-      if (siblingVideoIndex === videoIndex) return
-
-      // console.log(
-      //   moveDir == 1 ? 'down': 'up', 
-      //   this.videoFiles[videoIndex].fileName,
-      //   videoIndex, 
-      //   siblingVideoIndex)
-
-      let siblingVideo = this.videoFiles[siblingVideoIndex]
-
-      return !!siblingVideo
+      this.$emit('video-files', this.videoFiles)
     }
   },
   components: {
     AlertModal,
-    ConfirmModal
+    ConfirmModal,
+    VodVideoModal
   }
 };
 
@@ -529,15 +573,22 @@ function imageReader(file, cb) {
 .video-item-header {
   padding: 11px;
   /* margin-bottom: 3px; */
-  border-bottom: 1px solid rgb(44, 46, 82);
+  /* border-bottom: 1px solid rgb(44, 46, 82); */
   font-size: 12.5px;
 }
 .video-item {
   padding: 11px;
+  height: 45px;
+  overflow: hidden;
   margin-bottom: 3px;
-  /* border-radius: 6px; */
+  border-radius: 4px;
+  background-color: #202940;
   border-bottom: 1px solid rgb(44, 46, 82);
   font-size: 14px;
+}
+.video-item.expanded {
+  height: auto;
+  margin-bottom:10px;
 }
 .video-item:last-of-type {
   border-bottom: none;
@@ -547,6 +598,12 @@ function imageReader(file, cb) {
 }
 .video-item > * > * {
   vertical-align: middle;
+}
+.video-item .video-name {
+  word-break: break-word;
+  height: 18px;
+  display: inline-block;
+  overflow: hidden;
 }
 .video-item .button {
     display: inline-block;
@@ -571,7 +628,7 @@ function imageReader(file, cb) {
 }
 .input {
   width: 400px;
-  min-height: 120px;
+  /* min-height: 120px; */
   font-size: 12px;
       background: #37384e;
     border: 1px solid rgba(0,123,255,0.58);
@@ -640,10 +697,66 @@ function imageReader(file, cb) {
   color: #ffffff;
 }
 .upload-wrapper {
-  /* padding-left: 15px; */
   width: 100%;
 }
 .progress {
   height: 18px;
+}
+
+.field-container {
+  /* width: 235px; */
+  width: 100%;
+  padding: 0;
+  position:relative;
+}
+.field-container-sm {
+  padding:0;
+}
+.field-container:last-of-type {
+  border-bottom: none;
+}
+.field-container .label {
+  font-size: 12px;
+  opacity: 0.65;
+  margin-bottom:3px;
+  text-transform: capitalize;
+}
+.field-container .input {
+  display: block;
+  width: 100%;
+  height: auto !important;
+  /* margin: 10px 0 10px 0; */
+  margin: 0;
+  padding: 7px 12px;
+  color: #ffffff;
+  /* background-color: #010329; */
+  background-color: #27375d;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  outline-color: #0074fc;
+}
+.field-container .input:focus {
+  background-color: rgba(18, 23, 37, 0.67);
+}
+.field-container .input:read-only:focus {
+  background-color: rgb(42, 49, 68);
+}
+.field-container .badge-button {
+  opacity: 0;
+  font-size:11px;
+  padding: 4px 9px;
+  position: absolute;
+  right: 6px;
+  top: 25px;
+  pointer-events: none;
+  transition: all 0.15s linear;
+}
+.field-container:hover .badge-button {
+  opacity:1;
+  pointer-events: inherit;
+}
+.field-container-sm .badge-button {
+  top: 8px;
 }
 </style>

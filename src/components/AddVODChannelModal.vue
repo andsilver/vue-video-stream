@@ -1,8 +1,8 @@
 <template>
   <div class="">
     <!-- Modal Component -->
-    <b-modal ref="modalAddScheduledChannel" 
-             id="modal-add-scheduled-channel"
+    <b-modal ref="modalAddVodChannel" 
+             id="modal-add-vod-channel"
              class="modal-fullscreen1 modal-fullscreen-right modal-platform"
              size="sm"
              centered
@@ -11,29 +11,28 @@
         <div style="width: 100%">
           <b-row>
             <!-- <b-col><span v-html="modalTitle()"></span></b-col> -->
-            <b-col><span>New Scheduling</span></b-col>
+            <b-col><span>New VOD Bucket</span></b-col>
           </b-row>
         </div>
       </template>
       <div>
-
         <!-- error placeholder -->
         <div v-if="error && !error.role" 
              class="alert alert-danger">
           <div v-show="error.message">{{error.message}}</div>
           <div v-if="error.subscription"
                class="text-center" style="margin-top:10px">
-            <router-link to="/subscribe?category=scheduled&action=upgrade">
+            <router-link to="/subscribe?category=vod&action=upgrade">
               <button class="btn btn-sm btn-link" style="text-transform:uppercase;color: gold;"><strong>upgrade now</strong></button>
             </router-link>
           </div>
         </div>
-
+        
         <div v-if="error">
           <div v-if="error.role"
                style="margin-top:10px;font-size:14px;">
             <p style="min-height:80px;">
-              You do not have an active Scheduled Streaming subscription. Would you like to activate our 7 days trial ?</p>
+              You do not have an active VOD subscription. Would you like to activate our 7 days trial ?</p>
             <br>
             <div v-if="trialError" 
                  class="alert alert-danger">{{trialError.message}}</div>
@@ -49,7 +48,7 @@
                 <button class="modal-button" @click="dismiss">cancel</button>
                 <button class="modal-button highlight" @click="forceActivateTrial">Activate Trial</button>
                 <div style="font-size:13px;margin:12px;">
-                  <router-link to="/subscribe?category=scheduled&action=upgrade">Get more options</router-link>
+                  <router-link to="/subscribe?category=vod&action=upgrade">Get more options</router-link>
                 </div>
               </div>
             </div>
@@ -61,15 +60,15 @@
         <div v-show="operational">
           <!-- form -->
           <div class="field-container">
-            <div class="label">stream name</div>
+            <div class="label">bucket name</div>
             <input v-model="channel.name"
                   class="input"
-                  placeholder="#stream_name"
+                  placeholder="#bucket_name"
                   @keypress="onInputChange('name')" />
             <p v-show="formErrors.name"
-              class="text-danger">specify stream name</p>
+              class="text-danger">specify bucket name</p>
           </div>
-          <div class="field-container hidden">
+          <div class="field-container hidden" >
             <div class="label">hosting region</div>
             
             <b-dropdown no-caret class="region-dropdown w-100" style="margin:7px 0;">
@@ -133,11 +132,11 @@ import StreamService from "../services/StreamService";
 import SubscriptionService from "../services/SubscriptionService";
 
 export default {
-  name: "AddScheduledChannelModal",
+  name: "AddVODChannelModal",
   async mounted() {
-    this.$refs.modalAddScheduledChannel.$on("hide", this.onDismiss);
-    this.$refs.modalAddScheduledChannel.$on("shown", this.onInit);
-    this.regions = await StreamService.getAvailableRegions('scheduled');
+    this.$refs.modalAddVodChannel.$on("hide", this.onDismiss);
+    this.$refs.modalAddVodChannel.$on("shown", this.onInit);
+    this.regions = await StreamService.getAvailableRegions('vod');
     this.selectRegion(_.head(this.regions))
   },
   data() {
@@ -170,8 +169,8 @@ export default {
       const sub = await SubscriptionService.getUserSubscriptions()
       this.processing = false
 
-      const hasSchedulerStreamSub = !!_.find(sub.addonSubscriptions, { category: 'scheduled' })
-      if (!hasSchedulerStreamSub) {
+      const hasVODSub = !!_.find(sub.addonSubscriptions, { category: 'vod' })
+      if (!hasVODSub) {
         this.operational = false
         this.error = {role: true}
         return
@@ -180,7 +179,7 @@ export default {
     selectRegion(region) {
       this.selectedRegion = region;
       this.channel.region = region._id;
-      this.onInputChange("region");
+      this.onInputChange("vod");
     },
     getCountryFlag(region) {
       return `https://countryflags.io/${region.identifier}/flat/24.png`;
@@ -190,7 +189,7 @@ export default {
       this.trialProcessing = true
       
       try {
-        await SubscriptionService.requestTrial('scheduled')
+        await SubscriptionService.requestTrial('vod')
       } catch(e) {
         this.trialError = e
         return
@@ -202,12 +201,12 @@ export default {
       this.operational = true
 
       // on trial activated
-      this.$notify({ group: 'success', text: 'Scheduler Trial activated successfully' })
+      this.$notify({ group: 'success', text: 'VOD Trial activated successfully' })
 
       // update intercom config
       window.Intercom('update', { 
-        scheduledStreamTrial: true,
-        scheduledStreamTrialExpiry: new Date(Date.now()+(7*24*3600*1000))
+        vodTrial: true,
+        vodTrialExpiry: new Date(Date.now()+(7*24*3600*1000))
       });
 
     },
@@ -219,7 +218,7 @@ export default {
       this.processing = true;
 
       try {
-        const stream = await StreamService.addScheduledStream(
+        const stream = await StreamService.addVODChannel(
           this.channel.name,
           this.channel.region
         );
@@ -227,7 +226,7 @@ export default {
         this.$emit("new-channel", stream, this.selectedRegion);
         
         // update intercom config
-        window.Intercom('update', { "scheduledStreamCreated": true });
+        window.Intercom('update', { "vodCreated": true });
 
         this.dismiss();
       } catch (err) {
@@ -240,7 +239,7 @@ export default {
       }
     },
     dismiss() {
-      this.$refs.modalAddScheduledChannel.hide();
+      this.$refs.modalAddVodChannel.hide();
       this.onDismiss();
     },
     onDismiss() {

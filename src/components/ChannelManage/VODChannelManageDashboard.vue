@@ -2,7 +2,7 @@
   <div>
     <div class="content-container">
         <b-row>
-          <b-col cols="12" lg="8">
+          <b-col cols="7">
             <div v-if="!streamPlatforms.length" 
                  class="placeholder">
                  No Platforms yet
@@ -177,24 +177,15 @@
 
           </b-col>
           <b-col class="preveiw-container">
-            <div class="video-wrapper"
-                 :class="{'webcam-wrapper': streamSourceType === SourceTypes.Webcam}">
-              <webcam-player v-if="streamSourceType === SourceTypes.Webcam" 
-                             :stream="stream" 
-                             @stream-stopped="onWebcamStopped"
-                             @stream-started="onWebcamStarted"
-                             @stream-authorized="onWebcamAuthorized"
-                             class="video-thumb" />
-
-              <!-- <div v-if="!isAlive()" class="video-thumb placeholder"> -->
-              <div v-else-if="!stream.enabled" class="video-thumb placeholder">
+            <div class="video-wrapper">
+              <div v-if="!stream.enabled" class="video-thumb placeholder">
                 <p class="text-center">
                   Disabled Stream<br>
                   <span style="font-size:13px;opacity:0.7;">( Please enable )</span>
                 </p>
               </div>
               <div v-else-if="!streamAlive" class="video-thumb placeholder">
-                <p>Waiting for stream</p>
+                <p>Playist Not Configured</p>
               </div>
 
               <stream-player v-else :stream="stream" class="video-thumb" />
@@ -202,36 +193,6 @@
             </div>
             <br>
             <div>
-              <div class="source-switch-container">
-                <b-form-group label="">
-                                      <!-- v-model="streamSourceType" -->
-                  <b-form-radio-group id="stream-source-type" 
-                                      buttons
-                                      button-variant="outline-danger"
-                                      v-model="streamSourceTypeModel"
-                                      @input="onSourceTypeChange">
-                    <b-form-radio :value="SourceTypes.Publish"
-                                  :disabled="streamSourceTypeProcessing">Publish</b-form-radio>
-                    <b-form-radio :value="SourceTypes.Pull"
-                                  :disabled="streamSourceTypeProcessing">Pull</b-form-radio>
-                    <b-form-radio :value="SourceTypes.Webcam"
-                                  :disabled="streamSourceTypeProcessing">Webcam</b-form-radio>
-                  </b-form-radio-group>
-                </b-form-group>
-              </div>
-              <div style="clear: both;"></div>
-              <!-- <div class="field-container">
-                <div class="label">Embed Url</div>
-                <input class="input"
-                       :value="getStreamEmbedUrl()"
-                       readonly/>
-              </div>
-              <div class="field-container">
-                <div class="label">HLS Url</div>
-                <input class="input"
-                       :value="getStreamHlsUrl()"
-                       readonly/>
-              </div> -->
               <div class="field-container" style="padding-bottom:0;">
                 <div class="label">Deployment Region</div>
                 <div class="input">
@@ -252,83 +213,27 @@
                   <div style="">{{getStreamPushUrl()}}</div>
                 </div>
               </div>
-              <div v-if="hasPullSource()" class="field-container">
+
+              <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamIframeCode)">Copy</button>
                 <b-row>
-                  <b-col>
-                    <div class="label">Pull Source</div>
-                  </b-col>
-                  <b-col>
-                    <div v-if="stream.enabled && stream.pullUrl" class="text-right">
-                      <code v-if="streamAlive"
-                            class="platform-connect-status"
-                            style="color:#1d87d2;">connected</code>
-                      <code v-else class="platform-connect-status">connecting..</code>
-                    </div>
-                  </b-col>
+                  <b-col><div class="label">Iframe Snippet</div></b-col>
                 </b-row>
-                <div>
-                  <input v-model="streamPullUrl"
-                         @keypress="onPullUrlChange()"
-                         class="input" 
-                         placeholder="specify source url"/>
-                </div>
+                <!-- <div class="label">Iframe Snippet</div> -->
+                <input class="input"
+                       :value="getStreamIframeCode()"
+                       readonly/>
               </div>
-              <div v-else-if="streamSourceType === SourceTypes.Webcam" 
-                   class="field-container" style="padding:0;">
-
+              <div class="field-container">
+                <button class="modal-button modal-button-sm highlight badge-button"
+                        @click="clipboardCopy(getStreamEmbedUrl)">Copy</button>
+                <div class="label">Embed Url</div>
+                <input class="input"
+                       :value="getStreamEmbedUrl()"
+                       readonly/>
               </div>
-              <div v-else class="field-container">
-                <div class="label">Streaming Key</div>
-                <div class="input">
-                  <button class="modal-button modal-button-sm highlight float-right"
-                          style="margin-top: -4px; margin-right: -6px;"
-                          @click="toggleStreamKeyVisibility">
-                          {{ streamKeyVisible ? 'Hide 0' + (streamKeyVisibleTimeout/1000) : 'Show' }}
-                  </button>
-                  <div v-if="streamKeyVisible" class="flaot-left">{{stream.key}}</div>
-                  <div v-else class="flaot-left">xxxxxxxxxxxxxxxxx</div>
-                </div>
-              </div>
-              <div class="field-container"
-                   style="padding-top:0;">
-                <!-- <div class="label">RTMP pull url</div> -->
-                <div style="margin-right:5px;">
-                    <b-button v-if="hasPullSource()"
-                              style="margin-right:10px;"
-                              variant="primary"
-                              @click="setStreamPullUrl"
-                              :disabled="!canSavePullUrl() || streamSourceTypeProcessing">
-                      <span v-if="streamSourceTypeProcessing">
-                        <i class="fas fa-spinner fa-spin"></i>
-                      </span>
-                      <span v-else>Save</span>
-                    </b-button>
 
-                  <button class="modal-button modal-button-sm highlight"
-                          :class="{'float-right': hasPullSource() }"
-                          :style="{'margin-top': hasPullSource() ? '4px' : 0}"
-                          @click="requestRTMPPullUrl()">
-                    <span v-if="rmptPullUrlProcessing">
-                      <i class="fas fa-spinner fa-spin"></i></span>
-                    <span v-else>Get RTMP Pull</span>
-                  </button>
-
-                  <div v-if="streamSourceType === SourceTypes.Pull"
-                       class="hint"
-                       style="margin-top:20px;">
-                       <code style="font-szie:14px;">
-                         Restreaming Mixer FTL?
-                         <span class="btn btn-link" 
-                               style="margin-left:-2px;"
-                               @click="requestMixerUsername">Get Mixer Pull URL</span>
-                       </code>
-                   </div>
-
-                  <div v-if="streamPullError && streamSourceType === SourceTypes.Pull"
-                       class="text-danger"
-                       style="margin-top:10px;">Source pull url is invalid</div>
-                </div>
-              </div>
             </div>
           </b-col>
         </b-row>
@@ -409,7 +314,7 @@ const SourceTypes = {
 };
 
 export default {
-  name: "ChannelManage",
+  name: "ScheduledChannelManage",
   props: ['stream', 'streamAlive', 'mediaPulse'],
   beforeRouteLeave (to, from, next) {
 
@@ -511,6 +416,22 @@ export default {
         this.$copyText(text);
         this.$notify({ group: "info", text: "Copied to clipboard" });
       } catch (e) {}
+    },
+    getStreamIframeCode() {
+      let embedUrl = this.getStreamEmbedUrl();
+      let htmlCode = `<iframe src="${embedUrl}" width="590" height="431" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
+      return htmlCode;
+    },
+    getStreamEmbedUrl() {
+      // let embedUrl = `https://player.haxr.io/${this.stream.key}`;
+      let embedUrl = `https://player.castr.io/${this.stream.key}?`;
+      const {hostnameCDN} = this.stream.region || {}
+      if (hostnameCDN) {
+        let cdnPop = _.replace(hostnameCDN, /\D/g, '')
+        embedUrl += `cdnsrc=${cdnPop}&`
+      }
+
+      return embedUrl;
     },
     onMediaPulseChanged () {
       const platforms = []
@@ -1137,7 +1058,7 @@ function flushBlobUrl(blob) {
 }
 
 function isValidUrl (url) {
-  return /^(tshttp|http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
+  return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
 }
 
 function isMixerFTLSource(pullUrl) {
@@ -1209,7 +1130,7 @@ function isRTSPSource(pullUrl) {
 }
 .video-wrapper {
   width: 100%;
-  height: 220px;
+  height: 275px;
   background-color: #000000;
   position: relative;
 }

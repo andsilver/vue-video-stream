@@ -46,6 +46,15 @@
               <div class="desc">Live Stream Using Your Own Player</div>
             </div>
           </b-dropdown-item>
+          <b-dropdown-item v-b-modal.modal-add-vod-channel>
+            <div class="dropdown-icon ico">
+              <i class="fa fa-stream"></i>
+            </div>
+            <div class="dropdown-text">
+              <div class="main">New VOD Bucket</div>
+              <div class="desc">HLS Videos With Castr CDN</div>
+            </div>
+          </b-dropdown-item>
         </b-dropdown>
       </div>
     </div>
@@ -107,6 +116,15 @@
                   <div class="desc">Live Stream Using Your Own Player</div>
                 </div>
               </b-dropdown-item>
+              <b-dropdown-item v-b-modal.modal-add-vod-channel>
+                <div class="dropdown-icon ico">
+                  <i class="fab fa-stream" style="color:#4949fd;"></i>
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New VOD Bucket</div>
+                  <div class="desc">HLS Videos With Castr CDN</div>
+                </div>
+              </b-dropdown-item>
           </b-dropdown>
         </div>
 
@@ -125,7 +143,7 @@
     <add-channel-modal @new-channel="onNewStream"></add-channel-modal>
     <add-live-channel-modal @new-channel="onNewStream"></add-live-channel-modal>
     <add-cam-channel-modal @new-channel="onNewStream"></add-cam-channel-modal>
-    <add-scheduled-channel-modal @new-channel="onNewStream"></add-scheduled-channel-modal>
+    <add-vod-channel-modal @new-channel="onNewStream"></add-vod-channel-modal>
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
   </div>
@@ -136,7 +154,7 @@ import StreamCardView from "./StreamCardView.vue";
 import AddCamChannelModal from "./AddCamChannelModal.vue";
 import AddChannelModal from "./AddChannelModal.vue";
 import AddLiveChannelModal from "./AddLiveChannelModal.vue";
-import AddScheduledChannelModal from "./AddSchedulerChannelModal.vue";
+import AddVodChannelModal from "./AddVODChannelModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import StreamService from "../services/StreamService";
 
@@ -183,9 +201,6 @@ export default {
     openCamModal() {
       this.$root.$emit("bv::show::modal", "modal-add-cam-channel");
     },
-    openScheduledStreamModal() {
-      this.$root.$emit("bv::show::modal", "modal-add-scheduled-channel");
-    },
     onStreamCreateToggle(state) {
       this.streamCreateDropdownActive = state;
     },
@@ -201,6 +216,8 @@ export default {
         redirectPath = "/ipcams/";
       } else if (stream.type === "scheduled") {
         redirectPath = "/scheduled/";
+      } else if (stream.type === "vod") {
+        redirectPath = "/vods/";
       }
 
       redirectPath += stream._id;
@@ -248,7 +265,7 @@ export default {
     AddCamChannelModal,
     AddChannelModal,
     AddLiveChannelModal,
-    AddScheduledChannelModal,
+    AddVodChannelModal,
     ConfirmModal
   }
 };
@@ -359,9 +376,18 @@ export default {
   display: inline-block;
   width: 32px;
 }
+.dropdown-icon.ico {
+  color: #4949fd;
+  vertical-align: super;
+}
 .dropdown-icon img {
   width: 20px;
   vertical-align: super;
+}
+.dropdown-icon .fa,
+.dropdown-icon .far {
+  font-size: 24px;
+  margin-left: -1px;
 }
 .dropdown-text {
   display: inline-block;

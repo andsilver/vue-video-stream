@@ -8,11 +8,14 @@ import VueClipboard from 'vue-clipboard2'
 import Notifications from 'vue-notification'
 import VueLocalStorage from 'vue-localstorage'
 import VueStripeCheckout from 'vue-stripe-checkout'
+import Datetime from 'vue-datetime'
 
 import BootstrapVue from 'bootstrap-vue'
 import { Dropdown } from 'bootstrap-vue/es/components'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+import 'vue-datetime/dist/vue-datetime.css'
 
 import App from './App'
 import appFilters from './deps'
@@ -23,6 +26,7 @@ Vue.use(VueAxios, axios)
 Vue.use(VueClipboard)
 Vue.use(Notifications)
 Vue.use(BootstrapVue)
+Vue.use(Datetime)
 Vue.use(VueSocketio, 'https://www.haxr.io:1330/')
 Vue.use(VueLocalStorage, { name: 'localStorage', bind: true })
 const options = {

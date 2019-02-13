@@ -5,16 +5,14 @@
         <div class="col-md-3">
           <div class="title">
             <!-- <a class="title-change-placeholder">change</a> -->
-            <input
-              v-model="streamName"
-              @change="onStreamNameChange"
-              type="text"
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="off"
-              spellcheck="false"
-              title="Edit stream name"
-            >
+            <input v-model="streamName"
+                   @change="onStreamNameChange"
+                   type="text" 
+                   autocomplete="off" 
+                   autocorrect="off" 
+                   autocapitalize="off" 
+                   spellcheck="false"
+                   title="Edit stream name">
           </div>
           <router-link to="/dashboard" style="color:inherit;opacity:0.75;">
             <i class="fa fa-caret-left"></i>&nbsp; Go back
@@ -22,133 +20,45 @@
         </div>
         <div class="col-md-9">
           <b-row>
-            <b-col cols="2" style="padding-right:0;">
+            <b-col cols="3">
               <div class="stat-container">
-                <div>
-                  <span
-                    class="value"
-                    :style="{color: streamAlive ? '#2ad640' : 'inherit' }"
-                  >{{getStreamStatus()}}</span>
-                </div>
-                <div class="label">status</div>
-              </div>
-              <div v-if="mediaPulse && mediaPulse.alive" class="stat-container xs">
-                <div class="value">
-                  <strong class="text-uppercase">{{getStreamQuality()}}</strong>
-                  <span
-                    style="margin-left:5px;font-size:14px;"
-                  >{{mediaPulse.width}} x {{mediaPulse.height}}</span>
-                </div>
+                  <div v-if="videoFilesRetrieved">
+                    <span class="value">{{ storageStats.value }}</span>
+                    <span class="text-uppercase" style="font-size:14px;">{{ storageStats.unit }}</span>
+                  </div>
+                  <!-- <span class="value">
+                    {{bucketSize | bytes}}
+                  </span> -->
+                <div v-else><span class="value">..</span></div>
+                <div class="label">Storage</div>
               </div>
             </b-col>
-            <b-col cols="2">
-              <div v-if="mediaPulse" class="stat-container">
-                <div v-if="streamAlive">
-                  <span class="value">
-                    {{mediaPulse.bitrate | number}}
-                    <span style="font-size:16px;">kbps</span>
-                  </span>
-                </div>
-                <div v-else>
-                  <span class="value">..</span>
-                </div>
-
-                <div class="label">incoming</div>
-              </div>
-              <div v-if="mediaPulse && mediaPulse.alive" class="stat-container xs">
-                <div class="value">
-                  <span
-                    v-for="(track, index) in mediaPulse.tracks"
-                    :key="index"
-                    class="media-codec"
-                    :class="getTrackType(track)"
-                  >{{track.codec}}</span>
-                </div>
-              </div>
-            </b-col>
-            <b-col>
+            <b-col></b-col>
+            <b-col cols="1" class="text-right" style="padding-left:0;">
               <div>
-                <b-row>
-                  <b-col cols="6">
-                    <div class="field-container">
-                      <div class="label">Scheduling Mode</div>
-                      <select class="input" v-model="scheduleMode">
-                        <option value="loop">Infinie Loop</option>
-                        <option value="datetime">Schedule Date Time</option>
-                      </select>
-                    </div>
-                  </b-col>
-                  <b-col cols="6">
-                    <div v-if="scheduleMode === 'datetime'" class="field-container">
-                      <div class="label">Specify Date Time</div>
-                      <datetime
-                        type="datetime"
-                        v-model="scheduledDateTime"
-                        input-class="datetime-input"
-                        :min-datetime="minScheduleDateTime"
-                        style="cursor:pointer"
-                      ></datetime>
-                    </div>
-                  </b-col>
-                </b-row>
-
-                <b-button style="position:absolute;"
-                          variant="primary"
-                          v-show="canSaveScheduleSetting()"
-                          @click="saveSchedulerConfig">
-                  <span v-if="schedulerConfigProcessing">
-                    <i class="fas fa-spinner fa-spin"></i>
-                  </span>
-                  <span v-else>Save</span>
-                </b-button>
-              </div>
-            </b-col>
-            <b-col cols="2" class="text-right" style="padding-left:0;">
-              <!-- <button class="head-button"
-                      @click="requestStreamDelete">
-                <span class="icon far fa-trash-alt"></span>
-              </button>-->
-              <div>
-                <div v-if="statusProcessing">
-                  <i class="fas fa-spinner fa-spin"></i>
-                </div>
-                <div v-else>
-                  <button
-                    v-if="stream.enabled"
-                    class="btn-status outlined"
-                    @click="toggleStatus($event)"
-                  >disable</button>
-                  <button v-else class="btn-status no-dimm" @click="toggleStatus($event)">enable</button>
-                </div>
-              </div>
-
               <div style="margin-top:8px;">
-                <button class="btn-status danger outlined" @click="requestStreamDelete">delete</button>
-              </div>
+                <button class="btn-status danger outlined"
+                        @click="requestStreamDelete">delete</button>
+              </div>              
+            </div>              
             </b-col>
           </b-row>
         </div>
       </div>
       <div class="content-container">
         <ul class="nav-menu-inline page-menu">
-          <router-link
-            tag="li"
-            :to="{name: 'ScheduledChannelManageDashboard'}"
-            active-class="active"
-          >dashboard</router-link>
+          <!-- <router-link tag="li" 
+                       :to="{name: 'VODChannelManageDashboard'}"
+                       active-class="active">dashboard</router-link> -->
           <!-- <router-link v-if="stream.dvrHours" -->
-          <router-link
-            tag="li"
-            :to="{name: 'ScheduledChannelManageVideos'}"
-            active-class="active"
-          >playlist</router-link>
+          <router-link tag="li" 
+                       :to="{name: 'VODChannelManageVideos'}"
+                       active-class="active">videos</router-link>
 
           <!-- <router-link v-if="stream.dvrHours" -->
-          <!-- <router-link
-            tag="li"
-            :to="{name: 'ScheduledChannelManageSettings'}"
-            active-class="active"
-          >playback settings</router-link> -->
+          <router-link tag="li" 
+                       :to="{name: 'VODChannelManageSettings'}"
+                       active-class="active">video settings</router-link>
         </ul>
 
         <!-- <div v-if="trialSubscription"
@@ -156,27 +66,32 @@
              style="font-size:14px;">
           You are using a Trial plan with limit events slots.
           Please <router-link to="/subscribe?category=scheduled&action=upgrade">upgrade</router-link> to remove this cap.
-        </div>-->
-        <router-view
-          :stream="stream"
-          :streamAlive="streamAlive"
-          :mediaPulse="mediaPulse"
-          @stream-updated="onStreamUpdates"
-        ></router-view>
+        </div> -->
+
+        <router-view :stream="stream" 
+                     :streamAlive="streamAlive"
+                     :mediaPulse="mediaPulse"
+                     @stream-updated="onStreamUpdates"
+                     @video-files="onVideoFiles"></router-view>
+
       </div>
     </div>
-    <div v-else class="page-placeholder" :style="{height: (windowHeight) + 'px'}">
+    <div v-else 
+         class="page-placeholder" 
+         :style="{height: (windowHeight) + 'px'}">
       <div class="page-placeholder-content">
         {{ processingMessage || 'Retreiving details' }} ..
         <br>
-        <b-progress :value="100" :max="100" animated class="w-100 mt-2" style="height: 10px;"></b-progress>
+        <b-progress :value="100" 
+                    :max="100" 
+                    animated
+                    class="w-100 mt-2"
+                    style="height: 10px;"></b-progress>
       </div>
     </div>
 
-    <confirm-modal
-      message="Would you like to delete this stream and all of its content?"
-      @modal-confirm="onStreamDeleteConfirm"
-    ></confirm-modal>
+    <confirm-modal message="Deleting VOD will discard all of your saved videos. Continue?"
+                   @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
   </div>
 </template>
 
@@ -193,7 +108,7 @@ const SourceTypes = {
 };
 
 export default {
-  name: "ScheduledChannelManage",
+  name: "VODChannelManage",
   async mounted() {
     this.windowHeight = window.innerHeight - 200;
     this.streamId = this.$route.params.streamId;
@@ -203,51 +118,36 @@ export default {
     this.processing = false;
 
     if (!this.stream) return;
-
-    const userSub = await SubscriptionService.getUserSubscriptions(true);
-    const baseSub = _.find(userSub.addonSubscriptions, {
-      category: "scheduled"
-    });
+    
+    const userSub = await SubscriptionService.getUserSubscriptions(true)
+    const baseSub = _.find(userSub.addonSubscriptions, { category: 'vod' })
     if (baseSub) {
-      this.trialSubscription = /trial/gi.test(baseSub.package.name);
+      this.trialSubscription = /trial/gi.test(baseSub.package.name)
     }
-
-    const schedulerConfig = await StreamService.getStreamScheduleSettings(this.streamId);
-    if (schedulerConfig) {
-      this.savedSchedulerConfig = schedulerConfig;
-      this.scheduleMode = schedulerConfig.mode;
-      let { datetime } = schedulerConfig;
-      if (datetime) {
-        this.scheduledDateTime = new Date(datetime).toISOString();
-      }
-    }
-    console.log(this.savedSchedulerConfig, this.scheduleMode, this.scheduledDateTime)
 
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Page", this.stream);
 
-    this.$root.$on("event", () => {
-      console.log("root event");
-      this.$root.$broadcast("event-from-parent", { message: "hey" });
-    });
+    this.$root.$on('event', () => {
+
+      console.log('root event')
+      this.$root.$broadcast('event-from-parent', { message: 'hey' })
+    })
+
   },
   destroyed() {
     if (!this.stream) return;
     this.unsubscribeMediaPulse();
-    this.scopeAlive = false;
+    this.scopeAlive = false
   },
   data() {
     return {
-      savedSchedulerConfig: null,
-      scheduleMode: null,
-      // scheduledDateTime: new Date(Date.now() + (3600000)).toISOString(),
-      scheduledDateTime: null,
-      schedulerConfigProcessing: false,
-
       statusProcessing: false,
       scopeAlive: true,
       SourceTypes,
       nameEdit: false,
+      bucketSize: 0,
+      videoFilesRetrieved: false,
       userSubscription: null,
       processing: true,
       processingMessage: null,
@@ -260,12 +160,17 @@ export default {
       mediaPulse: null,
       clientsCount: null,
       windowHeight: 0,
+      storageStats: {
+        value: 0,
+        unit: 'bytes',
+        loaded: false,
+      },
       countPushedBytes() {
         const { bytesOutTotal = 0, pushStatsTotal = 0 } = this.mediaPulse;
         return _.sum([bytesOutTotal, pushStatsTotal]);
       },
       getStreamStatus() {
-        return this.streamAlive ? "active" : "offline";
+        return this.streamAlive ? "active" : "inactive";
       },
       getStreamQuality() {
         const sizes = [480, 720, 1080, 1440, 2160];
@@ -282,62 +187,23 @@ export default {
         }
 
         return quality;
-      },
-      canSaveScheduleSetting() {
-        // debugger
-        if (!this.savedSchedulerConfig) return;
-
-        let changed = this.savedSchedulerConfig.mode !== this.scheduleMode;
-        if (this.scheduleMode === "loop") return changed;
-
-        let hasDatetime = !!this.scheduledDateTime;
-        if (!hasDatetime) return false;
-
-        let scheduledMs = new Date(this.scheduledDateTime).getTime()
-        // changed = this.scheduledDateTime !== this.savedSchedulerConfig.datetime;
-        changed = scheduledMs !== this.savedSchedulerConfig.datetime;
-        return changed;
-      },
+      }
     };
   },
-  computed: {
-    minScheduleDateTime () {
-      let minTime = new Date(Date.now() + 180*1000)
-      return minTime.toISOString()
-    }
-  },
   methods: {
-    async saveSchedulerConfig () {
-      if (this.schedulerConfigProcessing) return
-
-      this.schedulerConfigProcessing = true
-      try {
-        await StreamService.saveStreamScheduleSettings(this.stream._id, this.scheduleMode, new Date(this.scheduledDateTime))
-
-        let updatedConfig = { mode: this.scheduleMode }
-        if (this.scheduleMode === 'datetime')
-          updatedConfig.datetime = new Date(this.scheduledDateTime).getTime()
-        
-        else if (this.scheduleMode === 'loop')
-          this.scheduledDateTime = null
-
-        this.savedSchedulerConfig = updatedConfig
-
-      } catch(e) { 
-        this.$notify({ group: 'error', text: 'Could not update scheduler settings' })
-        console.log(e) 
-      }
-
-      this.schedulerConfigProcessing = false
+    isRecording () {
+      return /(recording|vodepisodes)$/gi.test(this.$router.currentRoute.path)
     },
-    isRecording() {
-      return /(recording|vodepisodes)$/gi.test(this.$router.currentRoute.path);
-    },
-    requestChatStatus() {
+    requestChatStatus () {
       this.$root.$emit("bv::show::modal", "alert-chat-down");
     },
-    onStreamUpdates(updates) {
-      this.stream = _.assign({}, this.stream, updates);
+    onStreamUpdates (updates) {
+      this.stream = _.assign({}, this.stream, updates)
+    },
+    onVideoFiles (videos) {
+      console.log('videos', videos)
+      this.updateStorageUsage(videos)
+      this.videoFilesRetrieved = true
     },
     async setupStream() {
       // get stream details
@@ -347,6 +213,7 @@ export default {
         this.streamName = this.stream.name;
         this.setupMediaPulse();
         this.setupViewershipCounter();
+        
       } catch (err) {
         // redirect to stream list
         this.$router.push({ name: "ChannelList" });
@@ -387,7 +254,7 @@ export default {
     setupMediaPulse() {
       if (!this.stream) return;
 
-      let { haxrBlockId } = this.stream;
+      const { haxrBlockId } = this.stream;
       if (!haxrBlockId) {
         setTimeout(() => this.setupStream(), 2000);
         return;
@@ -395,7 +262,6 @@ export default {
 
       let headChunkRecieved = false;
 
-      // haxrBlockId = "5c13faf6899aac1b34de8bc8";
       this.$socket.emit("stream.summary", haxrBlockId, {
         subscribe: true,
         out: "restream-push",
@@ -421,19 +287,22 @@ export default {
         }, 1000);
       }, 5000);
     },
-    setupViewershipCounter() {
+    setupViewershipCounter () {
+
       (async function updateCounter() {
         try {
-          let viewers = await StreamService.getStreamViewership(this.streamId);
-          this.clientsCount = viewers || 0;
+          let viewers = await StreamService.getStreamViewership(this.streamId)
+          this.clientsCount = viewers || 0
         } catch (e) {}
 
-        if (this.scopeAlive) setTimeout(updateCounter.bind(this), 3000);
-      }.bind(this)());
+        if (this.scopeAlive)
+          setTimeout(updateCounter.bind(this), 3000)
+
+      }.bind(this))()
+
     },
     onMediaPulse() {
-      this.streamAlive =
-        this.stream.enabled && this.mediaPulse && this.mediaPulse.alive;
+      this.streamAlive = this.stream.enabled && this.mediaPulse && this.mediaPulse.alive
 
       let codecs = _.get(this, "mediaPulse.tracks");
       if (!_.size(codecs)) return;
@@ -501,11 +370,21 @@ export default {
       }
 
       this.processing = false;
+    },
+    updateStorageUsage (videos) {
+      let bytes = 0
+      _.each(videos, video => {
+        if(!video || !video.bytes) return
+        bytes += video.bytes
+      })
+
+      let bytesInfo = this.$options.filters.bytes(bytes, true, 2, true)
+      this.storageStats = _.assign({}, bytesInfo, { loaded: true })
     }
   },
   components: {
     AlertModal,
-    ConfirmModal
+    ConfirmModal,
   }
 };
 
@@ -515,8 +394,8 @@ function flushBlobUrl(blob) {
   }
 }
 
-function isValidUrl(url) {
-  return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url);
+function isValidUrl (url) {
+  return /^(http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url)
 }
 </script>
 
@@ -576,6 +455,9 @@ function isValidUrl(url) {
   font-weight: 600;
   margin-right: 3px;
   height: 34px;
+}
+.stat-container .value.sm {
+  font-size:18px;
 }
 .stat-container.lg .value {
   font-size: 28px;
@@ -673,13 +555,13 @@ function isValidUrl(url) {
   /* display: inline-block; */
   /* margin-bottom: 20px; */
   float: right;
-  clear: both;
+  clear: both
 }
 
 .field-container {
   /* width: 235px; */
   width: 100%;
-  padding: 0;
+  padding: 10px 0;
 }
 .field-container:last-of-type {
   border-bottom: none;
@@ -693,15 +575,14 @@ function isValidUrl(url) {
   display: block;
   width: 100%;
   height: auto !important;
-  margin: 10px 0 10px 0 !important;;
-  padding: 10px 14px !important;
+  margin: 10px 0 10px 0;
+  padding: 10px 14px;
   color: #ffffff;
   /* background-color: #010329; */
   background-color: #202940;
   border: 1px solid #151c31;
   border-radius: 2px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
-    0 2px 1px -1px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
 }
 .input:focus {
   background-color: rgba(1, 3, 41, 0.47);
@@ -744,26 +625,5 @@ function isValidUrl(url) {
 }
 .btn-status:hover {
   background-color: #2647a3;
-}
-</style>
-<style>
-.datetime-input{
-  display: block;
-  width: 100%;
-  height: auto !important;
-  margin: 10px 0 10px 0;
-  padding: 10px 14px;
-  color: #ffffff;
-  /* background-color: #010329; */
-  background-color: #202940;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
-  outline-color: #0074fc;
-  cursor: pointer;
-  line-height: 17px;
-}
-.datetime-input:focus {
-  background-color: rgba(18, 23, 37, 0.67);
 }
 </style>
