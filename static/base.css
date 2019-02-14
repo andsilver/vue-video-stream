@@ -424,3 +424,7 @@ body {
 .no-pointer {
   pointer-events: none;
 }
+/* .btn-group-toggle label.btn {
+  padding-top:3px !important;
+  padding-bottom:3px !important;
+} */

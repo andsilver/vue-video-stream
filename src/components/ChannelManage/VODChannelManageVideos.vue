@@ -626,7 +626,7 @@ function imageReader(file, cb) {
   border-radius: 2px;
   border: none;
 }
-.input {
+.video-item .input {
   width: 400px;
   /* min-height: 120px; */
   font-size: 12px;
@@ -703,25 +703,25 @@ function imageReader(file, cb) {
   height: 18px;
 }
 
-.field-container {
+.video-item .field-container {
   /* width: 235px; */
   width: 100%;
   padding: 0;
   position:relative;
 }
-.field-container-sm {
+.video-item .field-container-sm {
   padding:0;
 }
-.field-container:last-of-type {
+.video-item .field-container:last-of-type {
   border-bottom: none;
 }
-.field-container .label {
+.video-item .field-container .label {
   font-size: 12px;
   opacity: 0.65;
   margin-bottom:3px;
   text-transform: capitalize;
 }
-.field-container .input {
+.video-item .field-container .input {
   display: block;
   width: 100%;
   height: auto !important;
@@ -736,13 +736,13 @@ function imageReader(file, cb) {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
   outline-color: #0074fc;
 }
-.field-container .input:focus {
+.video-item .field-container .input:focus {
   background-color: rgba(18, 23, 37, 0.67);
 }
-.field-container .input:read-only:focus {
+.video-item .field-container .input:read-only:focus {
   background-color: rgb(42, 49, 68);
 }
-.field-container .badge-button {
+.video-item .field-container .badge-button {
   opacity: 0;
   font-size:11px;
   padding: 4px 9px;
@@ -752,11 +752,11 @@ function imageReader(file, cb) {
   pointer-events: none;
   transition: all 0.15s linear;
 }
-.field-container:hover .badge-button {
+.video-item .field-container:hover .badge-button {
   opacity:1;
   pointer-events: inherit;
 }
-.field-container-sm .badge-button {
+.video-item .field-container-sm .badge-button {
   top: 8px;
 }
 </style>
