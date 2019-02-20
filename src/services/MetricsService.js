@@ -12,7 +12,8 @@ import RequestError from './RequestError'
 
 export default {
   getStreamViewers,
-  getStreamBandwidth
+  getStreamBandwidth,
+  getUserBandwidth,
 }
 
 /**
@@ -42,6 +43,17 @@ function getStreamBandwidth(streamId, startTime, endTime) {
   return makeRequest({
     path: uri,
     params: { startTime, endTime }
+  })
+}
+
+/**
+ * @param {string} userId
+ */
+function getUserBandwidth(userId) {
+  let uri = `/metrics/subscription/${userId}/bandwidth`
+  return makeRequest({
+    path: uri,
+    method: 'post'
   })
 }
 
