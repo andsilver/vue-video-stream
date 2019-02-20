@@ -19,47 +19,51 @@
       <div class="para-title">Subscriptions</div>
       <br>
       <div v-if="!userSubscription">
-        <div class="page-placeholder" 
-             style="height: 200px">
-          <div class="page-placeholder-content">
-            Please wait ..
+        <div class="page-placeholder" style="height: 200px">
+          <div class="page-placeholder-content">Please wait ..
             <br>
-            <b-progress :value="100" 
-                        :max="100" 
-                        animated
-                        class="w-100 mt-2"
-                        style="height: 7px;"></b-progress>
+            <b-progress :value="100" :max="100" animated class="w-100 mt-2" style="height: 7px;"></b-progress>
           </div>
         </div>
       </div>
       <div v-else class="user-sub-list">
-        <div class="user-sub-item head">
+        <!-- <div class="user-sub-item head">
           <b-row>
-            <b-col cols="4"><span style="padding-left:10px;">subscription</span></b-col>
+            <b-col cols="4"><span>subscription</span></b-col>
             <b-col cols="2">streaming type</b-col>
             <b-col cols="4">subscription age</b-col>
             <b-col></b-col>
           </b-row>
-        </div>
+        </div>-->
         <div class="user-sub-item" :class="{ disabled: !isSubEnabled() }">
           <b-row>
-            <b-col cols="4">
-              <div style="padding-left:10px;">
+            <b-col cols="6">
+              <div>
                 <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
-                <div class="pack-name">{{getSubscriptionName()}}</div>
-                <div>
-                  <code style="font-size:13px;">USD ${{getSubscriptionFee()}}/month</code>
+                <div class="pack-name">
+                  {{getSubscriptionName()}}
+                  &nbsp;
+                  <span v-if="isSubEnabled()" class="expired-badge inverse">active</span>  
+                  <span v-else class="expired-badge">expired</span>
                 </div>
+                <div>
+                  <code style="font-size:13px;">
+                    USD ${{getSubscriptionFee()}}/{{ isAnnualPackage() ? 'year' : 'month' }}
+                  </code>
+                </div>
+                <div class="subscription-badge package-category-badge">restream</div>
               </div>
             </b-col>
-            <b-col cols="2">
-              <div class="subscription-badge package-category-badge sm">restream</div>
-            </b-col>
+            <!-- <b-col cols="2">
+              <div class="subscription-badge package-category-badge">restream</div>
+            </b-col>-->
             <b-col cols="4">
               <div v-if="isPaidSubscription()">
                 Valid untill
-                <code style="font-size:inherit;margin: 10px;">{{ getSubscriptionAge() | date('DD MMM, YYYY') }}</code>
-                <span v-if="!isSubEnabled()" class="expired-badge">expired</span>
+                <code
+                  style="font-size:inherit;margin: 10px;"
+                >{{ getSubscriptionAge() | date('DD MMM, YYYY') }}</code>
+                <!-- <span v-if="!isSubEnabled()" class="expired-badge">expired</span> -->
               </div>
             </b-col>
             <b-col class="text-right">
@@ -69,109 +73,201 @@
                   <span v-else>PAY NOW</span>
                 </b-button>
               </router-link>
-              
-              <b-button v-if="isSubEnabled()"
-                        variant="link"
-                        size="sm"
-                        onclick="Intercom('show')">CANCEL</b-button>
-              &nbsp;
+
+              <b-button
+                v-if="isSubEnabled()"
+                variant="link"
+                size="sm"
+                onclick="Intercom('show')"
+              >CANCEL</b-button>&nbsp;
             </b-col>
           </b-row>
         </div>
         <div v-if="hasAddonSubscripitons()">
-          <div v-for="sub in userSubscription.addonSubscriptions"
-               :key="sub._id"
-               class="user-sub-item"
-               :class="{ disabled: !isSubEnabled(sub) }">
-          <b-row>
-            <b-col cols="4">
-              <div style="padding-left:10px;">
-                <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
-                <div class="pack-name">{{getSubscriptionName(sub)}}</div>
+          <div
+            v-for="(sub, index) in userSubscription.addonSubscriptions"
+            :key="index"
+            class="user-sub-item"
+            :class="{ disabled: !isSubEnabled(sub) }">
+            <b-row>
+              <b-col cols="6">
                 <div>
-                  <code style="font-size:13px;">USD ${{getSubscriptionFee(sub)}}/month</code>
+                  <!-- <div class="subscription-badge">{{getSubscriptionName()}}</div> -->
+                  <div class="pack-name">
+                    {{getSubscriptionName(sub)}}
+                    &nbsp;
+                    <span v-if="isSubEnabled(sub)" class="expired-badge inverse">active</span>  
+                    <span v-else class="expired-badge">expired</span>
+                  </div>
+                  <div v-if="getSubscriptionFee(sub) > 0">
+                    <code style="font-size:13px;">
+                      USD ${{getSubscriptionFee(sub)}} /{{ isAnnualPackage(sub) ? 'year' : 'month' }}
+                    </code>
+                  </div>
+                  <div class="subscription-badge package-category-badge">{{sub.category}}</div>
                 </div>
-              </div>
-            </b-col>
-            <b-col cols="2">
-              <div class="subscription-badge package-category-badge sm">{{sub.category}}</div>
-            </b-col>
-            <b-col cols="4">
-              <div v-if="isPaidSubscription()">
-                Valid untill
-                <code style="font-size:inherit;margin: 10px;">{{ getSubscriptionAge(sub) | date('DD MMM, YYYY') }}</code>
-                <span v-if="!isSubEnabled(sub)" class="expired-badge">expired</span>
-              </div>
-            </b-col>
-            <b-col class="text-right">
-              <router-link :to="subscriptionManagePage(null, sub.category)">
-                <b-button :variant="isSubEnabled(sub) ? 'link' : 'danger'" size="sm">
-                  <span v-if="isSubEnabled(sub)">{{isPaidSubscription(sub) ? 'CHANGE' : 'UPGRADE'}}</span>
-                  <span v-else>PAY NOW</span>
-                </b-button>
-              </router-link>
-              
-              <b-button v-if="isSubEnabled(sub)"
-                        variant="link"
-                        size="sm"
-                        onclick="Intercom('show')">CANCEL</b-button>
-              &nbsp;
-            </b-col>
-          </b-row>
-        </div>
+              </b-col>
+              <!-- <b-col cols="2">
+                <div class="subscription-badge package-category-badge">{{sub.category}}</div>
+              </b-col>-->
+              <b-col cols="4">
+                <div v-if="isPaidSubscription()">
+                  Valid untill
+                  <code
+                    style="font-size:inherit;margin: 10px;"
+                  >{{ getSubscriptionAge(sub) | date('DD MMM, YYYY') }}</code>
+                  <!-- <span v-if="!isSubEnabled(sub)" class="expired-badge">expired</span> -->
+                </div>
+              </b-col>
+              <b-col class="text-right">
+                <router-link :to="subscriptionManagePage(null, sub.category)">
+                  <b-button :variant="isSubEnabled(sub) ? 'link' : 'danger'" size="sm">
+                    <span
+                      v-if="isSubEnabled(sub)"
+                    >{{isPaidSubscription(sub) ? 'CHANGE' : 'UPGRADE'}}</span>
+                    <span v-else>PAY NOW</span>
+                  </b-button>
+                </router-link>
+
+                <b-button
+                  v-if="isSubEnabled(sub)"
+                  variant="link"
+                  size="sm"
+                  onclick="Intercom('show')"
+                >CANCEL</b-button>&nbsp;
+              </b-col>
+            </b-row>
+            <br>
+            <div class="sub-usage-container">
+              <b-row>
+                <b-col cols="6">
+                  <div>
+                    <code>
+                      <u>USAGE QUOTA</u>
+                    </code>
+                  </div>
+                  <div class="sub-usage">
+                    <div v-for="(usageProp, index) in usageProps" :key="index">
+                      <div v-if="hasUsageProp(usageProp, sub)" class="item-usage-row">
+                        <b-row>
+                          <b-col cols="4">
+                            <label class="item-name">{{usageProp.name || usageProp}}&nbsp;&nbsp;</label>
+                          </b-col>
+                          <b-col>
+                            <span class="item-usage">
+                              <span v-if="usageProp.nousage">
+                                <span class="value">{{getAllowedPropUsage(usageProp, sub)}}</span>
+                                <span v-if="usageProp.unit">{{usageProp.unit}}</span> 
+                                assigned
+                              </span>
+                              <span v-else>
+                                <span class="value">{{getPropUsage(usageProp, sub)}}</span> used from
+                                <span
+                                  class="value"
+                                >{{getAllowedPropUsage(usageProp, sub)}}</span>
+                              </span>
+                            </span>
+                          </b-col>
+                        </b-row>
+                        <div v-if="usageProp.explicit" class="item-usage-explicit">
+
+                          <b-row>
+                            <b-col offset="4">
+                              <div class="explicit-usage-wrapper">
+                                
+                                <div class="explicit-usage">
+                                  <div class="value">
+                                    <i v-if="!hasExplicitUsageProp(usageProp, sub)" class="fas fa-spinner fa-spin"></i>
+                                    <span v-else>
+                                      <code>{{ getExplicitUsageProp(usageProp, sub).value}}</code>
+                                      <span style="font-size:0.6em">{{getExplicitUsageProp(usageProp, sub).unit}}</span>
+                                    </span>
+                                  </div>
+                                  <div>Usage</div>
+                                </div>
+
+                                <div class="explicit-usage">
+                                  <div class="value">
+                                    <code>1.00</code>
+                                    <span style="font-size:0.6em">TB</span>
+                                  </div>
+                                  <div>Assigned</div>
+                                </div>
+                                
+                              </div>
+                            </b-col>
+                          </b-row>
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </b-col>
+              </b-row>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
     <br>
-    <div class="row-container" style="border:none;">
-      <div class="para-title">Transactions</div>
-      <div class="text-dimm">Below are the billing transactions debited through Castr</div>
-    </div>
-    <br>
-    <p v-if="transactionsProcessing" class="text-center">retreiving billing history</p>
-    <b-table
-      v-if="!transactionsProcessing"
-      :fields="transactionsTableFields"
-      :items="paymentHistory"
-      :hover="true"
-      class
-    >
-      <template slot="time" slot-scope="data">{{data.value | date('DD/MM/YYYY')}}</template>
-      <template slot="package" slot-scope="data">
-        <code class="subscription-badge sm">{{data.value.name}}</code>
-      </template>
-      <template slot="cycle" slot-scope="data">
-        <span>{{data.item.time | date('DD/MM/YYYY')}}</span>
-        <code>&nbsp;through&nbsp;</code>
-        <span>{{getCycleEnd(data.item.time) | date('DD/MM/YYYY')}}</span>
-      </template>
-      <template slot="amount" slot-scope="data">
-        <span style="font-size:12px;">USD</span>
-        ${{data.value}}
-      </template>
-      <template slot="actions" slot-scope="data">
-        <b-button variant="link" size="sm" disabled>--</b-button>
-      </template>
-    </b-table>
-    <p
-      v-if="!transactionsProcessing && !paymentHistory.length"
-      class="text-center"
-    >no transactions to display</p>
+    <section class="hidden">
+      <div class="row-container" style="border:none;">
+        <div class="para-title">Transactions</div>
+        <div class="text-dimm">Below are the billing transactions debited through Castr</div>
+      </div>
+      <br>
+      <p v-if="transactionsProcessing" class="text-center">retreiving billing history</p>
+      <b-table
+        v-if="!transactionsProcessing"
+        :fields="transactionsTableFields"
+        :items="paymentHistory"
+        :hover="true"
+        class
+      >
+        <template slot="time" slot-scope="data">{{data.value | date('DD/MM/YYYY')}}</template>
+        <template slot="package" slot-scope="data">
+          <code class="subscription-badge">{{data.value.name}}</code>
+        </template>
+        <template slot="cycle" slot-scope="data">
+          <span>{{data.item.time | date('DD/MM/YYYY')}}</span>
+          <code>&nbsp;through&nbsp;</code>
+          <span>{{getCycleEnd(data.item.time) | date('DD/MM/YYYY')}}</span>
+        </template>
+        <template slot="amount" slot-scope="data">
+          <span style="font-size:12px;">USD</span>
+          ${{data.value}}
+        </template>
+        <template slot="actions" slot-scope="data">
+          <b-button variant="link" size="sm" disabled>--</b-button>
+        </template>
+      </b-table>
+      <p
+        v-if="!transactionsProcessing && !paymentHistory.length"
+        class="text-center"
+      >no transactions to display</p>
+    </section>
   </div>
 </template>
 
 <script>
+import UserService from "../../services/UserService";
 import SubscriptionService from "../../services/SubscriptionService";
+import MetricsService from "../../services/MetricsService";
 
 export default {
   name: "ManageBilling",
   async mounted() {
     try {
       // get user subscription
-      this.userSubscription = await SubscriptionService.getUserSubscriptions(
-        true
-      );
+      const usersub = await SubscriptionService.getUserSubscriptions(true);
+      usersub.addonSubscriptions = _.map(usersub.addonSubscriptions, (addonSub) => {
+        return _.assign(addonSub, { usage: {
+          // bandwidth: null
+        }})
+      })
+
+      this.userSubscription = usersub
+      
       this.processing = false;
 
       const isPaid = this.isPaidSubscription();
@@ -190,8 +286,26 @@ export default {
       }
 
       // get user billing transactions
-      this.paymentHistory = await SubscriptionService.getUserBillingHistory();
+      // this.paymentHistory = await SubscriptionService.getUserBillingHistory();
       this.transactionsProcessing = false;
+
+      _.each(this.userSubscription.addonSubscriptions, async (addonSub, index) => {
+        
+        const bwLimit =  _.get(addonSub, 'package.definition.bandwidth')
+        if (bwLimit) {
+          let bytes = '-'
+          try {
+            let res = await MetricsService.getUserBandwidth(UserService.getUserId())
+            bytes = res && res.bytes || 0
+          } catch(e) { console.log('e', e) }
+  
+          addonSub.usage = { 
+            bandwidth: this.$options.filters.bytes(bytes, true, 3, true) 
+          }
+        }
+      })
+
+      // this.userSubscription.addonSubscriptions = updatedAddonSubList
 
       // track event
     } catch (e) {
@@ -203,6 +317,18 @@ export default {
   },
   data() {
     return {
+      usageProps: [
+        "streams",
+        { name: "bandwidth", key: "bandwidth", nousage: true, unit: 'TB', mapFn: gb => (gb/1024).toFixed(2), explicit: true },
+        { name: "storage", key: "storage", nousage: true, unit: 'GB' },
+        {
+          name: "concurrent viewers",
+          key: "maxConcurrentUsers",
+          nousage: true,
+          unit: 'Conns'
+        },
+        { name: "dvr", key: "dvrUnits", nousage: true, unit: 'GB' }
+      ],
       processing: true,
       transactionsProcessing: true,
 
@@ -210,20 +336,7 @@ export default {
       basicPackage: null,
       superiorPackage: null,
       userSubscription: null,
-      paymentHistory: [
-        // {
-        //   id: 'm87jdhcw0e8r7',
-        //   cycle: { start: new Date(Date.now()-(30*24*3600000)), end: new Date() },
-        //   bill: { net: 19.99 },
-        //   time: new Date()
-        // },
-        // {
-        //   id: 'cimosyndnfy',
-        //   cycle: { start: new Date(Date.now()-(2*30*24*3600000)), end: new Date(Date.now()-(30*24*3600000)) },
-        //   bill: { net: 19.99 },
-        //   time: new Date(Date.now()-(30*24*3600000))
-        // }
-      ],
+      paymentHistory: [],
       transactionsTableFields: [
         { key: "time", label: "Date" },
         { key: "package", label: "subscription" },
@@ -262,6 +375,35 @@ export default {
     };
   },
   methods: {
+    hasExplicitUsageProp (usageProp, baseSub) {
+      let prop = usageProp.key || usageProp;
+      return prop in baseSub.usage
+    },
+    getExplicitUsageProp (usageProp, baseSub) {
+      let prop = usageProp.key || usageProp;
+      return baseSub.usage[prop]
+    },
+    isAnnualPackage (sub) {
+      sub = sub || this.userSubscription.subscription;
+      return /yearly/i.test(sub.package.name)
+    },
+    hasUsageProp(usageProp, baseSub) {
+      let prop = usageProp.key || usageProp;
+      return (
+        baseSub.package &&
+        baseSub.package.definition &&
+        baseSub.package.definition[prop]
+      );
+    },
+    getAllowedPropUsage(usageProp, baseSub) {
+      let prop = usageProp.key || usageProp;
+      let value = _.get(baseSub, "package.definition." + prop);
+      return usageProp.mapFn ? usageProp.mapFn(value) : value
+    },
+    getPropUsage(usageProp, baseSub) {
+      let prop = usageProp.key || usageProp;
+      return 1;
+    },
     isSubEnabled(sub) {
       sub = sub || this.userSubscription.subscription;
       return sub.enabled;
@@ -352,40 +494,107 @@ export default {
 
 .expired-badge {
   border-radius: 3px;
-  padding: 1px 4px;
-  font-size: 12px;
-  letter-spacing: -0.5px;
-  background-color: #dc3545;
-  color: #ffffff;
+  padding: 2px 5px;
+  font-size: 13px;
+  /* letter-spacing: -0.5px; */
+  /* background-color: #dc3545; */
+  /* color: #ffffff; */
+  border: 1px solid red;
+  color: red;
   display: inline-block;
 }
+
+.expired-badge.inverse {
+  border: 1px solid #ffb204;
+  color: #ffb204;
+}
+
 .package-category-badge {
   /* background: #282c83; */
-  background: #2159d1;
+  /* background: #2159d1; */
   /* background: #dc3545; */
   /* margin-right: 5px; */
+  border:1px solid #9698c7;
+  border-radius: 2px;
+  color: #e2e3f1;
   letter-spacing: 0;
-  text-transform: capitalize;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-top: 7px;
+  line-height: 18px;
 }
 .user-sub-list {
-
 }
 .user-sub-item.head {
-  font-size:13px;
+  font-size: 13px;
   color: #eeeeee;
   background-color: #192035;
 }
 .user-sub-item {
-  padding: 12px 0;
+  padding: 15px 20px;
   /* border-bottom:1px dashed rgba(255,255,255,0.4); */
-  border-bottom: 1px solid #37395f;
+  /* border-bottom: 1px solid #37395f; */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  background-color: #29344e;
+  margin-bottom: 20px;
+  border-radius: 2px;
 }
 .pack-name {
-  font-size: 15px;
-  text-transform: capitalize;
+      font-size: 17.5px;
+    text-transform: capitalize;
+    margin-bottom: 4px;
 }
 .user-sub-item.disabled {
   background-color: rgba(220, 220, 220, 0.09);
+}
+.sub-usage-container {
+  /* padding: 0 10px; */
+  margin-top: 10px;
+}
+.sub-usage {
+  margin-top: 5px;
+}
+.item-usage-row {
+  padding-top: 5px;
+  font-size: 12.5px;
+}
+.item-usage-row .item-name {
+  text-transform: capitalize;
+  /* opacity: 0.8; */
+  font-size: 13px;
+}
+.item-usage-row .item-usage {
+  font-size: 1em;
+  padding-left: 5px;
+}
+.item-usage-row .item-usage .value {
+  display: inline-block;
+  /* background: aliceblue; */
+  /* padding: 0px 7px; */
+  margin: 0 2px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.explicit-usage-wrapper {
+  margin-left:7px;
+}
+.explicit-usage {
+  background: #202940;
+  margin: 10px 0;
+  margin-right: 10px;
+  padding: 15px;
+  border-radius: 3px;
+  display: inline-block;
+  text-align: center;
+  font-size:11px;
+}
+.explicit-usage .value {
+  font-size: 22px;
+  /* font-weight: 600; */
+}
+.explicit-usage .value code {
+  /* color: #006ee8; */
+  letter-spacing: -0.5px;
 }
 </style>
 
