@@ -63,14 +63,19 @@
                     <span class="package-name">{{subscriptionPackage.name}}</span>
                   </div>
                 </template>
-                <b-dropdown-item v-for="(pack, index) in packages || []"
+                <!-- <b-dropdown-item v-for="(pack, index) in packages || []" -->
+                <b-dropdown-item v-for="(pack, index) in filteredPackages"
                                  :key="index"
                                  @click="selectSubscriptionPackage(pack)">
                                  <!-- :disabled="isCurrentSubscription(pack)"> -->
                   <div class="a package-dropdown-item" 
                        :class="{ selected: subscriptionPackage === pack }">
                     <span class="package-name">{{pack.name}}</span>
-                    <span v-if="pack.baseCharge > 0" class="package-price">${{pack.baseCharge}} <small style="text-transform:none;">/mon</small> </span>
+                    <span v-if="pack.baseCharge > 0" class="package-price">
+                      ${{pack.baseCharge}} 
+                      <small style="text-transform:none;">/{{isAnnualPackage(pack) ? 'yr' : 'mo'}}</small> 
+                      
+                    </span>
                     <code v-else class="package-price">free</code>
                     &nbsp;
                     <code v-if="isCurrentSubscription(pack)" 
@@ -78,6 +83,12 @@
                   </div>
                 </b-dropdown-item>
               </b-dropdown>
+
+              <div class="archived-plans-ctrl">
+                <label>
+                  <input type="checkbox" v-model="showArchivedPlans"/> Show archived plans
+                </label>
+              </div>
 
              </b-col>
            </b-row>
@@ -280,6 +291,7 @@ export default {
       processing: true,
       cardValidated: false,
       packages: [],
+      showArchivedPlans: false,
       userSubscription: null,
       userBaseSubscription: null,
       packCategory: null,
@@ -292,9 +304,14 @@ export default {
         // { label: 'ip camera', value: 'ipcam' },
       ],
       quantity: 1,
-      getEndingDate() {
+      getEndingDate(pack) {
         const today = new Date();
-        today.setMonth(today.getMonth() + this.quantity);
+        if (this.isAnnualPackage(this.subscriptionPackage)) {
+          today.setFullYear(today.getFullYear() + 1);
+        } else {
+          today.setMonth(today.getMonth() + this.quantity);
+        }
+
         return today;
       },
       getSubscriptionFee() {
@@ -313,7 +330,16 @@ export default {
       }
     };
   },
+  computed: {
+    filteredPackages () {
+      let packs =  this.showArchivedPlans ? this.packages : _.filter(this.packages, pack => !pack.archived)
+      return packs
+    }
+  },
   methods: {
+    isAnnualPackage (pack) {
+      return /yearly/i.test(pack.name)
+    },
     processURLSearchParams () {
       const searchParams = _.reduce((window.location.search||'').split('&'), (o, e) => {
         let pars = _.split(e, '=')
@@ -367,6 +393,8 @@ export default {
       }
 
       this.userBaseSubscription = baseSub
+      this.showArchivedPlans = _.get(baseSub, 'package.archived') === true
+
     },
     filterSubscriptionPacks () {
       const packCat = this.packCategory
@@ -515,5 +543,15 @@ export default {
 }
 .message {
   font-size: 15px;
+}
+.archived-plans-ctrl {
+  margin-top:7px;
+  font-size:12.5px;
+  text-transform: lowercase;
+  opacity: 0.8;
+}
+.archived-plans-ctrl input {
+  vertical-align: middle;
+  margin-right:2px;
 }
 </style>
