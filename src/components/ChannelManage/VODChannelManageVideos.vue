@@ -249,9 +249,9 @@
                      message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
                      okText="Got it, thanks"></alert-modal>
       
-      <alert-modal modal-id="alert-video-size" 
+      <!-- <alert-modal modal-id="alert-video-size" 
                    message="You can upload media with size upto of 50MB only"
-                   okText="Fine"></alert-modal>
+                   okText="Fine"></alert-modal> -->
 
       <alert-modal modal-id="alert-leaving-active-uploads"
                    message="Video(s) are being uploaded. Please cancel active uploads before leaving"
@@ -395,11 +395,11 @@ export default {
           return
         }
         
-        if (file.size > MaxVideoUploadSize) {
-          vm.$root.$emit("bv::show::modal", "alert-video-size")
-          el.value = null
-          return
-        }
+        // if (file.size > MaxVideoUploadSize) {
+        //   vm.$root.$emit("bv::show::modal", "alert-video-size")
+        //   el.value = null
+        //   return
+        // }
         
 
         let newVideo = {
