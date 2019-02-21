@@ -157,10 +157,12 @@ import AddLiveChannelModal from "./AddLiveChannelModal.vue";
 import AddVodChannelModal from "./AddVODChannelModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import StreamService from "../services/StreamService";
+import Utils from '@/utils'
 
 export default {
   name: "ChannelList",
   async mounted() {
+
     try {
       const streams = await StreamService.getUserStreams();
       setTimeout(() => {
@@ -188,6 +190,8 @@ export default {
     // update win title
     this.$emit('updateTitle', 'Dashboard - Castr Streams')
 
+    this.onViewLoaded () 
+
   },
   data() {
     return {
@@ -198,6 +202,20 @@ export default {
     };
   },
   methods: {
+    onViewLoaded () {
+      let qs = Utils.parseQueryString(window.location.search) || {}
+      if (qs.action === 'newstream') {
+        let streamCreationType =  qs.streamtype || ''
+        streamCreationType = streamCreationType === 'restream' ? '' : streamCreationType
+        if (streamCreationType) 
+          streamCreationType += '-'
+
+        let streamCreationModalId = `modal-add-${streamCreationType}channel`
+
+        console.log(streamCreationModalId)
+        this.$root.$emit("bv::show::modal", streamCreationModalId);
+      }
+    },
     openCamModal() {
       this.$root.$emit("bv::show::modal", "modal-add-cam-channel");
     },
