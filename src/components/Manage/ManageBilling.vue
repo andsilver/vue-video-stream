@@ -67,19 +67,24 @@
               </div>
             </b-col>
             <b-col class="text-right">
-              <router-link :to="subscriptionManagePage(null, 'restream')">
-                <b-button :variant="isSubEnabled() ? 'link' : 'danger'" size="sm">
-                  <span v-if="isSubEnabled()">{{isPaidSubscription() ? 'CHANGE' : 'UPGRADE'}}</span>
-                  <span v-else>PAY NOW</span>
-                </b-button>
-              </router-link>
+              <div v-if="isBundledSub()">
+                <span class="expired-badge inverse">Bundled</span>
+              </div>
+              <div v-else>
+                <router-link :to="subscriptionManagePage(null, 'restream')">
+                  <b-button :variant="isSubEnabled() ? 'link' : 'danger'" size="sm">
+                    <span v-if="isSubEnabled()">{{isPaidSubscription() ? 'CHANGE' : 'UPGRADE'}}</span>
+                    <span v-else>PAY NOW</span>
+                  </b-button>
+                </router-link>
 
-              <b-button
-                v-if="isSubEnabled()"
-                variant="link"
-                size="sm"
-                onclick="Intercom('show')"
-              >CANCEL</b-button>&nbsp;
+                <b-button
+                  v-if="isSubEnabled()"
+                  variant="link"
+                  size="sm"
+                  onclick="Intercom('show')"
+                >CANCEL</b-button>&nbsp;
+              </div>
             </b-col>
           </b-row>
         </div>
@@ -120,21 +125,26 @@
                 </div>
               </b-col>
               <b-col class="text-right">
-                <router-link :to="subscriptionManagePage(null, sub.category)">
-                  <b-button :variant="isSubEnabled(sub) ? 'link' : 'danger'" size="sm">
-                    <span
-                      v-if="isSubEnabled(sub)"
-                    >{{isPaidSubscription(sub) ? 'CHANGE' : 'UPGRADE'}}</span>
-                    <span v-else>PAY NOW</span>
-                  </b-button>
-                </router-link>
+                <div v-if="isBundledSub(sub)">
+                  <span class="expired-badge inverse">Bundled</span>
+                </div>
+                <div v-else>
+                  <router-link :to="subscriptionManagePage(null, sub.category)">
+                    <b-button :variant="isSubEnabled(sub) ? 'link' : 'danger'" size="sm">
+                      <span
+                        v-if="isSubEnabled(sub)"
+                      >{{isPaidSubscription(sub) ? 'CHANGE' : 'UPGRADE'}}</span>
+                      <span v-else>PAY NOW</span>
+                    </b-button>
+                  </router-link>
 
-                <b-button
-                  v-if="isSubEnabled(sub)"
-                  variant="link"
-                  size="sm"
-                  onclick="Intercom('show')"
-                >CANCEL</b-button>&nbsp;
+                  <b-button
+                    v-if="isSubEnabled(sub)"
+                    variant="link"
+                    size="sm"
+                    onclick="Intercom('show')"
+                  >CANCEL</b-button>&nbsp;
+                </div>
               </b-col>
             </b-row>
             <br>
@@ -404,6 +414,10 @@ export default {
       let prop = usageProp.key || usageProp;
       return 1;
     },
+    isBundledSub(sub) {
+      sub = sub || this.userSubscription.subscription;
+      return sub.parentPackage;
+    },
     isSubEnabled(sub) {
       sub = sub || this.userSubscription.subscription;
       return sub.enabled;
@@ -534,7 +548,7 @@ export default {
   padding: 15px 20px;
   /* border-bottom:1px dashed rgba(255,255,255,0.4); */
   /* border-bottom: 1px solid #37395f; */
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
   background-color: #29344e;
   margin-bottom: 20px;
   border-radius: 2px;
@@ -548,8 +562,13 @@ export default {
   background-color: rgba(220, 220, 220, 0.09);
 }
 .sub-usage-container {
-  /* padding: 0 10px; */
-  margin-top: 10px;
+    padding: 15px 20px;
+    margin-top: 10px;
+    margin-left: -20px;
+    margin-right: -20px;
+    background: rgba(32, 41, 64, 0.4);
+    /* margin-bottom: -14px; */
+    border-top: 1px solid #19203570;
 }
 .sub-usage {
   margin-top: 5px;

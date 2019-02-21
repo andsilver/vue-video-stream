@@ -84,11 +84,11 @@
                 </b-dropdown-item>
               </b-dropdown>
 
-              <div class="archived-plans-ctrl">
+              <!-- <div class="archived-plans-ctrl">
                 <label>
                   <input type="checkbox" v-model="showArchivedPlans"/> Show archived plans
                 </label>
-              </div>
+              </div> -->
 
              </b-col>
            </b-row>
@@ -266,7 +266,17 @@ export default {
         const curPack = _.find(this.packages, p => p.baseCharge === userPackage.baseCharge)
         this.subscriptionPackage = curPack
       } else if (baseCharge) {
-        const subPack = _.find(this.packages, p => p.baseCharge === baseCharge)
+
+        const isAnnualPack = this.$route.query.annual === '1'
+
+        const subPack = _.find(this.packages, p => {
+          let bool = p.baseCharge === baseCharge
+          if (isAnnualPack) {
+            bool = bool && /year|annual/gi.test(p.name)
+          }
+
+          return bool
+          })
         if (subPack) {
           this.subscriptionPackage = subPack
         }
@@ -393,7 +403,7 @@ export default {
       }
 
       this.userBaseSubscription = baseSub
-      this.showArchivedPlans = _.get(baseSub, 'package.archived') === true
+      // this.showArchivedPlans = _.get(baseSub, 'package.archived') === true
 
     },
     filterSubscriptionPacks () {

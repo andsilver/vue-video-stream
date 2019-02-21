@@ -8,7 +8,8 @@ export default {
   resolveURL,
   resolveStreamKey,
   removeArrayItem,
-  binarySearch
+  binarySearch,
+  parseQueryString
 }
 
 /**
@@ -194,4 +195,19 @@ function binarySearch(ar, el, compareFunc) {
   }
 
   return -m - 1
+}
+
+function parseQueryString(qstring) {
+  let query = {}
+  // if (qstring && /email\=/.test(qstring)) {
+  if (qstring) {
+    qstring = qstring.replace('?', '');
+    let params = qstring.split('&');
+    for (let i = 0; i < params.length; i++) {
+      let pars = params[i].split('=');
+      query[pars[0]] = pars[1]
+    }
+  }
+
+  return query
 }
