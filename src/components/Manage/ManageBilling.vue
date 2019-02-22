@@ -190,7 +190,7 @@
                                     <i v-if="!hasExplicitUsageProp(usageProp, sub)" class="fas fa-spinner fa-spin"></i>
                                     <span v-else>
                                       <code>{{ getExplicitUsageProp(usageProp, sub).value}}</code>
-                                      <span style="font-size:0.6em">{{getExplicitUsageProp(usageProp, sub).unit}}</span>
+                                      <span style="font-size:0.6em" class="text-uppercase">{{getExplicitUsageProp(usageProp, sub).unit}}</span>
                                     </span>
                                   </div>
                                   <div>Usage</div>
@@ -198,7 +198,8 @@
 
                                 <div class="explicit-usage">
                                   <div class="value">
-                                    <code>1.00</code>
+                                    <!-- <code>1.00</code> -->
+                                    <code>{{getAllowedPropUsage(usageProp, sub)}}</code>
                                     <span style="font-size:0.6em">TB</span>
                                   </div>
                                   <div>Assigned</div>
@@ -303,13 +304,15 @@ export default {
         
         const bwLimit =  _.get(addonSub, 'package.definition.bandwidth')
         if (bwLimit) {
-          let bytes = '-'
+          // let bytes = '-'
+          let bytes = 0
           try {
-            let res = await MetricsService.getUserBandwidth(UserService.getUserId())
+            // let res = await MetricsService.getUserBandwidth(UserService.getUserId())
+            let res = await MetricsService.getSubscriptionBandwidth(UserService.getUserId(), addonSub.package._id)
             bytes = res && res.bytes || 0
           } catch(e) { console.log('e', e) }
   
-          addonSub.usage = { 
+          addonSub.usage = {
             bandwidth: this.$options.filters.bytes(bytes, true, 3, true) 
           }
         }
@@ -329,7 +332,7 @@ export default {
     return {
       usageProps: [
         "streams",
-        { name: "bandwidth", key: "bandwidth", nousage: true, unit: 'TB', mapFn: gb => (gb/1024).toFixed(2), explicit: true },
+        { name: "bandwidth", key: "bandwidth", nousage: true, unit: 'TB', mapFn: gb => (gb/1000).toFixed(2), explicit: true },
         { name: "storage", key: "storage", nousage: true, unit: 'GB' },
         {
           name: "concurrent viewers",

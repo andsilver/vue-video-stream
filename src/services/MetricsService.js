@@ -14,6 +14,7 @@ export default {
   getStreamViewers,
   getStreamBandwidth,
   getUserBandwidth,
+  getSubscriptionBandwidth
 }
 
 /**
@@ -51,6 +52,18 @@ function getStreamBandwidth(streamId, startTime, endTime) {
  */
 function getUserBandwidth(userId) {
   let uri = `/metrics/subscription/${userId}/bandwidth`
+  return makeRequest({
+    path: uri,
+    method: 'post'
+  })
+}
+
+/**
+ * @param {string} userId
+ * @param {string} packageId
+ */
+function getSubscriptionBandwidth(userId, packageId) {
+  let uri = `/metrics/subscription/${userId}/bandwidth/${packageId}`
   return makeRequest({
     path: uri,
     method: 'post'
