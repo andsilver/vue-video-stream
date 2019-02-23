@@ -116,7 +116,7 @@
                 <div class="subscription-badge package-category-badge">{{sub.category}}</div>
               </b-col>-->
               <b-col cols="4">
-                <div v-if="isPaidSubscription()">
+                <div v-if="isPaidSubscription(sub)">
                   Valid untill
                   <code
                     style="font-size:inherit;margin: 10px;"
@@ -302,7 +302,8 @@ export default {
 
       _.each(this.userSubscription.addonSubscriptions, async (addonSub, index) => {
         
-        const bwLimit =  _.get(addonSub, 'package.definition.bandwidth')
+        // const bwLimit =  _.get(addonSub, 'package.definition.bandwidth')
+        const bwLimit = this.getSubscriptionDefProp(addonSub, 'bandwidth')
         if (bwLimit) {
           // let bytes = '-'
           let bytes = 0
@@ -402,20 +403,27 @@ export default {
     },
     hasUsageProp(usageProp, baseSub) {
       let prop = usageProp.key || usageProp;
-      return (
-        baseSub.package &&
-        baseSub.package.definition &&
-        baseSub.package.definition[prop]
-      );
+      let propValue = this.getSubscriptionDefProp(baseSub, prop)
+
+      return propValue != null;
+      // return (
+      //   baseSub.package &&
+      //   baseSub.package.definition &&
+      //   baseSub.package.definition[prop]
+      // );
     },
     getAllowedPropUsage(usageProp, baseSub) {
       let prop = usageProp.key || usageProp;
-      let value = _.get(baseSub, "package.definition." + prop);
+      // let value = _.get(baseSub, "package.definition." + prop);
+      let value = this.getSubscriptionDefProp(baseSub, prop)
       return usageProp.mapFn ? usageProp.mapFn(value) : value
     },
     getPropUsage(usageProp, baseSub) {
       let prop = usageProp.key || usageProp;
       return 1;
+    },
+    getSubscriptionDefProp (sub, prop) {
+      return _.get(sub, 'definitionOverride.' + prop) || _.get(sub, 'package.definition.' + prop)
     },
     isBundledSub(sub) {
       sub = sub || this.userSubscription.subscription;
@@ -432,8 +440,8 @@ export default {
         mappedCat = 'IPCamera Restreaming'
         break;
         
-        case 'VOD':
-        mappedCat = 'VOD Bucket'
+        case 'vod':
+        mappedCat = 'vod bucket'
         break;
       }
 
