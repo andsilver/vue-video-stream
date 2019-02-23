@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!stream.dvrHours" class="container" style="padding:0;">
+    <div v-if="!stream.dvrUnits" class="container" style="padding:0;">
       <p class="text-danger" style="font-size:14px;">
         Video Recording is not included in your current subscription. Kindly upgrade your subscription plan to access this feature.
       </p>

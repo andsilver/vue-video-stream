@@ -7,7 +7,7 @@
         <button class="btn btn-danger">Upgrade Now</button>
       </router-link>
     </div>
-    <div v-else-if="stream.dvrReady && !stream.dvrHours" class="container text-center" style="padding:40px 0;">
+    <div v-else-if="stream.dvrReady && !stream.dvrUnits" class="container text-center" style="padding:40px 0;">
       <p class="text-warning" style="font-size:14px;">
         Video Recording is included in your subscription. Please contact us to get this feature enabled.
       </p>

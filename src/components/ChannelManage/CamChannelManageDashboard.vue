@@ -441,7 +441,7 @@ export default {
       const ostate = this.dvrEmbedEnabled
       const nstate = !ostate
 
-      if (!this.stream.dvrHours) {
+      if (!this.stream.dvrUnits) {
         // window.alertt('not available in trial pack')
         this.$root.$emit('bv::show::modal', 'feature-upgrade')
         return

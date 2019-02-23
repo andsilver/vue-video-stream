@@ -123,7 +123,7 @@
                        active-class="active">dashboard</router-link>
 
           <!-- <router-link v-if="stream.enabled && stream.dvrReady" -->
-          <router-link v-if="stream.dvrHours"
+          <router-link v-if="stream.dvrUnits"
                        :to="{name: 'ChannelManageDVR'}"
                        tag="li" 
                        active-class="active">recording</router-link>

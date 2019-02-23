@@ -214,7 +214,7 @@ export default {
         return
       }
 
-      if (featureName === 'embedRewind' && !this.stream.dvrHours) {
+      if (featureName === 'embedRewind' && !this.stream.dvrUnits) {
         // window.alertt('not available in trial pack')
         this.$root.$emit('bv::show::modal', 'feature-upgrade')
         return

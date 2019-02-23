@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!stream.dvrHours" class="container view-wrapper" style="padding:0">
+    <div v-if="!stream.dvrUnits" class="container view-wrapper" style="padding:0">
       <p class="text-danger">
         Video Recording is not included in your current subscription.
         <br>

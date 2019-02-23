@@ -169,9 +169,8 @@
         </ul>
 
         <div v-if="trialSubscription && !isRecording()" 
-             class="text-danger" 
-             style="font-size:14px;">
-          You are using a Trial plan with max 4 viewers at a time. 
+             class="trial-prompt-message">
+          <span>{{trialSubscriptionPromptMessage}}</span>
           Please <router-link to="/subscribe?category=live&action=upgrade">upgrade</router-link> to remove this cap.
         </div>
 
@@ -246,6 +245,8 @@ export default {
     // update win title
     this.$emit('updateTitle', _.toUpper(this.stream.name) + ' - Castr LiveStreams')
 
+
+
   },
   destroyed() {
     if (!this.stream) return;
@@ -301,6 +302,24 @@ export default {
         return quality;
       }
     };
+  },
+  computed: {
+    trialSubscriptionPromptMessage () {
+
+      let msg = 'You are using a Trial plan with max '
+      const baseSub = this.baseSubscription
+      if (baseSub) {
+        let packDef = _.get(baseSub, 'package.definition')
+
+        if ('maxConcurrentUsers' in packDef) {
+          msg += `${packDef.maxConcurrentUsers} users at a time`
+        } else if ('bandwidth' in packDef) {
+          msg += `${packDef.bandwidth}GB bandwidth`
+        }
+      }
+
+      return msg
+    }
   },
   methods: {
     isRecording () {
@@ -744,5 +763,9 @@ function isValidUrl (url) {
 }
 .btn-status:hover {
   background-color: #2647a3;
+}
+.trial-prompt-message {
+  color: #ff6363 !important;
+  font-size:14px;
 }
 </style>
