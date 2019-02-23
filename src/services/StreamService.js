@@ -453,7 +453,8 @@ function uploadStreamPlaylistVideo(streamId, file, onBytesUploaded, cancelToken)
         onBytesUploaded(percentCompleted)
       }
     },
-    cancelToken
+    cancelToken,
+    timeout: 0
   })
 }
 

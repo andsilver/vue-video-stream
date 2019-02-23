@@ -341,7 +341,7 @@ export default {
       if (!video) return
       this.selectedVideo = video
       this.$root.$emit("bv::show::modal", "modal-vod-video")
-      console.log('video', video)
+      // console.log('video', video)
     },
     clipboardCopy (text) {
       try {
