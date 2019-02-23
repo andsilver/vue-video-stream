@@ -51,7 +51,7 @@
                     USD ${{getSubscriptionFee()}}/{{ isAnnualPackage() ? 'year' : 'month' }}
                   </code>
                 </div>
-                <div class="subscription-badge package-category-badge">restream</div>
+                <div class="subscription-badge package-category-badge">restreaming</div>
               </div>
             </b-col>
             <!-- <b-col cols="2">
@@ -109,7 +109,7 @@
                       USD ${{getSubscriptionFee(sub)}} /{{ isAnnualPackage(sub) ? 'year' : 'month' }}
                     </code>
                   </div>
-                  <div class="subscription-badge package-category-badge">{{sub.category}}</div>
+                  <div class="subscription-badge package-category-badge">{{getSubCategoryName(sub)}}</div>
                 </div>
               </b-col>
               <!-- <b-col cols="2">
@@ -332,7 +332,7 @@ export default {
     return {
       usageProps: [
         "streams",
-        { name: "bandwidth", key: "bandwidth", nousage: true, unit: 'TB', mapFn: gb => (gb/1000).toFixed(2), explicit: true },
+        { name: "bandwidth", key: "bandwidth", nousage: true, unit: 'TB', mapFn: gb => (gb/1000).toFixed(3), explicit: true },
         { name: "storage", key: "storage", nousage: true, unit: 'GB' },
         {
           name: "concurrent viewers",
@@ -420,6 +420,24 @@ export default {
     isBundledSub(sub) {
       sub = sub || this.userSubscription.subscription;
       return sub.parentPackage;
+    },
+    getSubCategoryName (sub) {
+      let mappedCat = sub.category
+      switch(mappedCat) {
+        case 'live':
+        mappedCat = 'live streaming'
+        break;
+
+        case 'ipcam':
+        mappedCat = 'IPCamera Restreaming'
+        break;
+        
+        case 'VOD':
+        mappedCat = 'VOD Bucket'
+        break;
+      }
+
+      return mappedCat
     },
     isSubEnabled(sub) {
       sub = sub || this.userSubscription.subscription;
