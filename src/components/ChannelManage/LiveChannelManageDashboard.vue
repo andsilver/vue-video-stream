@@ -994,7 +994,8 @@ export default {
       // }
 
       if (this.dvrEmbedEnabled) {
-        embedUrl += '?dvr=true'
+        // embedUrl += '?dvr=true'
+        embedUrl += '?playlist=1'
       }
 
       return embedUrl;

@@ -43,6 +43,10 @@
                  :key="episode.starTime"
                  class="episode-item">
               <b-row>
+                <b-col cols="2" >
+                  <img v-if="episode.thumb" :src="episode.thumb" class="thumb"/>
+                  <div v-else class="thumb"/>
+                </b-col>
                 <b-col cols="5" style="padding-top:3px;font-size:14.5px;">
                   <div style="font-size:13px;">Streamed {{ episode.startTimeDate | ago }}</div>
                   <code>{{ episode.startTimeDate | date('hh:mma') }}</code>
@@ -57,14 +61,16 @@
                   <span v-else>{{episode.duration/60|number}} mins</span>
                 </b-col>
                 <b-col>
-                  <a target="_blank" :href="episode.downloadUrl" class="button">Download</a>
+                  <!-- <a target="_blank" :href="episode.downloadUrl" class="button">Download</a> -->
+                  <a target="_blank" :href="episode.downloadUrl" class="btn btn-outline-primary">Download</a>
                 </b-col>
                 <b-col>
                   <!-- <button class="button">Embed Snippet</button> -->
                   <div class="embed-dropdown-wrapper">
                   <b-dropdown id="ddown-embed-snippet" no-caret right >
                      <template slot="button-content">
-                       <button class="button">Embed code</button>
+                       <!-- <button class="button">Embed code</button> -->
+                       <button class="btn btn-outline-primary">Embed code</button>
                         <!-- &#x1f50d;<span class="sr-only">Search</span> -->
                     </template>
                     <div style="padding:10px;">
@@ -112,6 +118,9 @@ export default {
     }
   },
   methods: {
+    getEpisodeThumb (episode) {
+      return episode.thumb || ''
+    },
     copyIframeCode (episode) {
       let text = this.getEpisodeIframeSnippet(episode)
       try {
@@ -120,7 +129,8 @@ export default {
       } catch (e) {}
     },
     getEpisodeIframeSnippet (episode) {
-      let iframeSrc = 'https://player.castr.io/embed?src='+episode.playbackUrl
+      // let iframeSrc = 'https://player.castr.io/embed?src='+episode.playbackUrl
+      let iframeSrc = `https://player.castr.io/${this.stream.key}?playlist=1&watchId=${episode.watchId}`
       return `<iframe src="${iframeSrc}" width="590" height="430" frameborder="0" scrolling="no" allow="autoplay" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
     }
   }
@@ -156,6 +166,12 @@ export default {
 }
 .episode-item > * > * {
   vertical-align: middle;
+}
+.episode-item .thumb {
+  width: 160px;
+  height: 100px;
+  background-color: #37383a;
+  border:1px solid #17192f;
 }
 .episode-item .button {
     display: inline-block;
