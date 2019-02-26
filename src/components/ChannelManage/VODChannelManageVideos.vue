@@ -249,9 +249,9 @@
                      message="Only MP4 Videos are allowed. Please upload video with appropriate encoding/format"
                      okText="Got it, thanks"></alert-modal>
       
-      <!-- <alert-modal modal-id="alert-video-size" 
-                   message="You can upload media with size upto of 50MB only"
-                   okText="Fine"></alert-modal> -->
+      <alert-modal modal-id="alert-storage-exceeding" 
+                   message="You are exceeding your storage limit. Please delete older video(s) or upgrade to continue"
+                   okText="Fine"></alert-modal>
 
       <alert-modal modal-id="alert-leaving-active-uploads"
                    message="Video(s) are being uploaded. Please cancel active uploads before leaving"
@@ -271,6 +271,7 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import AlertModal from "@/components/AlertModal.vue";
 import VodVideoModal from "@/components/VODVideoModal.vue";
 import StreamService from '@/services/StreamService'
+import MetricsService  from '@/services/MetricsService'
 import utils from '@/utils'
 
 const MaxVideoUploadSize = 50 * 1024 * 1024
@@ -374,6 +375,15 @@ export default {
       let iframeSrc = this.getPlayerUrl(video)
       return `<iframe src="${iframeSrc}" frameborder="0" width="590" height="430" allow="autoplay"  scrolling="no"  allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>`
     },
+    async isStorageSpaceAvailable (bytes) {
+      let allowed = false
+      try {
+        let res = await MetricsService.getUserStorage()
+        allowed = res.unitsLeft > bytes
+      } catch(e) { console.log(e)}
+
+      return allowed
+    },
     initVideoUpload () {
       const el = document.getElementById('video-input')
       if (!el) {
@@ -426,9 +436,15 @@ export default {
     triggerFileUpload () {
       document.getElementById('video-input').click()
     },
-    uploadVideoFile (videoId) {
+    async uploadVideoFile (videoId) {
       const video = _.find(this.videoFiles, { id: videoId })
       if (!video.file || video.uploading) return
+
+      let hasEnoughSpace = await this.isStorageSpaceAvailable(video.file.size)
+      if(!hasEnoughSpace) {
+        this.$root.$emit("bv::show::modal", "alert-storage-exceeding")
+        return
+      }
 
       video.uploading = true
       // video.precedence = this.computeVideoPrecedence(video)

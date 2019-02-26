@@ -200,7 +200,8 @@
                                   <div class="value">
                                     <!-- <code>1.00</code> -->
                                     <code>{{getAllowedPropUsage(usageProp, sub)}}</code>
-                                    <span style="font-size:0.6em">TB</span>
+                                    <!-- <span style="font-size:0.6em">TB</span> -->
+                                    <span style="font-size:0.6em">{{usageProp.unit}}</span>
                                   </div>
                                   <div>Assigned</div>
                                 </div>
@@ -308,14 +309,27 @@ export default {
           // let bytes = '-'
           let bytes = 0
           try {
-            // let res = await MetricsService.getUserBandwidth(UserService.getUserId())
             let res = await MetricsService.getSubscriptionBandwidth(UserService.getUserId(), addonSub.package._id)
             bytes = res && res.bytes || 0
           } catch(e) { console.log('e', e) }
   
-          addonSub.usage = {
+          addonSub.usage = _.assign({}, addonSub.usage, {
             bandwidth: this.$options.filters.bytes(bytes, true, 3, true) 
-          }
+          })
+        }
+
+        const storageLimit = this.getSubscriptionDefProp(addonSub, 'storage')
+        if (storageLimit) {
+          // let bytes = '-'
+          let bytes = 0
+          try {
+            let res = await MetricsService.getSubscriptionStorage(UserService.getUserId(), addonSub.package._id)
+            bytes = res && res.bytes || 0
+          } catch(e) { console.log('e', e) }
+  
+          addonSub.usage = _.assign({}, addonSub.usage, {
+            storage: this.$options.filters.bytes(bytes, true, 3, true) 
+          })
         }
       })
 
@@ -334,7 +348,7 @@ export default {
       usageProps: [
         "streams",
         { name: "bandwidth", key: "bandwidth", nousage: true, unit: 'TB', mapFn: gb => (gb/1000).toFixed(3), explicit: true },
-        { name: "storage", key: "storage", nousage: true, unit: 'GB' },
+        { name: "storage", key: "storage",  unit: 'GB', explicit: true },
         {
           name: "concurrent viewers",
           key: "maxConcurrentUsers",

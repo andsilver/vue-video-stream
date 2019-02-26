@@ -407,7 +407,7 @@ export default {
       setTimeout(() => {
         if (headChunkRecieved) return;
 
-        console.log("refreshing stream pulse request");
+        // console.log("refreshing stream pulse request");
         this.unsubscribeMediaPulse();
         setTimeout(() => {
           this.setupMediaPulse();

@@ -129,8 +129,6 @@ export default {
     window.trackEvent(this.stream.name + " - Stream Page", this.stream);
 
     this.$root.$on('event', () => {
-
-      console.log('root event')
       this.$root.$broadcast('event-from-parent', { message: 'hey' })
     })
 
@@ -201,7 +199,7 @@ export default {
       this.stream = _.assign({}, this.stream, updates)
     },
     onVideoFiles (videos) {
-      console.log('videos', videos)
+      // console.log('videos', videos)
       this.updateStorageUsage(videos)
       this.videoFilesRetrieved = true
     },
@@ -280,7 +278,7 @@ export default {
       setTimeout(() => {
         if (headChunkRecieved) return;
 
-        console.log("refreshing stream pulse request");
+        // console.log("refreshing stream pulse request");
         this.unsubscribeMediaPulse();
         setTimeout(() => {
           this.setupMediaPulse();
