@@ -346,9 +346,9 @@ export default {
   data() {
     return {
       usageProps: [
-        "streams",
+        { name: "streams", key: "streams", nousage: true },
         { name: "bandwidth", key: "bandwidth", nousage: true, unit: 'TB', mapFn: gb => (gb/1000).toFixed(3), explicit: true },
-        { name: "storage", key: "storage",  unit: 'GB', explicit: true },
+        { name: "storage", key: "storage", nousage: true, unit: 'GB', explicit: true },
         {
           name: "concurrent viewers",
           key: "maxConcurrentUsers",
