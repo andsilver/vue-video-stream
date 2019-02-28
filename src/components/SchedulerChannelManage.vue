@@ -41,7 +41,7 @@
                 </div>
               </div>
             </b-col>
-            <b-col cols="2">
+            <b-col cols="2" style="padding-left:0;padding-right:0;">
               <div v-if="mediaPulse" class="stat-container">
                 <div v-if="streamAlive">
                   <span class="value">
@@ -161,8 +161,10 @@
           :stream="stream"
           :streamAlive="streamAlive"
           :mediaPulse="mediaPulse"
+          :subscription="baseSubscription"
           @stream-updated="onStreamUpdates"
         ></router-view>
+          <!-- @stream-updated="onStreamUpdates" -->
       </div>
     </div>
     <div v-else class="page-placeholder" :style="{height: (windowHeight) + 'px'}">
@@ -208,9 +210,12 @@ export default {
     const baseSub = _.find(userSub.addonSubscriptions, {
       category: "scheduled"
     });
+
     if (baseSub) {
       this.trialSubscription = /trial/gi.test(baseSub.package.name);
     }
+
+    this.baseSubscription = baseSub
 
     const schedulerConfig = await StreamService.getStreamScheduleSettings(this.streamId);
     if (schedulerConfig) {
@@ -249,6 +254,7 @@ export default {
       SourceTypes,
       nameEdit: false,
       userSubscription: null,
+      baseSubscription: null,
       processing: true,
       processingMessage: null,
       stream: null,
@@ -284,7 +290,6 @@ export default {
         return quality;
       },
       canSaveScheduleSetting() {
-        // debugger
         if (!this.savedSchedulerConfig) return;
 
         let changed = this.savedSchedulerConfig.mode !== this.scheduleMode;

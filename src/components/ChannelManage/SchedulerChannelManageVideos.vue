@@ -130,7 +130,7 @@
 
                 </b-col>
                 
-                <b-col>
+                <b-col style="padding-right:0;">
 
                   <div v-if="video.uploadable">
                     <button v-if="!video.uploading" 
@@ -177,6 +177,10 @@
       <alert-modal modal-id="alert-leaving-active-uploads"
                    message="Video(s) are being uploaded. Please cancel active uploads before leaving"
                    okText="Fine"></alert-modal>
+
+      <alert-modal modal-id="alert-storage-exceeding" 
+                   message="You are exceeding your storage limit. Please delete older video(s) or upgrade to continue"
+                   okText="Fine"></alert-modal>
       
       <confirm-modal modal-id="confirm-video-removal" 
                      :message="'You are about to delete video named `' + (focusedVideo && focusedVideo.fileName || '') + '`'"
@@ -191,11 +195,13 @@ import Vue from 'vue'
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import AlertModal from "@/components/AlertModal.vue";
 import StreamService from '@/services/StreamService'
+import UserService  from '@/services/UserService'
+import MetricsService  from '@/services/MetricsService'
 import utils from '@/utils'
 
 export default {
   name: "ScheduledChannelManageVideos",
-  props: ['stream'],
+  props: ['stream', 'subscription'],
   beforeRouteLeave (to, from, next) {
 
     let videosUploading = _.filter(this.videoFiles, { uploading: true })
@@ -223,7 +229,7 @@ export default {
     })
 
     this.processing = false
-    
+
     setTimeout(() => this.initVideoUpload(), 1000)
   },
   data () {
@@ -248,6 +254,15 @@ export default {
     }
   },
   methods: {
+    async isStorageSpaceAvailable (bytes) {
+      let allowed = false
+      try {
+        let res = await MetricsService.getSubscriptionStorage(UserService.getUserId(), this.subscription.package._id)
+        allowed = res.unitsLeft > bytes
+      } catch(e) { console.log(e)}
+
+      return allowed
+    },
     initVideoUpload () {
       const el = document.getElementById('video-input')
       if (!el) {
@@ -293,9 +308,16 @@ export default {
     triggerFileUpload () {
       document.getElementById('video-input').click()
     },
-    uploadVideoFile (videoId) {
+    async uploadVideoFile (videoId) {
       const video = _.find(this.videoFiles, { id: videoId })
+
       if (!video.file || video.uploading) return
+
+      let hasEnoughSpace = await this.isStorageSpaceAvailable(video.file.size)
+      if(!hasEnoughSpace) {
+        this.$root.$emit("bv::show::modal", "alert-storage-exceeding")
+        return
+      }
 
       video.uploading = true
       // video.precedence = this.computeVideoPrecedence(video)
@@ -419,8 +441,10 @@ export default {
       }
 
       if (video.file || video.uploading) {
-        video.cancelSource.cancel()
-        console.log('uploading cancelled with success')
+        if (video.cancelSource) {
+          video.cancelSource.cancel()
+          console.log('uploading cancelled with success')
+        }
       }
 
       let index = this.videoFiles.indexOf(video)
