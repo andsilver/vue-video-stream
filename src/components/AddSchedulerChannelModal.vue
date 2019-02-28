@@ -11,12 +11,11 @@
         <div style="width: 100%">
           <b-row>
             <!-- <b-col><span v-html="modalTitle()"></span></b-col> -->
-            <b-col><span>New Scheduling</span></b-col>
+            <b-col><span>New Scheduler</span></b-col>
           </b-row>
         </div>
       </template>
       <div>
-
         <!-- error placeholder -->
         <div v-if="error && !error.role" 
              class="alert alert-danger">
@@ -33,7 +32,7 @@
           <div v-if="error.role"
                style="margin-top:10px;font-size:14px;">
             <p style="min-height:80px;">
-              You do not have an active Scheduled Streaming subscription. Would you like to activate our 7 days trial ?</p>
+              You do not have an active Scheduled Streaming subscription. Would you like to subscribe to our trial?</p>
             <br>
             <div v-if="trialError" 
                  class="alert alert-danger">{{trialError.message}}</div>

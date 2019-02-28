@@ -43,7 +43,7 @@
 
           <div class="description">
             <div>
-              <img class="media-flag" :src="getCountryFlag(stream)" :class="{ hidden: stream.type==='vod' }">
+              <img class="media-flag" :src="getCountryFlag(stream)" :class="{ hidden: stream.type==='vod' || stream.type==='scheduled' }">
               <div class="media-region">{{stream.region.name}}</div>
             </div>
           </div>
