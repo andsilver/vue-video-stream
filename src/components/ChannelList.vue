@@ -46,6 +46,15 @@
               <div class="desc">Live Stream Using Your Own Player</div>
             </div>
           </b-dropdown-item>
+          <b-dropdown-item @click="openScheduledStreamModal">
+                <div class="dropdown-icon ico">
+                  <i class="far fa-calendar-alt"></i>
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New Scheduled Stream</div>
+                  <div class="desc">Schedule your live presence</div>
+                </div>
+          </b-dropdown-item>
           <b-dropdown-item v-b-modal.modal-add-vod-channel>
             <div class="dropdown-icon ico">
               <i class="fa fa-stream"></i>
@@ -116,6 +125,15 @@
                   <div class="desc">Live Stream Using Your Own Player</div>
                 </div>
               </b-dropdown-item>
+              <b-dropdown-item @click="openScheduledStreamModal">
+                <div class="dropdown-icon ico">
+                  <i class="far fa-calendar-alt"></i>
+                </div>
+                <div class="dropdown-text">
+                  <div class="main">New Scheduled Stream</div>
+                  <div class="desc">Schedule your live presence</div>
+                </div>
+              </b-dropdown-item>
               <b-dropdown-item v-b-modal.modal-add-vod-channel>
                 <div class="dropdown-icon ico">
                   <i class="fab fa-stream" style="color:#4949fd;"></i>
@@ -143,6 +161,7 @@
     <add-channel-modal @new-channel="onNewStream"></add-channel-modal>
     <add-live-channel-modal @new-channel="onNewStream"></add-live-channel-modal>
     <add-cam-channel-modal @new-channel="onNewStream"></add-cam-channel-modal>
+    <add-scheduled-channel-modal @new-channel="onNewStream"></add-scheduled-channel-modal>
     <add-vod-channel-modal @new-channel="onNewStream"></add-vod-channel-modal>
     <confirm-modal message="Would you like to delete this stream and all of its content?"
                    @modal-confirm="onStreamDeleteConfirm"></confirm-modal>
@@ -154,6 +173,7 @@ import StreamCardView from "./StreamCardView.vue";
 import AddCamChannelModal from "./AddCamChannelModal.vue";
 import AddChannelModal from "./AddChannelModal.vue";
 import AddLiveChannelModal from "./AddLiveChannelModal.vue";
+import AddScheduledChannelModal from "./AddSchedulerChannelModal.vue";
 import AddVodChannelModal from "./AddVODChannelModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import StreamService from "../services/StreamService";
@@ -219,6 +239,9 @@ export default {
     openCamModal() {
       this.$root.$emit("bv::show::modal", "modal-add-cam-channel");
     },
+    openScheduledStreamModal() {
+      this.$root.$emit("bv::show::modal", "modal-add-scheduled-channel");
+    },
     onStreamCreateToggle(state) {
       this.streamCreateDropdownActive = state;
     },
@@ -283,6 +306,7 @@ export default {
     AddCamChannelModal,
     AddChannelModal,
     AddLiveChannelModal,
+    AddScheduledChannelModal,
     AddVodChannelModal,
     ConfirmModal
   }
