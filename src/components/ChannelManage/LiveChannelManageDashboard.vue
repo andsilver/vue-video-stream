@@ -618,7 +618,13 @@ export default {
         this.rmptPullUrlProcessing = false;
       }
 
-      if (!sub) return;
+      let baseSub = _.find(_.get(sub, 'addonSubscriptions'), { category: 'live' })
+      if (!baseSub) return;
+
+      if (!isRTMPSource(pullSource) && /trial/gi.test(baseSub.package.name)) {
+        this.$root.$emit('bv::show::modal', 'feature-upgrade')
+        return
+      }
 
       // check if url is valid
       if (!isValidUrl(pullSource)) {
@@ -1100,6 +1106,9 @@ function isMixerFTLSource(pullUrl) {
 
 function isRTSPSource(pullUrl) {
   return /^rtsp?\:\/\//gi.test(pullUrl);
+}
+function isRTMPSource(pullUrl) {
+  return /^rtmp?\:\/\//gi.test(pullUrl);
 }
 </script>
 
