@@ -20,11 +20,10 @@
         <div v-if="error && !error.role" 
              class="alert alert-danger">
           <div v-show="error.message">{{error.message}}</div>
-          <div v-if="error.subscription"
-               class="text-center" style="margin-top:10px">
-            <router-link to="/subscribe?category=scheduled&action=upgrade">
-              <button class="btn btn-sm btn-link" style="text-transform:uppercase;color: gold;"><strong>upgrade now</strong></button>
-            </router-link>
+          <div class="text-center" style="margin-top:10px">
+            <button class="btn btn-sm btn-link" 
+                    style="text-transform:uppercase;color: gold;" 
+                    onclick="Intercom('show')"><strong>contact us</strong></button>
           </div>
         </div>
 
@@ -48,7 +47,7 @@
                 <button class="modal-button" @click="dismiss">cancel</button>
                 <button class="modal-button highlight" @click="forceActivateTrial">Activate Trial</button>
                 <div style="font-size:13px;margin:12px;">
-                  <router-link to="/subscribe?category=scheduled&action=upgrade">Get more options</router-link>
+                  <button class="btn btn-sm btn-outline-primary" onclick="Intercom('show')">Want more options?</button>
                 </div>
               </div>
             </div>
