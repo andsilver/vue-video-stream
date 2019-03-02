@@ -603,6 +603,11 @@ export default {
         this.$root.$emit("bv::show::modal", "alert-mixer-pull");
         return;
       }
+      
+      if (trial) {
+        this.$root.$emit("bv::show::modal", "alert-mixer-pull");
+        return;
+      }
 
       let sub = this.userSubscription;
       if (!sub) {
@@ -621,7 +626,8 @@ export default {
       let baseSub = _.find(_.get(sub, 'addonSubscriptions'), { category: 'live' })
       if (!baseSub) return;
 
-      if (!isRTMPSource(pullSource) && /trial/gi.test(baseSub.package.name)) {
+      // if (!isRTMPSource(pullSource) && /trial/gi.test(baseSub.package.name)) {
+      if (/trial/gi.test(baseSub.package.name)) {
         this.$root.$emit('bv::show::modal', 'feature-upgrade')
         return
       }
