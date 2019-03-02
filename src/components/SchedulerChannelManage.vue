@@ -53,7 +53,7 @@
                   <span class="value">..</span>
                 </div>
 
-                <div class="label">incoming</div>
+                <div class="label">bitrate</div>
               </div>
               <div v-if="mediaPulse && mediaPulse.alive" class="stat-container xs">
                 <div class="value">
@@ -70,12 +70,44 @@
               <div>
                 <b-row>
                   <b-col cols="6">
-                    <div class="field-container">
+                    <!-- <div class="field-container">
                       <div class="label">Scheduling Mode</div>
                       <select class="input" v-model="scheduleMode">
                         <option value="loop">Infinie Loop</option>
                         <option value="datetime">Schedule Date Time</option>
                       </select>
+                    </div> -->
+                    <div class="field-container">
+                      <div class="label">Scheduling Mode</div>
+                      <!-- <select class="input" v-model="scheduleMode">
+                        <option value="loop">Infinie Loop</option>
+                        <option value="datetime">Schedule Date Time</option>
+                      </select> -->
+                      <b-dropdown no-caret class="region-dropdown input-style-dropdown w-100" style="margin:7px 0;">
+                        <template slot="button-content">
+                          <div v-if="!scheduleMode">Setup Now</div>
+                          <div v-else class="region-dropdown-item region-dropdown-item-placeholder">
+                            <span class="region-name">
+                              <span v-if="scheduleMode==='loop'">Infinie Loop</span>
+                              <span v-if="scheduleMode==='datetime'">Schedule Date Time</span>
+                            </span>
+                          </div>
+                        </template>
+                        <b-dropdown-item @click="setScheduleMode('loop')">
+                          <div class="a region-dropdown-item" 
+                              :class="{ selected: scheduleMode === 'loop' }">
+                            <span class="region-name"> Infinie Loop
+                            </span>
+                          </div>
+                        </b-dropdown-item>
+                        <b-dropdown-item @click="setScheduleMode('datetime')">
+                          <div class="a region-dropdown-item" 
+                              :class="{ selected: scheduleMode === 'datetime' }">
+                            <span class="region-name"> Schedule Date Time
+                            </span>
+                          </div>
+                        </b-dropdown-item>
+                      </b-dropdown>
                     </div>
                   </b-col>
                   <b-col cols="6">
@@ -312,6 +344,9 @@ export default {
     }
   },
   methods: {
+    setScheduleMode (mode) {
+      this.scheduleMode = mode
+    },
     async saveSchedulerConfig () {
       if (this.schedulerConfigProcessing) return
 
@@ -770,5 +805,14 @@ function isValidUrl(url) {
 }
 .datetime-input:focus {
   background-color: rgba(18, 23, 37, 0.67);
+}
+.input-style-dropdown button {
+  background-color: #202940;
+  border: 1px solid #151c31;
+  border-radius: 4px;
+  border-top-right-radius: 4px  !important;
+  border-bottom-right-radius: 4px !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14),
+    0 2px 1px -1px rgba(0, 0, 0, 0.12);
 }
 </style>
