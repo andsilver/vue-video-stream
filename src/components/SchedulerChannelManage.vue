@@ -193,6 +193,7 @@
           :stream="stream"
           :streamAlive="streamAlive"
           :mediaPulse="mediaPulse"
+          :savedSchedulerConfigParent="savedSchedulerConfig"
           :subscription="baseSubscription"
           @stream-updated="onStreamUpdates"
         ></router-view>
@@ -362,6 +363,7 @@ export default {
           this.scheduledDateTime = null
 
         this.savedSchedulerConfig = updatedConfig
+        this.savedSchedulerConfigParent = updatedConfig
 
       } catch(e) { 
         this.$notify({ group: 'error', text: 'Could not update scheduler settings' })
@@ -369,6 +371,9 @@ export default {
       }
 
       this.schedulerConfigProcessing = false
+
+      this.$emit('stream-updated', { platforms: this.streamPlatforms })
+
     },
     isRecording() {
       return /(recording|vodepisodes)$/gi.test(this.$router.currentRoute.path);

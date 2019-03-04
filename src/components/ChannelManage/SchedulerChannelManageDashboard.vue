@@ -189,7 +189,13 @@
                 </p>
               </div>
               <div v-else-if="!streamAlive" class="video-thumb placeholder">
-                <p>No stream</p>
+                <VueCountdown v-if="this.streamInitialSettings.datetime && streamInitialSettings.mode === 'datetime'" :time="this.streamInitialSettings.datetime-(new Date().getTime())">
+                  <template slot-scope="props">
+                    <p class="text-center">Stream will start in</p>
+                    <p>{{ props.days }} days, {{ props.hours }} hours, {{ props.minutes }} minutes, {{ props.seconds }} seconds.</p>
+                  </template>
+                </VueCountdown>
+                <p v-else>No stream</p>
               </div>
 
               <stream-player v-else :stream="stream" class="video-thumb" />
@@ -227,6 +233,7 @@ import SubscriptionService from "@/services/SubscriptionService";
 import IntegrationService from "@/services/IntegrationService";
 import StreamThumb from "@/components/StreamThumb.vue";
 import StreamPlayer from "@/components/StreamPlayer.vue";
+import VueCountdown from '@chenfengyuan/vue-countdown';
 
 import PromptModal from "@/components/PromptModal.vue";
 import AlertModal  from "@/components/AlertModal.vue";
@@ -244,13 +251,27 @@ const SourceTypes = {
 
 export default {
   name: "ScheduledChannelManage",
-  props: ['stream', 'streamAlive', 'mediaPulse'],
+  props: {
+    stream: Object,
+    streamAlive: Boolean,
+    mediaPulse: Function,
+    savedSchedulerConfigParent: {
+      type: Object,
+      default: {}
+    },
+    streamInitialSettings: Object
+  },
   beforeRouteLeave (to, from, next) {
     next()
   },
   async mounted() {
+
+    console.log('this.savedSchedulerConfigParent ===', this.savedSchedulerConfigParent);
+
+    this.streamInitialSettings = await StreamService.getStreamScheduleSettings(this.stream._id);
+
     // event tracking
-    window.trackEvent(this.stream.name + " - Stream Dashboard Page", this.stream);
+    window.trackEvent(this.stream.name + " - Stream Dashboard Page", this.stream)
 
     // get stream details
     await this.setupStream();
@@ -259,6 +280,11 @@ export default {
     mediaPulse () {
       this.onMediaPulseChanged()
     }
+  },
+  computed: {
+      streamInitialSettingsCmp: function() {
+          return this.streamInitialSettings;
+      }
   },
   data() {
     return {
@@ -305,19 +331,27 @@ export default {
   },
   methods: {
     async saveSchedulerConfig () {
-      this.schedulerConfigProcessing = true
+
+      this.schedulerConfigProcessing = true;
+
       try {
-        await StreamService.saveStreamScheduleSettings(this.stream._id, this.scheduleMode, new Date(this.scheduledDateTime))
 
-        let updatedConfig = { mode: this.scheduleMode }
+        const streamScheduleDate = new Date(this.scheduledDateTime);
+
+        await StreamService.saveStreamScheduleSettings(this.stream._id, this.scheduleMode, streamScheduleDate);
+
+        this.streamInitialSettings = { mode: this.scheduleMode, datetime: streamScheduleDate };
+
+        let updatedConfig = { mode: this.scheduleMode };
+
         if (this.scheduleMode === 'datetime')
-          updatedConfig.datetime = this.scheduledDateTime
+          updatedConfig.datetime = this.scheduledDateTime;
 
-        this.savedSchedulerConfig = updatedConfig
+        this.savedSchedulerConfig = updatedConfig;
 
-      } catch(e) { 
-        this.$notify({ group: 'error', text: 'Could not update scheduler settings' })
-        console.log(e) 
+      } catch(e) {
+        this.$notify({ group: 'error', text: 'Could not update scheduler settings' });
+        console.log(e);
       }
 
       this.schedulerConfigProcessing = false
@@ -453,7 +487,7 @@ export default {
       }
 
       platform.serviceMetaEditor.formProcessing[propname] = false
-      platform.serviceMetaEditor.form
+
       // save changes
       platform.serviceMeta = _.assign({}, platform.serviceMeta, {[propname]: newValue})
       platform.serviceMetaEditor.changes[propname] = false
@@ -632,6 +666,7 @@ export default {
         platform.removing = false;
       }
     }
+
   },
   components: {
     AddPlatformModal,
@@ -640,7 +675,8 @@ export default {
     AlertModal,
     StreamThumb,
     StreamPlayer,
-    PromptModal
+    PromptModal,
+    VueCountdown
   }
 };
 
