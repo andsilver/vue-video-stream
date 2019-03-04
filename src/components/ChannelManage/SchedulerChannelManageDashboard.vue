@@ -189,7 +189,7 @@
                 </p>
               </div>
               <div v-else-if="!streamAlive" class="video-thumb placeholder">
-                <VueCountdown v-if="this.streamInitialSettings.datetime && streamInitialSettings.mode === 'datetime'" :time="this.streamInitialSettings.datetime-(new Date().getTime())">
+                <VueCountdown v-if="streamInitialSettings.datetime && streamInitialSettings.mode === 'datetime'" :time="streamInitialSettings.datetime-(new Date().getTime())">
                   <template slot-scope="props">
                     <p class="text-center">Stream will start in</p>
                     <p>{{ props.days }} days, {{ props.hours }} hours, {{ props.minutes }} minutes, {{ props.seconds }} seconds.</p>
@@ -254,12 +254,11 @@ export default {
   props: {
     stream: Object,
     streamAlive: Boolean,
-    mediaPulse: Function,
+    mediaPulse: Object,
     savedSchedulerConfigParent: {
       type: Object,
       default: {}
-    },
-    streamInitialSettings: Object
+    }
   },
   beforeRouteLeave (to, from, next) {
     next()
@@ -279,6 +278,9 @@ export default {
   watch: {
     mediaPulse () {
       this.onMediaPulseChanged()
+    },
+    savedSchedulerConfigParent () {
+      // do something when scheduler config changes
     }
   },
   computed: {
@@ -298,6 +300,7 @@ export default {
       groupToggleState: false,
       windowHeight: 0,
       configurablePlatform: {},
+      streamInitialSettings: {},
       isCustomPlatform(platform) {
         return platform.template === "custom";
       },
