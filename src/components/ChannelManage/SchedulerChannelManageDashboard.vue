@@ -265,8 +265,6 @@ export default {
   },
   async mounted() {
 
-    this.streamInitialSettings = await StreamService.getStreamScheduleSettings(this.stream._id);
-
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Dashboard Page", this.stream)
 
@@ -290,7 +288,6 @@ export default {
       groupToggleState: false,
       windowHeight: 0,
       configurablePlatform: {},
-      streamInitialSettings: {},
       isCustomPlatform(platform) {
         return platform.template === "custom";
       },
@@ -332,8 +329,6 @@ export default {
         const streamScheduleDate = new Date(this.scheduledDateTime);
 
         await StreamService.saveStreamScheduleSettings(this.stream._id, this.scheduleMode, streamScheduleDate);
-
-        this.streamInitialSettings = { mode: this.scheduleMode, datetime: streamScheduleDate };
 
         let updatedConfig = { mode: this.scheduleMode };
 
