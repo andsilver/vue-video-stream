@@ -88,7 +88,7 @@
                           <div v-if="!scheduleMode">Setup Now</div>
                           <div v-else class="region-dropdown-item region-dropdown-item-placeholder">
                             <span class="region-name">
-                              <span v-if="scheduleMode==='loop'">Infinie Loop</span>
+                              <span v-if="scheduleMode==='loop'">Infinite Loop</span>
                               <span v-if="scheduleMode==='datetime'">Schedule Date Time</span>
                             </span>
                           </div>
