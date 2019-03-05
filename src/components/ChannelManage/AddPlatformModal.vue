@@ -127,20 +127,23 @@
                        :placeholder="platform.serverInputPlaceholder || 'rtmp://braodcaster_addr/'"
                        @keypress="onInputChange('server')" />
 
+                <div v-if="customPlatform">
 
-                <b-form-checkbox v-if="rtmpIsPresentInUrl()" v-model="isAuthRequired"
-                                 :value="true"
-                                 :unchecked-value="false">Authentication Required</b-form-checkbox>
+                  <b-form-checkbox v-model="isAuthRequired"
+                                   :value="true"
+                                   :unchecked-value="false">Authentication Required</b-form-checkbox>
 
-                <div v-if="isAuthRequired">
+                  <div v-if="isAuthRequired">
 
-                  <input v-model="rtmpAuthUsername"
-                         class="input"
-                         :placeholder="'Username'" />
+                    <input v-model="rtmpAuthUsername"
+                           class="input"
+                           placeholder="Username" />
 
-                  <input v-model="rtmpAuthPassword"
-                         class="input"
-                         :placeholder="'Password'" />
+                    <input v-model="rtmpAuthPassword"
+                           class="input"
+                           placeholder="Password" />
+
+                  </div>
 
                 </div>
 
@@ -374,6 +377,13 @@ export default {
             this.platform[prop] = utils.resolveStreamKey(this.platform[prop])
           })
         }
+
+        setTimeout(() => {
+          if (this.platform.server && !this.platform.server.match(/^[a-z]+:\/\//i)) {
+            this.platform.server = 'rtmp://' + this.platform.server;
+          }
+        });
+
       },
       canSave() {
         const validStage = this.stage > 0
@@ -383,9 +393,6 @@ export default {
   },
   methods: {
     onInit() {},
-    rtmpIsPresentInUrl() {
-      return this.platform.server && this.platform.server.match(/^[a-z]+:\/\//i);
-    },
     stepBack() {
       this.stage--;
 
