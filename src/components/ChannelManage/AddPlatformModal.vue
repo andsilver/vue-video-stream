@@ -125,7 +125,8 @@
                 <input v-model="platform.server"
                        class="input"
                        :placeholder="platform.serverInputPlaceholder || 'rtmp://braodcaster_addr/'"
-                       @keypress="onInputChange('server')" />
+                       @keypress="onInputChange('server')"
+                       v-on:keyup="onInputChange('server')" />
 
                 <div v-if="customPlatform">
 
@@ -322,11 +323,15 @@ export default {
     },
     rtmpAuthUsername: function(val) {
       this.platform.server = this.platform.server.replace(/:\/\/.*?:.*?@/, '://');
-      this.platform.server = this.platform.server.replace('://', '://' + val + ':' + this.rtmpAuthPassword + '@');
+      if (val && this.rtmpAuthPassword) {
+        this.platform.server = this.platform.server.replace('://', '://' + encodeURIComponent(val) + ':' + encodeURIComponent(this.rtmpAuthPassword) + '@');
+      }
     },
     rtmpAuthPassword: function(val) {
       this.platform.server = this.platform.server.replace(/:\/\/.*?:.*?@/, '://');
-      this.platform.server = this.platform.server.replace('://', '://' + this.rtmpAuthUsername + ':' + val + '@');
+      if (this.rtmpAuthUsername && val) {
+        this.platform.server = this.platform.server.replace('://', '://' + encodeURIComponent(this.rtmpAuthUsername) + ':' + encodeURIComponent(val) + '@');
+      }
     }
   },
   data() {
@@ -383,6 +388,27 @@ export default {
             this.platform.server = 'rtmp://' + this.platform.server;
           }
         });
+
+        setTimeout(() => {
+
+          if (prop === 'server' && this.platform.server) {
+
+            let userAuthMatch;
+
+            if (userAuthMatch = this.platform.server.match(/:\/\/(.*?):(.*?)@/)) {
+
+              this.isAuthRequired = true;
+
+              setTimeout(() => {
+                this.rtmpAuthUsername = decodeURIComponent(userAuthMatch[1]);
+                this.rtmpAuthPassword = decodeURIComponent(userAuthMatch[2]);
+              }, 100);
+
+            }
+
+          }
+
+        }, 100);
 
       },
       canSave() {

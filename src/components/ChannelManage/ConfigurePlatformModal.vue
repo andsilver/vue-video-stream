@@ -144,11 +144,15 @@ export default {
     },
     rtmpAuthUsername: function(val) {
       this.platformConfig.server = this.platformConfig.server.replace(/:\/\/.*?:.*?@/, '://');
-      this.platformConfig.server = this.platformConfig.server.replace('://', '://' + val + ':' + this.rtmpAuthPassword + '@');
+      if (val && this.rtmpAuthPassword) {
+        this.platformConfig.server = this.platformConfig.server.replace('://', '://' + encodeURIComponent(val) + ':' + encodeURIComponent(this.rtmpAuthPassword) + '@');
+      }
     },
     rtmpAuthPassword: function(val) {
       this.platformConfig.server = this.platformConfig.server.replace(/:\/\/.*?:.*?@/, '://');
-      this.platformConfig.server = this.platformConfig.server.replace('://', '://' + this.rtmpAuthUsername + ':' + val + '@');
+      if (this.rtmpAuthUsername && val) {
+        this.platformConfig.server = this.platformConfig.server.replace('://', '://' + encodeURIComponent(this.rtmpAuthUsername) + ':' + encodeURIComponent(val) + '@');
+      }
     }
   },
   data() {
@@ -242,8 +246,8 @@ export default {
         this.isAuthRequired = true;
 
         setTimeout(() => {
-          this.rtmpAuthUsername = userAuthMatch[1];
-          this.rtmpAuthPassword = userAuthMatch[2];
+          this.rtmpAuthUsername = decodeURIComponent(userAuthMatch[1]);
+          this.rtmpAuthPassword = decodeURIComponent(userAuthMatch[2]);
         }, 100);
 
       }
