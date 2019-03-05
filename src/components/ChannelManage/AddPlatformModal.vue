@@ -120,12 +120,32 @@
               <div class="label">streaming {{ customPlatform && 'platform address' || 'server' }} </div>
 
               <!-- <input v-if="customPlatform || platform.customServer" -->
-              <input v-if="checkServerInputMode('input')" 
-                     v-model="platform.server"
-                     class="input"
-                     :placeholder="platform.serverInputPlaceholder || 'rtmp://braodcaster_addr/'"
-                     @keypress="onInputChange('server')" />
-              
+              <div v-if="checkServerInputMode('input')">
+
+                <input v-model="platform.server"
+                       class="input"
+                       :placeholder="platform.serverInputPlaceholder || 'rtmp://braodcaster_addr/'"
+                       @keypress="onInputChange('server')" />
+
+
+                <b-form-checkbox v-if="rtmpIsPresentInUrl()" v-model="isAuthRequired"
+                                 :value="true"
+                                 :unchecked-value="false">Authentication Required</b-form-checkbox>
+
+                <div v-if="isAuthRequired">
+
+                  <input v-model="rtmpAuthUsername"
+                         class="input"
+                         :placeholder="'Username'" />
+
+                  <input v-model="rtmpAuthPassword"
+                         class="input"
+                         :placeholder="'Password'" />
+
+                </div>
+
+              </div>
+
               <!-- <input v-else-if="platform.customServer"
                      v-model="platform.server"
                      class="input"
@@ -286,6 +306,26 @@ export default {
     this.$refs.modalAddPlatform.$on("hide", this.onDismiss.bind(this));
     this.$refs.modalAddPlatform.$on("show", this.onInit.bind(this));
   },
+  watch: {
+    isAuthRequired: function(isRequired) {
+
+      if (!isRequired) {
+        this.platform.server = this.platform.server.replace(/:\/\/.*?:.*?@/, '://');
+      } else {
+        this.rtmpAuthUsername = '';
+        this.rtmpAuthPassword = '';
+      }
+
+    },
+    rtmpAuthUsername: function(val) {
+      this.platform.server = this.platform.server.replace(/:\/\/.*?:.*?@/, '://');
+      this.platform.server = this.platform.server.replace('://', '://' + val + ':' + this.rtmpAuthPassword + '@');
+    },
+    rtmpAuthPassword: function(val) {
+      this.platform.server = this.platform.server.replace(/:\/\/.*?:.*?@/, '://');
+      this.platform.server = this.platform.server.replace('://', '://' + this.rtmpAuthUsername + ':' + val + '@');
+    }
+  },
   data() {
     return {
       stage: 0,
@@ -302,6 +342,9 @@ export default {
       platformTemplates: Platforms,
       formErrors: { server: false, streamKey: false },
       oauthConnectId: null,
+      isAuthRequired: false,
+      rtmpAuthUsername: '',
+      rtmpAuthPassword: '',
       modalSize() {
         return this.stage > 0 ? "sm" : "lg";
       },
@@ -340,6 +383,9 @@ export default {
   },
   methods: {
     onInit() {},
+    rtmpIsPresentInUrl() {
+      return this.platform.server && this.platform.server.match(/^[a-z]+:\/\//i);
+    },
     stepBack() {
       this.stage--;
 

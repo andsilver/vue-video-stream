@@ -185,7 +185,7 @@ function getApiBase() {
     baseURL = 'api' + char + baseURL
   }
 
-  // baseURL = route.protocol + '//' + baseURL
-  baseURL = 'https://api.castr.io'
+  baseURL = route.protocol + '//' + baseURL
+  // baseURL = 'https://api.castr.io'
   return baseURL
 }
