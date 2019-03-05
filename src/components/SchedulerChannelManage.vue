@@ -259,7 +259,7 @@ export default {
         this.scheduledDateTime = new Date(datetime).toISOString();
       }
     }
-    console.log(this.savedSchedulerConfig, this.scheduleMode, this.scheduledDateTime)
+    // console.log(this.savedSchedulerConfig, this.scheduleMode, this.scheduledDateTime)
 
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Page", this.stream);

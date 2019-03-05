@@ -191,8 +191,16 @@
               <div v-else-if="!streamAlive" class="video-thumb placeholder">
                 <VueCountdown v-if="savedSchedulerConfigParent && savedSchedulerConfigParent.datetime && savedSchedulerConfigParent.mode === 'datetime'" :time="savedSchedulerConfigParent.datetime-(new Date().getTime())">
                   <template slot-scope="props">
-                    <p class="text-center">Stream will start in</p>
-                    <p>{{ props.days }} days, {{ props.hours }} hours, {{ props.minutes }} minutes, {{ props.seconds }} seconds.</p>
+                    <!-- <p class="text-center">Stream will start in</p> -->
+                    <p class="text-center">
+                      Ready to &nbsp;
+                      <button class="btn btn-danger">
+                        <i class="fa fa-video"></i>&nbsp;
+                        <b>LIVE</b>
+                      </button>
+                      &nbsp; in
+                    </p>
+                    <p>{{ props.days }} <small>days</small> {{ props.hours }} <small>hours</small> {{ props.minutes }} <small>mins</small> {{ props.seconds }} <small>secs</small></p>
                   </template>
                 </VueCountdown>
                 <p v-else>No stream</p>
