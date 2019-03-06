@@ -329,17 +329,18 @@
                     @modal-confirm="unsetStreamPullUrl"></confirm-modal>
     
 
-     <alert-modal modal-id="alert-mixer-pull"
-                  message="Mixer pull is not available in this region. Please use any regions in the US and it will not impact the quality of the stream"
-                  okText="Got it"></alert-modal>
-
-                   <!-- message="This Feature is not included in current subscription. Please upgrade your subscription " -->
-                   <!-- message="Feature is not included in your current subscription. Please upgrade your subscription plan to continue." -->
+    <!-- message="Feature is not included in your current subscription. Please upgrade your subscription plan to continue." -->
+    <confirm-modal modal-id="upgrade-for-pull"
+                   message="Pull is not available in trial, if you would like to test the pull feature contact us"
+                   okText="Upgrade Now"
+                   cancelText="Later"
+                   @modal-confirm="navigateToPayments()"></confirm-modal>
+    
     <confirm-modal modal-id="feature-upgrade"
                    message="Please upgrade your subscription plan to access this feature"
                    okText="Upgrade Now"
                    cancelText="Later"
-                   @modal-confirm="navigateToBilling()"></confirm-modal>
+                   @modal-confirm="navigateToPayments()"></confirm-modal>
   </div>
 </template>
 
@@ -466,7 +467,7 @@ export default {
     }
   },
   methods: {
-    navigateToBilling () {
+    navigateToPayments () {
       // /manage/billing?category=live
       this.$router.push({ name: 'Payments', query: { category: 'live', action: 'upgrade' } })
       // this.$root.$emit('bv::show::modal', 'feature-upgrade')
@@ -519,20 +520,6 @@ export default {
     onPullUrlChange() {
       this.streamPullError = false;
     },
-    isMixerPullAuthorized() {
-      const exlcudedRegions = ["br"];
-      const curRegion = this.stream.region.identifier;
-
-      let bypassed = true;
-      for (let i = 0; i < exlcudedRegions.length; i++) {
-        if (curRegion === exlcudedRegions[i]) {
-          bypassed = false;
-          break;
-        }
-      }
-
-      return bypassed;
-    },
     canSavePullUrl() {
       let canSave = false;
       // check for valid input
@@ -564,23 +551,6 @@ export default {
         this.streamSourceType = SourceTypes.Pull;
       });
     },
-    requestMixerUsername() {
-      // const res = await IntegrationService.getMixerFTLUrl('tidy')
-      if (!this.isMixerPullAuthorized()) {
-        this.$root.$emit("bv::show::modal", "alert-mixer-pull");
-        return;
-      }
-
-      this.$root.$emit("bv::show::modal", "modal-mixer-username");
-    },
-    async onMixerUsername(mixerUsername, ackCB) {
-      // console.log('mixerUsername', mixerUsername)
-      const res = await IntegrationService.getMixerFTLUrl(mixerUsername);
-      ackCB(!res.mixerPullURL);
-
-      const { mixerPullURL } = res;
-      this.streamPullUrl = mixerPullURL;
-    },
     setPullSourceStatus() {
       let status = this.streamAlive;
       this.pullSourceWorking = status;
@@ -593,21 +563,7 @@ export default {
     async setStreamPullUrl() {
       this.streamPullError = false;
 
-      // setTimeout(() => {
-      //   this.streamSourceType = SourceTypes.Publish
-      // })
-
       const pullSource = this.streamPullUrl;
-
-      if (isMixerFTLSource(pullSource) && !this.isMixerPullAuthorized()) {
-        this.$root.$emit("bv::show::modal", "alert-mixer-pull");
-        return;
-      }
-      
-      if (trial) {
-        this.$root.$emit("bv::show::modal", "alert-mixer-pull");
-        return;
-      }
 
       let sub = this.userSubscription;
       if (!sub) {
@@ -628,7 +584,8 @@ export default {
 
       // if (!isRTMPSource(pullSource) && /trial/gi.test(baseSub.package.name)) {
       if (/trial/gi.test(baseSub.package.name)) {
-        this.$root.$emit('bv::show::modal', 'feature-upgrade')
+        // this.$root.$emit('bv::show::modal', 'feature-upgrade')
+        this.$root.$emit('bv::show::modal', 'upgrade-for-pull')
         return
       }
 
@@ -1103,11 +1060,6 @@ function flushBlobUrl(blob) {
 
 function isValidUrl(url) {
   return /^(tshttp|http|https|ftp|ftps|hls|rtsp|rtmp|mpegts)\:\/\//gi.test(url);
-}
-
-function isMixerFTLSource(pullUrl) {
-  // return /^https?\:\/\/(www\.)?mixer\.com/gi.test(pullUrl)
-  return /^https?\:\/\/((\w+)\.)?mixer\.com/gi.test(pullUrl);
 }
 
 function isRTSPSource(pullUrl) {
