@@ -118,6 +118,7 @@
                         v-model="scheduledDateTime"
                         input-class="datetime-input"
                         :min-datetime="minScheduleDateTime"
+                        @focus="setMinScheduleDateTime"
                         style="cursor:pointer"
                       ></datetime>
                     </div>
@@ -189,11 +190,12 @@
           You are using a Trial plan with limit events slots.
           Please <router-link to="/subscribe?category=scheduled&action=upgrade">upgrade</router-link> to remove this cap.
         </div>-->
+          <!-- :savedSchedulerConfigParent="savedSchedulerConfig" -->
         <router-view
           :stream="stream"
           :streamAlive="streamAlive"
           :mediaPulse="mediaPulse"
-          :savedSchedulerConfigParent="savedSchedulerConfig"
+          :scheduleConfig="savedSchedulerConfig"
           :subscription="baseSubscription"
           @stream-updated="onStreamUpdates"
         ></router-view>
@@ -259,7 +261,8 @@ export default {
         this.scheduledDateTime = new Date(datetime).toISOString();
       }
     }
-    // console.log(this.savedSchedulerConfig, this.scheduleMode, this.scheduledDateTime)
+    
+    this.setMinScheduleDateTime()
 
     // event tracking
     window.trackEvent(this.stream.name + " - Stream Page", this.stream);
@@ -281,6 +284,7 @@ export default {
       // scheduledDateTime: new Date(Date.now() + (3600000)).toISOString(),
       scheduledDateTime: null,
       schedulerConfigProcessing: false,
+      minScheduleDateTime: null,
 
       statusProcessing: false,
       scopeAlive: true,
@@ -338,13 +342,10 @@ export default {
       },
     };
   },
-  computed: {
-    minScheduleDateTime () {
-      let minTime = new Date(Date.now() + 180*1000)
-      return minTime.toISOString()
-    }
-  },
   methods: {
+    setMinScheduleDateTime () {
+      this.minScheduleDateTime = new Date(Date.now() + 180*1000).toISOString()
+    },
     setScheduleMode (mode) {
       this.scheduleMode = mode
     },

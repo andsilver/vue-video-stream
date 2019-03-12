@@ -182,31 +182,82 @@
           </b-col>
           <b-col class="preveiw-container">
             <div class="video-wrapper">
+              <!-- {{scheduledCountdownSecs}} -->
               <div v-if="!stream.enabled" class="video-thumb placeholder">
                 <p class="text-center">
                   Disabled Stream<br>
                   <span style="font-size:13px;opacity:0.7;">( Please enable )</span>
                 </p>
               </div>
-              <div v-else-if="!streamAlive" class="video-thumb placeholder">
-                <VueCountdown v-if="savedSchedulerConfigParent && savedSchedulerConfigParent.datetime && savedSchedulerConfigParent.mode === 'datetime'" :time="savedSchedulerConfigParent.datetime-(new Date().getTime())">
+
+              <div v-else-if="isScheduled && !scheduleTimeActive" class="video-thumb placeholder">
+                <VueCountdown :time="countdownSecsLeft"
+                              :emitEvents="true"
+                              @progress="onScheduleCountdownTick"
+                              @end="onScheduleCountdownTick(null, true)">
                   <template slot-scope="props">
                     <!-- <p class="text-center">Stream will start in</p> -->
-                    <p class="text-center">
-                      Ready to &nbsp;
-                      <button class="btn btn-danger">
+                    <div class="text-center" style="font-size:16px;">
+                      <!-- Ready to go LIVE&nbsp; -->
+                      Stream will go Live in
+                      <!-- <button class="btn btn-danger">
                         <i class="fa fa-video"></i>&nbsp;
                         <b>LIVE</b>
                       </button>
-                      &nbsp; in
-                    </p>
-                    <p>{{ props.days }} <small>days</small> {{ props.hours }} <small>hours</small> {{ props.minutes }} <small>mins</small> {{ props.seconds }} <small>secs</small></p>
+                      &nbsp;  -->
+                      <!-- in -->
+                    </div>
+                    <p class="text-center" style="font-size:22px;">
+                      <span v-show="props.days">{{ props.days | paddStart(2) }} <small>days</small></span> 
+                      <span v-show="props.hours || props.days">{{ props.hours | paddStart(2) }} <small>hours</small></span> 
+                      <span v-show="props.minutes || props.hours || props.days">{{ props.minutes | paddStart(2) }} <small>mins</small></span> 
+                      <span>{{ props.seconds | paddStart(2) }} <small>secs</small></span> 
+                      <!-- {{ props.hours }} <small>hours</small> 
+                      {{ props.minutes }} <small>mins</small> 
+                      {{ props.seconds }} <small>secs</small> -->
+                   </p>
                   </template>
                 </VueCountdown>
-                <p v-else>No stream</p>
+                <!-- <p v-else>No stream</p> -->
               </div>
 
-              <stream-player v-else :stream="stream" class="video-thumb" />
+              <div v-else-if="!streamAlive" class="video-thumb placeholder text-center">
+                <!-- <p v-if="scheduledCountdownSecs > -5" class="">
+                  Starting stream now ..
+                </p>
+                <p v-else-if="scheduledCountdownSecs > -15">
+                  Checking stream health ..
+                </p> -->
+                <!-- <p v-else> -->
+                <p>
+                  <!-- Stream has Ended -->
+                  Waiting for Stream
+                  <br>
+                  <span style="font-size:13px;opacity:0.7;">Stream had ended or source not found</span>
+                </p>
+              </div>
+
+              <!-- <div v-else-if="!streamAlive" class="video-thumb placeholder">
+                <p class="text-center">
+                  Stream has Ended
+                  <br>
+                  <span style="font-size:13px;opacity:0.7;">( Please Reschedule )</span>
+                </p>
+              </div> -->
+              
+              <div v-else-if="!streamAlive" class="video-thumb placeholder">
+                <p>Waiting For Stream</p>
+              </div>
+              
+              <stream-player v-else :stream="stream" :mediaPulse="mediaPulse" class="video-thumb" />
+              
+              <!-- <div v-else :stream="stream" class="video-thumb" >
+                <p class="text-center">
+                  Waiting
+                  <br>
+                  <span style="font-size:13px;opacity:0.7;">( Please Reschedule )</span>
+                </p>
+              </div> -->
 
             </div>
           </b-col>
@@ -263,9 +314,11 @@ export default {
     stream: Object,
     streamAlive: Boolean,
     mediaPulse: Object,
-    savedSchedulerConfigParent: {
+    scheduleConfig: {
       type: Object,
-      default: {}
+      default () {
+        return {}
+      }
     }
   },
   beforeRouteLeave (to, from, next) {
@@ -282,6 +335,9 @@ export default {
   watch: {
     mediaPulse () {
       this.onMediaPulseChanged()
+    },
+    scheduleConfig () {
+      this.onScheduleCountdownTick()
     }
   },
   data() {
@@ -296,6 +352,12 @@ export default {
       groupToggleState: false,
       windowHeight: 0,
       configurablePlatform: {},
+
+      scheduleTimeActive: false,
+      scheduledCountdownTime: null,
+      scheduledCountdownSecs: null,
+      scheduledCountdownSecsTimeout: null,
+
       isCustomPlatform(platform) {
         return platform.template === "custom";
       },
@@ -327,7 +389,33 @@ export default {
       }
     }
   },
+  computed: {
+    isScheduled () {
+      let conf = this.scheduleConfig
+      return conf && conf.mode === 'datetime' && conf.datetime
+    },
+    countdownSecsLeft () {
+      let value = this.scheduleConfig.datetime - Date.now()
+      return Math.max(value, 0)
+    },
+  },
   methods: {
+    onScheduleCountdownTick (value, forceEnded) {
+      if (!this.scheduleConfig) return
+      // console.log('countdown value', value, 'forceEnded', forceEnded)
+
+      let offset = 0
+      if(!forceEnded) {
+        offset = this.scheduleConfig.datetime - Date.now()
+        offset /= 1000
+  
+        if (value) offset = value.totalSeconds
+      }
+
+      this.scheduleTimeActive = offset <= 0
+      // console.log('scheduleTimeActive', this.scheduleTimeActive, offset)
+
+    },
     async saveSchedulerConfig () {
 
       this.schedulerConfigProcessing = true;
@@ -343,7 +431,7 @@ export default {
         if (this.scheduleMode === 'datetime')
           updatedConfig.datetime = this.scheduledDateTime;
 
-        this.savedSchedulerConfig = updatedConfig;
+        // this.savedSchedulerConfig = updatedConfig;
 
       } catch(e) {
         this.$notify({ group: 'error', text: 'Could not update scheduler settings' });
