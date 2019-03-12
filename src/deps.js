@@ -89,4 +89,16 @@ export default function(vueInstance) {
     // copied from https://github.com/sindresorhus/pretty-bytes
     return _.capitalize(text)
   })
+
+  vueInstance.filter('paddStart', function(text, maxLen, char = '0') {
+    return _.padStart(text, maxLen, char)
+  })
+
+  vueInstance.filter('paddEnd', function(text, maxLen, char = '0') {
+    return _.padEnd(text, maxLen, char)
+  })
+  
+  vueInstance.filter('max', function(value, cmpValue) {
+    return Math.max(value, cmpValue)
+  })
 }
