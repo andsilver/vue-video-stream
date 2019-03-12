@@ -27,7 +27,8 @@ Vue.use(VueClipboard)
 Vue.use(Notifications)
 Vue.use(BootstrapVue)
 Vue.use(Datetime)
-Vue.use(VueSocketio, 'https://www.haxr.io:1330/')
+// Vue.use(VueSocketio, 'https://www.haxr.io:1330/')
+Vue.use(VueSocketio, 'https://haxr.castr.io:1330/')
 Vue.use(VueLocalStorage, { name: 'localStorage', bind: true })
 const options = {
   // old keys
